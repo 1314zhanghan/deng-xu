@@ -1,2 +1,16 @@
-allowBuilds:
-  esbuild: true
+# 这个文件刻意只留注释。
+#
+# 原因：这里原本放着
+#     allowBuilds:
+#       esbuild: true
+# 那是 pnpm 10+ 才支持的字段。GitHub Actions 的 pnpm/action-setup 装的是
+# pnpm 9，读到未知字段后 `pnpm store path` 会直接报
+#     ERROR  packages field missing or empty
+# 于是 CI 在 setup-node 阶段就挂了 —— 而本地用新版 pnpm 完全正常，
+# 所以这个问题只会在 CI 上暴露，很容易漏掉。
+#
+# 允许 esbuild 执行安装脚本的配置改放在 .npmrc：
+#     only-built-dependencies[]=esbuild
+# 这个写法在 pnpm 9 / 10 / 11 上都有效。
+#
+# 注意：不要删除本文件，它是 pnpm 识别工作区根目录的锚点之一。

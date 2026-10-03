@@ -29,7 +29,11 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          # 锁到 10，和本地开发用的大版本一致。
+          # 原本写 9，结果 pnpm-workspace.yaml 里一个 10+ 才认的字段
+          # 让 CI 在 setup-node 阶段就报 "packages field missing or empty" ——
+          # 本地正常、CI 挂掉，很难排查。锁一致版本可以避免这类差异。
+          version: 10
 
       - name: Setup Node
         uses: actions/setup-node@v4

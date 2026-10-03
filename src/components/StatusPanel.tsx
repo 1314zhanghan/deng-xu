@@ -2,6 +2,7 @@ import { useGameStore } from '@/stores/game';
 import { useUIStore } from '@/stores/ui';
 import { useSessionStore } from '@/stores/session';
 import { CharacterAvatar } from '@/components/CharacterAvatar';
+import { CharacterSprite } from '@/components/CharacterSprite';
 import {
   Sparkles,
   Zap,
@@ -42,14 +43,31 @@ export function StatusPanel({ className = '' }: StatusPanelProps) {
       <section className="space-y-3">
         <h3 className="text-xs font-serif text-text-muted uppercase tracking-[0.2em] border-b border-text-muted/20 pb-2">角色</h3>
         <div className="flex items-center gap-3 p-3 bg-black/20 rounded-sm border border-text-muted/10">
-          <CharacterAvatar
-            name={playerName || '主角'}
-            id={playerAvatarSeed}
-            avatar={playerAvatar}
-            style={world?.avatarStyle}
-            tone={world?.avatarTone}
-            size={44}
-          />
+          {/*
+            头像优先级与人物关系栏保持一致：
+            角色卡自带图片 > LPC 像素立绘。
+            以前这里固定用几何 SVG 头像，导致同一角色在关系栏是像素立绘、
+            在状态栏是几何头 —— 两套视觉语言并存，是本项目最刺眼的观感问题。
+          */}
+          {playerAvatar ? (
+            <CharacterAvatar
+              name={playerName || '主角'}
+              id={playerAvatarSeed}
+              avatar={playerAvatar}
+              style={world?.avatarStyle}
+              tone={world?.avatarTone}
+              size={48}
+            />
+          ) : (
+            <CharacterSprite
+              name={playerName || '主角'}
+              seed={playerAvatarSeed}
+              gender={playerGender}
+              headOnly
+              scale={4}
+              className="w-12 h-12 shrink-0 rounded border border-text-muted/25 bg-black/30"
+            />
+          )}
           <div className="min-w-0 flex-1">
             <div className="text-sm font-serif text-text-primary truncate" title={playerName}>
               {playerName || '未命名'}
