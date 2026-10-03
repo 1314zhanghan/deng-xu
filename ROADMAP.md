@@ -16,17 +16,34 @@
 | **4** | 截断检测 | 成对符号未闭合、结尾停在连接词＝强证据；结尾是句中标点或明显过短＝弱证据。**宁可漏报不可误报** |
 | **5** | 世界包导出 | 世界卡连同内嵌角色卡打包，可选附带存档（默认不带）；导入复用 `library.importWorlds` 的 id 冲突处理 |
 | **6** | 场景改像素风 | 160×90 逻辑分辨率 + 共享 16 色限色板 + Bayer 抖动，与 LPC 立绘风格统一 |
+| **7** | 世界书格式 | 成套设定集（多世界 + 章节 + 署名 + 标签）；构建时从内置世界生成 `public/official-worldbook.json`，用户可下载当范例或直接导入回来 |
+| **8** | 归档改按体积触发 | 原先只按条数（120），啰嗦模型一次两三千字仍会撞 5MB 配额；现在条数 + 体积双重判断，体积吃紧时热数据压到一半 |
+| **9** | 无障碍 | 叙事区加 `role="log"` + `aria-live="polite"`，读屏终于能收到内容 |
+| **10** | 端到端审计脚本 | `npm run audit:live` —— 对线上或本地走查标题页/资源/开局/立绘/移动端，25 项断言 |
 
 ### 这一轮踩过的坑（都值得记住）
 
-1. **CI 两次挂在"本地正常、CI 挂掉"的问题上**
-   - `pnpm-workspace.yaml` 里的 `allowBuilds` 是 pnpm 10+ 字段，而 CI 装 pnpm 9 → `pnpm store path` 报 `packages field missing or empty`
-   - `package.json` 被 PowerShell 的 `Set-Content -Encoding UTF8` 写入了 **BOM** → `pnpm/action-setup` 解析 JSON 直接失败（Node 的 `JSON.parse` 容错，所以本地看不出）
+1. **CI 三次挂在"本地正常、CI 挂掉"**
+   - `pnpm-workspace.yaml` 的 `allowBuilds` 是 pnpm 10+ 字段，而 CI 装 pnpm 9
+   - `package.json` 被 PowerShell `Set-Content -Encoding UTF8` 写入 **BOM** → `pnpm/action-setup` 解析失败（Node 容错，本地看不出）
+   - **`esbuild` 是 vite 的传递依赖**，pnpm 严格布局下根 `node_modules/.bin` 里没有它 → `sh: esbuild: not found`
 
 2. **场景 9 个原型看起来一模一样，查了三层**
-   - 第一层：误判为"画法问题" → 其实是**明度基调全压在调色板最暗 4 档**，山/树/楼/柱糊成一块灰
-   - 第二层：缓存键只按 `id|style` → **不传 asset 的调用会把 `interior` 缓存住**，之后传什么都不生效
-   - 第三层：我的画廊脚本按标签过滤 + `slice(0,6)`，只拿到了室内和街道 —— **"全都一样"有一半是测试脚本造成的**
+   - 明度基调全压在调色板最暗 4 档 → 山/树/楼/柱糊成一块灰
+   - 缓存键只按 `id|style` → 不传 asset 的调用把 `interior` 缓存住
+   - 我的画廊脚本按标签过滤 + `slice(0,6)`，只拿到室内和街道
+
+3. **审计脚本连续误报四次，全是脚本自己的问题**
+   - API Key 弹窗遮住标题页 → `innerText` 对不可见元素返回空串
+   - 复用浏览器 profile → 残留的 `isGameStarted: true` 让 `StartScreen` 直接 `return null`，标题页根本不渲染（为这一个 ✗ 查了四轮）
+   - 用 `innerText.length > 50` 当"渲染正常"的判据 → 手机端内容在折叠面板里，真实长度只有 46
+   - 对生产构建用 `__gameStore` → 调试钩子被有意 tree-shake 掉了
+
+   **共同教训：断言失败时，先怀疑断言，再怀疑被测代码。**
+
+4. **不要用 PowerShell 的字符串替换改代码文件**
+   - 反引号在 PowerShell 里是转义符，`` `t `` 会变成制表符，把 `` `typeof ...` `` 毁成 `	ypeof ...`
+   - 本轮因此弄坏了两个文件。改代码一律用编辑工具。
 
 ---
 

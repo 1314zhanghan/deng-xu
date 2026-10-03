@@ -9,3 +9,5 @@ __pycache__/
 .tools/
 
 .check/
+
+audit-shots/

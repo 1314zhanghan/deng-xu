@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "audit:live": "node scripts/checks/audit.mjs",
     "gen:worldbook": "esbuild src/data/builtinWorlds.ts --bundle --platform=node --format=esm --outfile=.check/worlds.mjs --alias:@=./src --log-level=error && node scripts/gen-worldbook.mjs public .check/worlds.mjs",
     "check:errors": "esbuild scripts/checks/errors.ts --bundle --platform=node --format=esm --outfile=.check/errors.mjs --alias:@=./src && node .check/errors.mjs",
     "check:retry": "esbuild scripts/checks/retry.ts --bundle --platform=node --format=esm --outfile=.check/retry.mjs --alias:@=./src && node .check/retry.mjs",
