@@ -13,6 +13,7 @@ import { ApiKeyModal } from '@/components/ApiKeyModal'
 import { SessionSetup } from '@/components/SessionSetup'
 import { lazyWithRetry } from '@/utils/lazyWithRetry'
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
+import { SaveManager } from '@/components/SaveManager'
 
 /**
  * 世界卡编辑器懒加载。
@@ -572,6 +573,15 @@ export function StartScreen() {
           完整署名
         </a>
       </footer>
+
+      {/*
+        存档管理入口。
+        放在标题界面而不是设置里：这是「数据安全」入口，要能被随手看到 ——
+        存档只在本机，配额满了之后写入会静默失败，用户需要一条自救路径。
+      */}
+      <div className="relative z-10 px-6 pb-4 max-w-xl mx-auto w-full">
+        <SaveManager />
+      </div>
     </div>
   )
 }
