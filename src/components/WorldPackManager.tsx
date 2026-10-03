@@ -1,0 +1,179 @@
+import { useRef, useState } from 'react'
+import { Package, PackagePlus, Check, X, AlertTriangle } from 'lucide-react'
+import { useLibraryStore } from '@/stores/library'
+import { exportPack, importPackFile } from '@/utils/worldPack'
+import { collectSave } from '@/utils/saveFile'
+
+/**
+ * 世界包导出 / 导入。
+ *
+ * 与「存档」入口的分工：
+ *  - 存档   = 备份**进度**（换设备继续玩）
+ *  - 世界包 = 备份 / 分享**创作**（世界卡及其内嵌的角色卡）
+ *
+ * 两点实现上的取舍（都是我一开始想错、看了代码才改的）：
+ *
+ * 1. **角色卡不是独立集合**。这个项目里角色卡嵌在 `WorldCard.characters` 里，
+ *    library store 也只有 `worlds`。所以导出世界卡就等于带上了它的角色卡，
+ *    不存在"另外再挑一批角色卡"这回事。
+ *
+ * 2. **冲突策略不在这里做**。`library.importWorlds` 已经处理了 id 撞车
+ *    （给导入的卡换新 id，而不是覆盖本地那张）。导入时应该复用它 ——
+ *    自己再实现一套"覆盖/跳过"只会和既有行为打架。
+ */
+export function WorldPackManager() {
+  const worlds = useLibraryStore(s => s.worlds)
+  const exportAll = useLibraryStore(s => s.exportAll)
+  const importWorlds = useLibraryStore(s => s.importWorlds)
+
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [includeSave, setIncludeSave] = useState(false)
+  const [msg, setMsg] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const toggle = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const allSelected = worlds.length > 0 && selected.size === worlds.length
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(worlds.map(w => w.id)))
+
+  const charCount = (w: (typeof worlds)[number]) => (w.characters || []).length
+
+  const handleExport = async () => {
+    // 没勾任何一张时默认导出全部 —— 比弹一句"请先勾选"更顺手
+    const picked = selected.size ? worlds.filter(w => selected.has(w.id)) : exportAll()
+    if (!picked.length) {
+      setMsg({ kind: 'err', text: '卡片库里没有可导出的世界卡' })
+      return
+    }
+    try {
+      const save = includeSave ? await collectSave() : undefined
+      const { bytes, filename } = exportPack({ worlds: picked, allCharacters: [], save })
+      setMsg({
+        kind: 'ok',
+        text: `已导出 ${filename}（${Math.round(bytes / 1024)} KB，${picked.length} 个世界）`,
+      })
+    } catch (e) {
+      setMsg({ kind: 'err', text: `导出失败：${(e as Error)?.message || e}` })
+    }
+  }
+
+  const handleImport = async (file: File | undefined) => {
+    if (!file) return
+    const r = await importPackFile(file)
+    if (!r.ok) {
+      setMsg({ kind: 'err', text: r.error || '导入失败' })
+      return
+    }
+    try {
+      // 复用 store 的导入：它会为撞车的 id 生成新 id，不会覆盖你本地的卡
+      const imported = await importWorlds(r.worlds || [])
+      const chars = (r.worlds || []).reduce((n, w) => n + ((w.characters || []).length), 0)
+      setMsg({
+        kind: 'ok',
+        text: `导入完成：新增 ${imported.length} 个世界（含 ${chars} 张角色卡）。`
+          + '若与原卡片 id 相同，已自动分配新 id 而不会覆盖你的卡。'
+          + (r.note ? '　' + r.note : ''),
+      })
+    } catch (e) {
+      setMsg({ kind: 'err', text: `写入失败：${(e as Error)?.message || e}` })
+    }
+  }
+
+  return (
+    <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-serif text-text-muted uppercase tracking-[0.2em] flex items-center gap-1.5">
+          <Package size={12} /> 世界包
+        </span>
+        {worlds.length > 0 && (
+          <button onClick={toggleAll} className="text-[10px] text-text-muted hover:text-accent-lantern transition-colors">
+            {allSelected ? '取消全选' : '全选'}
+          </button>
+        )}
+      </div>
+
+      <p className="text-[10px] text-text-muted leading-relaxed">
+        把世界卡连同它的角色卡打包成一个文件，便于备份或分享。
+        {selected.size === 0 && worlds.length > 0 && '未勾选时默认导出全部。'}
+        <br />
+        与「存档」的区别：存档是<b>进度</b>，世界包是<b>创作</b>。
+      </p>
+
+      {worlds.length === 0 ? (
+        <div className="text-[10px] text-text-muted italic">卡片库里还没有世界卡。</div>
+      ) : (
+        <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
+          {worlds.map(w => {
+            const on = selected.has(w.id)
+            const n = charCount(w)
+            return (
+              <label
+                key={w.id}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded border cursor-pointer transition-colors text-[11px]
+                  ${on ? 'bg-accent-lantern/10 border-accent-lantern/40' : 'border-text-muted/20 hover:border-text-muted/40'}`}
+              >
+                <input type="checkbox" checked={on} onChange={() => toggle(w.id)} className="accent-yellow-500 shrink-0" />
+                <span className={`truncate ${on ? 'text-accent-lantern' : 'text-text-secondary'}`}>{w.title}</span>
+                {w.builtin && <span className="text-[9px] text-text-muted/70 shrink-0">内置</span>}
+                {n > 0 && <span className="text-[9px] text-text-muted shrink-0 ml-auto">{n} 角色</span>}
+              </label>
+            )
+          })}
+        </div>
+      )}
+
+      <label className="flex items-start gap-2 cursor-pointer">
+        <input type="checkbox" checked={includeSave} onChange={e => setIncludeSave(e.target.checked)}
+          className="mt-0.5 accent-yellow-500 shrink-0" />
+        <span className="text-[10px] text-text-secondary leading-relaxed">
+          <b className="text-text-primary">附带当前存档</b><br />
+          勾上会把正在进行的进度也打进包里（用于换设备继续玩）。
+          <b>分享给他人时建议不要勾</b> —— 那会把你的游玩记录一起发出去。
+        </span>
+      </label>
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => { void handleExport() }}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors"
+        >
+          <Package size={12} /> 导出世界包
+        </button>
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors"
+        >
+          <PackagePlus size={12} /> 导入世界包
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".json,application/json"
+          className="hidden"
+          onChange={e => { void handleImport(e.target.files?.[0]); e.target.value = '' }}
+        />
+      </div>
+
+      {includeSave && (
+        <div className="flex items-start gap-1.5 text-[10px] text-amber-300 leading-relaxed">
+          <AlertTriangle size={11} className="mt-0.5 shrink-0" />
+          <span>已选择附带存档 —— 分享前请确认这是你要的。</span>
+        </div>
+      )}
+
+      {msg && (
+        <div className={`flex items-start gap-1.5 text-[10px] leading-relaxed ${msg.kind === 'ok' ? 'text-emerald-400' : 'text-red-400'}`}>
+          {msg.kind === 'ok' ? <Check size={11} className="mt-0.5 shrink-0" /> : <X size={11} className="mt-0.5 shrink-0" />}
+          <span>{msg.text}</span>
+        </div>
+      )}
+    </div>
+  )
+}

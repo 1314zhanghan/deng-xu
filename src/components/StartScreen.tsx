@@ -14,6 +14,7 @@ import { SessionSetup } from '@/components/SessionSetup'
 import { lazyWithRetry } from '@/utils/lazyWithRetry'
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SaveManager } from '@/components/SaveManager'
+import { WorldPackManager } from '@/components/WorldPackManager'
 
 /**
  * 世界卡编辑器懒加载。
@@ -581,6 +582,7 @@ export function StartScreen() {
       */}
       <div className="relative z-10 px-6 pb-4 max-w-xl mx-auto w-full">
         <SaveManager />
+        <WorldPackManager />
       </div>
     </div>
   )

@@ -43,7 +43,9 @@ function App() {
     debugDataInput,
     debugDataOutput,
     isInputAllowed,
-    lastError
+    lastError,
+    truncationWarning,
+    clearTruncationWarning
   } = useGameEngine()
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -189,6 +191,34 @@ function App() {
                 <RelationshipPanel className="h-auto overflow-visible border-none p-0 bg-transparent" />
               )}
             </div>
+          </div>
+        )}
+
+        {/*
+          截断提示。
+          与错误条分开：这一轮是**成功生成**的，只是可能没写完 ——
+          用琥珀色警告而不是红色错误，并且可以关掉（玩家可能觉得这段没问题）。
+        */}
+        {truncationWarning && !lastError && (
+          <div className="flex items-start gap-2 px-4 py-2 text-xs bg-amber-900/20 border-b border-amber-900/40 text-amber-300">
+            <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+            <span className="leading-relaxed flex-1 min-w-0">
+              {truncationWarning}
+            </span>
+            <button
+              onClick={() => retryLastAction()}
+              disabled={isProcessing}
+              className="shrink-0 px-2 py-0.5 text-[10px] border border-amber-400/40 rounded hover:bg-amber-500/15 transition-colors disabled:opacity-40"
+            >
+              {isProcessing ? '处理中…' : '重新生成'}
+            </button>
+            <button
+              onClick={() => clearTruncationWarning()}
+              className="shrink-0 p-0.5 text-amber-400/70 hover:text-amber-200 transition-colors"
+              title="忽略"
+            >
+              <X size={12} />
+            </button>
           </div>
         )}
 

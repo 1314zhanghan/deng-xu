@@ -15,6 +15,7 @@ import { storySystem } from '@/systems/StorySystem'
 import { pickAvatarId } from '@/utils/avatarArt'
 import { isKnownSceneId } from '@/utils/sceneArt'
 import { LlmError, classifyLlmError } from '@/api/llmErrors'
+import { detectTruncation } from '@/utils/truncation'
 import {
   needsArchive,
   isHistoryPressureHigh,
@@ -78,6 +79,9 @@ interface GameEngineReturn {
   isProcessing: boolean
   isAnalyzingData: boolean
   lastError: string | null
+  /** 疑似截断的提示（非错误，可关闭） */
+  truncationWarning: string | null
+  clearTruncationWarning: () => void
   currentOptions: any[]
   streamingContent: string | null
   streamingReasoning: string | null
@@ -93,6 +97,12 @@ export function useGameEngine(): GameEngineReturn {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isAnalyzingData, setIsAnalyzingData] = useState(false)
   const [lastError, setLastError] = useState<string | null>(null)
+  /**
+   * 截断提示。
+   * 与 lastError 分开：这不是"失败"，这一轮是成功生成的，
+   * 只是可能没写完 —— 用警告样式而不是错误样式，可关闭。
+   */
+  const [truncationWarning, setTruncationWarning] = useState<string | null>(null)
   const [streamingContent, setStreamingContent] = useState<string | null>(null)
   const [streamingReasoning, setStreamingReasoning] = useState<string | null>(null)
   const [turnCount, setTurnCount] = useState(0)
@@ -638,6 +648,20 @@ export function useGameEngine(): GameEngineReturn {
 
       if (!fullNarrative.trim()) throw new Error('模型返回了空内容，请检查模型名称与接口地址。')
 
+      /*
+        截断检测。
+        模型可能在句子中间被切断（max_tokens 用尽、流被中断），
+        返回的既不是空串也不是错误，而是一段"看起来正常但停在半句"的文本 ——
+        它会照原样进入历史与下一轮上下文，故事里凭空多一个断句，
+        而玩家完全不知道为什么。这里标出来让他决定要不要重新生成。
+      */
+      const trunc = detectTruncation(fullNarrative, activeWorld?.narrative?.replyLength)
+      if (trunc.truncated) {
+        setTruncationWarning(trunc.reason || '这段叙事可能没有写完')
+      } else {
+        setTruncationWarning(null)
+      }
+
       useGameStore.getState().addHistory({ role: 'assistant', content: fullNarrative, timestamp: Date.now() })
       setStreamingContent(null)
       setStreamingReasoning(null)
@@ -788,6 +812,8 @@ export function useGameEngine(): GameEngineReturn {
     isProcessing,
     isAnalyzingData,
     lastError,
+    truncationWarning,
+    clearTruncationWarning: () => setTruncationWarning(null),
     currentOptions: store.currentOptions,
     streamingContent,
     streamingReasoning,
