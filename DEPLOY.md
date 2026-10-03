@@ -63,7 +63,10 @@ Get-NetAdapter | Where-Object InterfaceDescription -like "*AdGuard*"
 
 ## 线上地址（已发布）
 
-# 🎮 https://ai-rp-engine.surge.sh
+# 🎮 https://fyjsj-zh.github.io/deng-xu/
+
+（旧地址 https://ai-rp-engine.surge.sh 仍在，但 surge 免费版会掐断大文件传输、
+且连接复用会失效，已改为 GitHub Pages 为主。）
 
 任何人打开这个网址就能用。首次打开会弹「模型设置」，填自己的 API Key 即可开始。
 

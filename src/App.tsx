@@ -196,7 +196,19 @@ function App() {
         {lastError && (
           <div className="flex items-start gap-2 px-4 py-2 text-xs bg-red-900/20 border-b border-red-900/40 text-red-300">
             <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
-            <span className="leading-relaxed">{lastError}</span>
+            <span className="leading-relaxed flex-1 min-w-0">{lastError}</span>
+            {/*
+              加一个重试出口。
+              之前这里只有文字：生成失败后玩家知道了原因，却没有任何可点的动作 ——
+              只能自己重新输入一遍行动。而 retryLastAction 早就存在、只是没接到这里。
+            */}
+            <button
+              onClick={() => retryLastAction()}
+              disabled={isProcessing}
+              className="shrink-0 px-2 py-0.5 text-[10px] border border-red-400/40 rounded hover:bg-red-500/15 transition-colors disabled:opacity-40"
+            >
+              {isProcessing ? '处理中…' : '重试'}
+            </button>
           </div>
         )}
 

@@ -14,6 +14,28 @@ import {
 import { storySystem } from '@/systems/StorySystem'
 import { pickAvatarId } from '@/utils/avatarArt'
 import { isKnownSceneId } from '@/utils/sceneArt'
+import { LlmError, classifyLlmError } from '@/api/llmErrors'
+
+/**
+ * 把引擎里抛出的任何错误转成**玩家能看懂的一句话**。
+ *
+ * 之前直接把 error.message 显示出来，于是界面上出现的是
+ * 「429 Too Many Requests - {"error":{"message":"Rate limit reached..."}}」
+ * 这种原始串 —— 玩家分不清是余额不足、Key 写错还是被限流，
+ * 而这三者的处理方式完全不同。
+ */
+function formatEngineError(error: unknown): string {
+  if (error instanceof LlmError) {
+    const { message, hint } = error.info
+    return hint ? `${message}（${hint}）` : message
+  }
+  // 非 LLM 错误（例如我们自己抛的"模型返回了空内容"）保留原文，
+  // 那些句子本来就是写给玩家看的
+  const raw = (error as Error)?.message
+  if (raw) return raw
+  const info = classifyLlmError(undefined, '', error)
+  return info.message
+}
 import { useLibraryStore } from '@/stores/library'
 
 interface GameEngineReturn {
@@ -664,7 +686,7 @@ export function useGameEngine(): GameEngineReturn {
       setIsAnalyzingData(false)
     } catch (error: any) {
       console.error('Game Engine Error:', error)
-      setLastError(error?.message || '发生未知错误。')
+      setLastError(formatEngineError(error))
       setIsAnalyzingData(false)
     } finally {
       setIsProcessing(false)

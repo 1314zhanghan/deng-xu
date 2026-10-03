@@ -1,3 +1,4 @@
+import { LlmError, classifyLlmError } from './llmErrors';
 /**
  * 通用 OpenAI 兼容 Chat Completions 封装
  *
@@ -141,6 +142,16 @@ function buildBody(opts: ChatOptions, stream: boolean): string {
 /**
  * 发起一次对话请求。
  * stream=true 时返回原始 Response（交给调用方读取 SSE），否则返回解析后的 JSON。
+ *
+ * 关于重试（这是关键设计，别退化成"失败就算了"）：
+ * 「叙事 AI」和「数据 AI」两段流水线里，任何一段因网络抖动失败，
+ * 整轮就白跑了 —— 玩家投入几十秒等待与一次 API 费用，最后只得到一句报错。
+ * 所以对**可重试**的错误（限流 / 5xx / 网络 / 超时）自动退避重试；
+ * 对**不可重试**的（Key 无效、余额不足、模型名错）立刻失败 ——
+ * 那类问题重试一百次也不会好，只会浪费时间与配额。
+ *
+ * 流式请求（stream=true）不在此处重试：SSE 一旦开始吐字就已经产生了副作用，
+ * 重试会导致叙事内容重复。它的重试放在调用方按「整轮」粒度处理。
  */
 export async function llmChat(opts: ChatOptions): Promise<any | Response> {
   const { config, stream = false, signal } = opts;
@@ -149,20 +160,75 @@ export async function llmChat(opts: ChatOptions): Promise<any | Response> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (config.apiKey) headers['Authorization'] = `Bearer ${config.apiKey}`;
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: buildBody(opts, stream),
-    signal,
-  });
+  const body = buildBody(opts, stream);
+  const maxAttempts = stream ? 1 : RETRY_MAX_ATTEMPTS;
 
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => '');
-    throw new Error(`${response.status} ${response.statusText}${errorText ? ` - ${errorText.slice(0, 500)}` : ''}`);
+  let lastErr: LlmError | null = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    // 用户已取消就别再发请求了
+    if (signal?.aborted) throw new LlmError(classifyLlmError(undefined, '', { name: 'AbortError' }));
+
+    try {
+      const response = await fetch(url, { method: 'POST', headers, body, signal });
+
+      if (response.ok) {
+        if (stream) return response;
+        return response.json();
+      }
+
+      const errorText = await response.text().catch(() => '');
+      const info = classifyLlmError(response.status, errorText);
+      lastErr = new LlmError(info);
+
+      // 不可重试 → 立刻抛出（例如 Key 无效、余额不足）
+      if (!info.retryable || attempt === maxAttempts) throw lastErr;
+
+      await backoff(attempt, signal);
+    } catch (e) {
+      // 已经是我们包装过的，直接决定是否继续
+      if (e instanceof LlmError) {
+        if (!e.info.retryable || attempt === maxAttempts) throw e;
+        lastErr = e;
+        await backoff(attempt, signal);
+        continue;
+      }
+      // 网络层异常（断网 / DNS / 连接被重置）
+      const info = classifyLlmError(undefined, '', e);
+      lastErr = new LlmError(info);
+      if (info.kind === 'aborted') throw lastErr;
+      if (!info.retryable || attempt === maxAttempts) throw lastErr;
+      await backoff(attempt, signal);
+    }
   }
 
-  if (stream) return response;
-  return response.json();
+  throw lastErr || new LlmError(classifyLlmError(undefined, '', '未知错误'));
+}
+
+/** 非流式请求的最大尝试次数（1 次原始 + 2 次重试） */
+const RETRY_MAX_ATTEMPTS = 3;
+
+/**
+ * 指数退避 + 抖动。
+ * 抖动很重要：两段流水线若同时被限流，固定间隔会让它们同步重试、继续互相挤。
+ */
+function backoff(attempt: number, signal?: AbortSignal): Promise<void> {
+  const base = 700 * Math.pow(2, attempt - 1);   // 700ms → 1400ms
+  const jitter = Math.random() * 400;
+  const ms = Math.min(base + jitter, 8000);
+
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(new LlmError(classifyLlmError(undefined, '', { name: 'AbortError' })));
+    const t = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(t);
+      reject(new LlmError(classifyLlmError(undefined, '', { name: 'AbortError' })));
+    };
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
 }
 
 export interface ParsedChunk {
