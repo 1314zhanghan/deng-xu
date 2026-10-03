@@ -15,6 +15,40 @@ import { storySystem } from '@/systems/StorySystem'
 import { pickAvatarId } from '@/utils/avatarArt'
 import { isKnownSceneId } from '@/utils/sceneArt'
 import { LlmError, classifyLlmError } from '@/api/llmErrors'
+import {
+  needsArchive,
+  isHistoryPressureHigh,
+  archiveOldMessages,
+  type HistoryMessage,
+} from '@/utils/historyArchive'
+
+/**
+ * 按需把较旧的叙事归档到 IndexedDB，让 localStorage 里的热数据保持有界。
+ *
+ * 触发条件有两个，任一满足就动手：
+ *  - 条数超过阈值（常规滚动）
+ *  - 估算体积已经偏高（提前抢救，不等配额真的写满）
+ *
+ * 归档失败时**不裁剪** —— 宁可继续撑在内存/localStorage 里并让容量警告提示用户导出，
+ * 也不能因为归档没写成功就把玩家的历史丢掉（见 historyArchive 里的说明）。
+ */
+async function maybeArchiveHistory(): Promise<void> {
+  const st = useGameStore.getState()
+  const history = st.history as HistoryMessage[]
+  if (!history?.length) return
+  if (!needsArchive(history) && !isHistoryPressureHigh(history)) return
+
+  const { hot, archived, ok } = await archiveOldMessages(history)
+  if (!ok) {
+    console.warn('[archive] 归档写入失败，保持历史不裁剪以免丢数据')
+    return
+  }
+  if (archived > 0) {
+    // 用 setState 直接替换 history：这是引擎内部的维护动作，不该走 addHistory
+    useGameStore.setState({ history: hot })
+    console.info(`[archive] 已归档 ${archived} 条旧叙事，热数据保留 ${hot.length} 条`)
+  }
+}
 
 /**
  * 把引擎里抛出的任何错误转成**玩家能看懂的一句话**。
@@ -607,6 +641,11 @@ export function useGameEngine(): GameEngineReturn {
       useGameStore.getState().addHistory({ role: 'assistant', content: fullNarrative, timestamp: Date.now() })
       setStreamingContent(null)
       setStreamingReasoning(null)
+
+      // 归档检查放在每轮叙事之后：这是 history 唯一增长的地方，
+      // 在这里查一次就能保证 localStorage 里的热数据始终有界，
+      // 不会等撞到 5MB 配额、写入静默失败之后才发现。
+      void maybeArchiveHistory()
 
       // —— 第二阶段：数据结算 ——
       useUIStore.getState().setStatusMessage('正在结算世界状态…')

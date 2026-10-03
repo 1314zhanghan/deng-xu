@@ -137,11 +137,30 @@ src/
 
 ## 许可与致谢
 
-- 本项目基于开源项目 **pale-notes** 改造，剥离了原有题材，改为题材无关。
-- **人物像素素材**来自 [Universal LPC Spritesheet Character Generator](https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator)，
-  分别以 CC0 / OGA-BY 3.0 / CC-BY-SA 3.0 发布。
-  其中 **OGA-BY 与 CC-BY-SA 强制要求署名**，完整作者名单见 [CREDITS.md](./public/CREDITS.md)。
-- 场景背景与备用头像为程序化生成的 SVG，无第三方素材。
+本项目以 **[GPL-3.0](./LICENSE)** 发布 —— 但这个结论是被约束出来的，而且**有一个保留事项**：
+
+**为什么是 GPL-3.0**
+- 依赖全是宽松许可（MIT / Apache-2.0 / ISC / BSD-2），无额外要求；
+- 但人物像素素材里有 **CC-BY-SA 3.0** 与 **GPL 3.0**，都要求成果以相容协议发布；
+- **CC-BY-SA 3.0 与 GPL-3.0 官方兼容**，所以 GPL-3.0 是能同时满足素材授权的选择。
+  换成 MIT 之类宽松协议就会与素材授权冲突。
+
+**⚠️ 保留事项：上游代码的授权缺口**
+
+本项目基于 [`luyu14039/pale-notes`](https://github.com/luyu14039/pale-notes) 改造，
+而**该上游项目没有 LICENSE、也没有声明任何授权** —— 按著作权法默认属于「保留所有权利」。
+
+所以：我对本项目**自己编写的部分**按 GPL-3.0 授权；
+但从上游**继承下来的代码**，我无权替你授权，**GPL-3.0 的声明在那部分上不成立**。
+若要商用或需要法律确定性，请自行联系上游作者。
+
+详见 **[NOTICE.md](./NOTICE.md)**。
+
+**素材署名（强制）**
+人物像素立绘来自 [Universal LPC Spritesheet Character Generator](https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator)，
+24 位作者，逐件授权见 **[CREDITS.md](./public/CREDITS.md)**。
+**OGA-BY 3.0 与 CC-BY-SA 3.0 明确要求署名**，删除署名文件即构成侵权。
+场景背景与备用头像为程序化生成，无第三方素材。
 
 ---
 

@@ -25,9 +25,11 @@ export function SaveManager({ compact = false }: { compact?: boolean }) {
   // 打开时测一次；执行导入后再测一次（导入会改变占用）
   useEffect(() => { refresh() }, [])
 
-  const handleExport = () => {
+  const handleExport = async () => {
     try {
-      const { bytes, filename } = exportSave()
+      // exportSave 现在是异步的：它要把 IndexedDB 里的归档历史也一起打包，
+      // 否则长局的备份会缺掉前面几百轮
+      const { bytes, filename } = await exportSave()
       setMsg({ kind: 'ok', text: `已导出 ${filename}（${Math.round(bytes / 1024)} KB）` })
     } catch (e) {
       setMsg({ kind: 'err', text: `导出失败：${(e as Error)?.message || e}` })
@@ -41,7 +43,7 @@ export function SaveManager({ compact = false }: { compact?: boolean }) {
       setMsg({ kind: 'err', text: r.error || '导入失败' })
       return
     }
-    setMsg({ kind: 'ok', text: '导入成功，正在重新载入…' })
+    setMsg({ kind: 'ok', text: '导入成功，正在重新载入…' + (r.note || '') })
     // 各 store 的内存状态还是旧的，必须重载页面才一致
     setTimeout(() => window.location.reload(), 900)
   }
@@ -78,7 +80,7 @@ export function SaveManager({ compact = false }: { compact?: boolean }) {
               <> 占用最大的是「{usage.perStore[0].key}」（{Math.round(usage.perStore[0].bytes / 1024)} KB）。</>
             )}
             <br />
-            请立刻<button onClick={handleExport} className="underline hover:text-red-200">导出存档</button>备份，
+            请立刻<button onClick={() => { void handleExport() }} className="underline hover:text-red-200">导出存档</button>备份，
             然后返回标题开始新游戏或清理旧数据。
           </span>
         </div>
@@ -95,7 +97,7 @@ export function SaveManager({ compact = false }: { compact?: boolean }) {
 
       <div className="flex flex-wrap gap-2">
         <button
-          onClick={handleExport}
+          onClick={() => { void handleExport() }}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors"
         >
           <Download size={12} /> 导出存档

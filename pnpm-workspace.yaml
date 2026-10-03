@@ -14,3 +14,6 @@
 # 这个写法在 pnpm 9 / 10 / 11 上都有效。
 #
 # 注意：不要删除本文件，它是 pnpm 识别工作区根目录的锚点之一。
+
+allowBuilds:
+  esbuild: set this to true or false

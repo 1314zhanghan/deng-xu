@@ -2,6 +2,7 @@
   "name": "deng-xu",
   "private": true,
   "version": "1.0.0",
+  "license": "GPL-3.0-only",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,6 +12,8 @@
     "deploy:surge": "npm run build && npx --yes surge dist",
     "deploy:netlify": "npx --yes netlify-cli deploy --dir=dist --prod",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check:errors": "esbuild scripts/checks/errors.ts --bundle --platform=node --format=esm --outfile=.check/errors.mjs --alias:@=./src && node .check/errors.mjs",
     "check:retry": "esbuild scripts/checks/retry.ts --bundle --platform=node --format=esm --outfile=.check/retry.mjs --alias:@=./src && node .check/retry.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
@@ -41,6 +44,7 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
-    "vite": "^5.1.4"
+    "vite": "^5.1.4",
+    "vitest": "^2.1.9"
   }
 }

@@ -16,6 +16,7 @@
  */
 
 import { downloadFile, safeFilename, timestampSuffix } from '@/utils/files'
+import { loadArchive, saveArchive, clearArchive, type ArchiveState } from '@/utils/historyArchive'
 
 /** 存档文件格式版本。将来结构变化时靠它做迁移。 */
 export const SAVE_FORMAT = 'deng-xu-save'
@@ -53,6 +54,13 @@ export interface SaveFile {
   }
   /** 原始 store 数据，键为 STORAGE_KEYS 里的名字 */
   data: Record<string, unknown>
+  /**
+   * 已归档的旧叙事（存在 IndexedDB 里，不在 localStorage）。
+   *
+   * 必须一起导出：长局会把大部分历史归档出去，只备份 localStorage
+   * 等于备份了一个缺了前 200 轮的故事。导入时也要一并还原。
+   */
+  archive?: ArchiveState
 }
 
 // ============================================================================
@@ -72,12 +80,19 @@ function readStore(key: string): unknown {
 }
 
 /** 收集当前存档（缺失的 store 不写入，避免导入时把好的覆盖成空的） */
-export function collectSave(): SaveFile {
+export async function collectSave(): Promise<SaveFile> {
   const data: Record<string, unknown> = {}
   for (const key of Object.values(STORAGE_KEYS)) {
     const v = readStore(key)
     if (v !== undefined) data[key] = v
   }
+
+  // 归档也要带上（长局的历史大部分在这里）
+  let archive: ArchiveState | undefined
+  try {
+    const a = await loadArchive()
+    if (a.messages.length) archive = a
+  } catch { /* 读不到就不带，不影响主流程 */ }
 
   // 尽量抽出可读的元信息，方便用户在一堆文件里认出是哪一局
   let worldTitle: string | undefined
@@ -89,7 +104,8 @@ export function collectSave(): SaveFile {
     playerName = g?.playerName || undefined
     // 字段名是 history（不是 narrativeMessages —— 我在第一版里猜错了，
     // 结果元信息里的条数一直是 undefined，导出的文件名也少了这个线索）
-    messageCount = Array.isArray(g?.history) ? g.history.length : undefined
+    const hot = Array.isArray(g?.history) ? g.history.length : 0
+    messageCount = hot + (archive?.messages.length || 0)
     savedAt = g?.lastPlayedAt || g?.savedAt || undefined
     const s = (data[STORAGE_KEYS.session] as any)?.state
     worldTitle = s?.world?.title || undefined
@@ -101,12 +117,13 @@ export function collectSave(): SaveFile {
     exportedAt: new Date().toISOString(),
     meta: { worldTitle, playerName, messageCount, savedAt },
     data,
+    ...(archive ? { archive } : {}),
   }
 }
 
 /** 导出为文件 */
-export function exportSave(): { bytes: number; filename: string } {
-  const save = collectSave()
+export async function exportSave(): Promise<{ bytes: number; filename: string }> {
+  const save = await collectSave()
   const json = JSON.stringify(save, null, 2)
   const bytes = new Blob([json]).size
   const base = [save.meta.worldTitle, save.meta.playerName].filter(Boolean).join('-') || '存档'
@@ -126,6 +143,8 @@ export interface ImportResult {
   meta?: SaveFile['meta']
   /** 写入了哪些 store */
   restored?: string[]
+  /** 附带提示（例如归档写入失败） */
+  note?: string
 }
 
 /** 校验导入内容是否像一份合法存档 */
@@ -166,8 +185,11 @@ export function validateSave(input: unknown): ImportResult {
  * 关键：**逐个 store 写入并捕获配额错误**。
  * 如果写到一半失败，把已写入的键回滚成原值 —— 否则会出现
  * “game 存进去了、session 没存进去”的撕裂状态，比不导入更糟。
+ *
+ * 归档（IndexedDB）在 localStorage 写成功之后再写：
+ * 它的容量大得多，几乎不会失败；万一失败也只是历史不全，不影响能继续玩。
  */
-export function applySave(save: SaveFile): ImportResult {
+export async function applySave(save: SaveFile): Promise<ImportResult> {
   const backup = new Map<string, string | null>()
   const written: string[] = []
 
@@ -196,7 +218,17 @@ export function applySave(save: SaveFile): ImportResult {
     return { ok: false, error: `写入失败：${(err as Error)?.message || err}（已还原）` }
   }
 
-  return { ok: true, meta: save.meta, restored: written }
+  // 还原归档
+  let archiveNote = ''
+  if (save.archive) {
+    const ok = await saveArchive(save.archive)
+    if (!ok) archiveNote = '（归档历史未能写入，但存档主体已恢复）'
+  } else {
+    // 导入的存档没有归档 → 清掉旧的，避免把上一局的归档混进这一局
+    await clearArchive()
+  }
+
+  return { ok: true, meta: save.meta, restored: written, note: archiveNote || undefined }
 }
 
 /** 从 File 读取并导入 */

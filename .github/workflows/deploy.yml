@@ -45,6 +45,13 @@ jobs:
         # 仓库提交的是 pnpm-lock.yaml，用 --frozen-lockfile 保证 CI 与本地一致
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        # 单元测试放在构建之前：测试挂了就不必浪费一次部署
+        run: pnpm test
+
       - name: Build
         run: pnpm build
 
