@@ -228,6 +228,20 @@ const HEADS_FEMALEISH = HEADS_ADULT.filter(h => /female/.test(h))
  * 换色是让立绘「看起来不是同一个人」的关键 ——
  * 在接入调色板之前，所有角色都是橙发，同屏观感极差。
  */
+/**
+ * 主角立绘的稳定种子。
+ *
+ * 必须由所有展示主角的地方**共用** —— 选角界面、状态栏、以后的立绘面板
+ * 如果各自算种子，同一个人会得到不同的脸（之前几何头像就踩过这个坑，
+ * 所以把它抽出来当唯一来源）。
+ *
+ * 刻意**不含头像本身**：那个是可变的（用户可能上传/移除），
+ * 用它当种子会导致换个头像就换一张脸。
+ */
+export function playerSpriteSeed(name?: string, gender?: string): string {
+  return `player:${name || 'hero'}:${gender || 'x'}`
+}
+
 export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   const rng = makeRng(hashSeed(key))
   const g = (opts?.gender || '').toLowerCase()

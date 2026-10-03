@@ -3,6 +3,7 @@ import { useUIStore } from '@/stores/ui';
 import { useSessionStore } from '@/stores/session';
 import { CharacterAvatar } from '@/components/CharacterAvatar';
 import { CharacterSprite } from '@/components/CharacterSprite';
+import { playerSpriteSeed } from '@/utils/lpcSprite';
 import {
   Sparkles,
   Zap,
@@ -32,7 +33,7 @@ export function StatusPanel({ className = '' }: StatusPanelProps) {
 
   // 生成头像的种子必须派生自「开局时定下的身份」，不能用 playerAvatar 之类的可变字段，
   // 否则换装备/改状态也会换一张脸。名字与性别在整局里是稳定的。
-  const playerAvatarSeed = `player:${playerName || 'hero'}:${playerGender || 'x'}`;
+  const playerAvatarSeed = playerSpriteSeed(playerName, playerGender);
 
   return (
     <div className={`h-full p-4 space-y-6 overflow-y-auto bg-surface/30 border-r border-text-muted/20 backdrop-blur-sm flex flex-col ${className}`}>

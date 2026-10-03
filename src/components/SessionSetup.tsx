@@ -6,6 +6,8 @@ import { useSessionStore } from '@/stores/session'
 import { useGameStore } from '@/stores/game'
 import { useUIStore } from '@/stores/ui'
 import { readFileAsDataURL } from '@/utils/files'
+import { playerSpriteSeed } from '@/utils/lpcSprite'
+import { CharacterSprite } from '@/components/CharacterSprite'
 
 /**
  * 开局配置
@@ -264,9 +266,24 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                     <div className="space-y-2">
                       {player.avatar
                         ? <img src={player.avatar} alt="" className="w-40 h-40 rounded object-cover border border-text-muted/30" />
-                        : <div className="w-40 h-40 rounded border border-dashed border-text-muted/30 flex items-center justify-center text-text-muted text-xs">
-                          无头像
-                        </div>}
+                        : (
+                          /*
+                            没有自带头像时，直接用**像素立绘**当预览 ——
+                            而不是留一个「无头像」的空框。
+                            种子取自姓名与性别，和进游戏后状态栏用的是同一个
+                            （playerSpriteSeed），所以这里看到的就是开局后的样子。
+                          */
+                          <div className="w-40 h-40 rounded border border-text-muted/30 bg-black/30 flex items-center justify-center overflow-hidden">
+                            <CharacterSprite
+                              name={player.name || '主角'}
+                              seed={playerSpriteSeed(player.name, player.gender)}
+                              gender={player.gender}
+                              headOnly
+                              scale={5}
+                              className="w-40 h-40"
+                            />
+                          </div>
+                        )}
                       <label className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors cursor-pointer">
                         <Upload size={13} /> 上传头像
                         <input type="file" accept="image/*" className="hidden"
