@@ -1,45 +1,37 @@
 /**
- * 程序化场景背景生成
+ * 程序化**像素风**场景背景
  *
- * 为什么不用现成图片素材：
- *  和头像同理 —— Lemma Soft Forums、OpenGameArt 之类站点上的"免费背景图"，
- *  授权条款逐个不同（有的要求署名、有的禁止再分发、有的仅限非商业），
- *  在不逐条核验的情况下打包进产物会把授权风险转嫁给使用者。
- *  而几十张 1280×720 的位图还会让这个纯前端站点多出好几 MB。
+ * 为什么重做：
+ *  之前是矢量扁平风（SVG 多边形 + 径向渐变），而人物立绘是**像素风**（LPC 素材）。
+ *  两者同屏时风格割裂 —— 这是整个界面最后一块明显不协调的地方。
  *
- * 所以按「场景类型 + 世界风格」程序化生成 SVG 背景：
- *  - 确定性：同一场景 id 永远得到同一张图
- *  - 零版权、可离线、单张约 1–2 KB
- *  - 通过 sceneStyle（复用 avatarStyle）让同一套几何语言换配色
+ * 像素画的关键不是"分辨率低"，而是：
+ *  1. **分辨率真的低** —— 这里用 160×90，只有 14400 个像素，然后整数倍放大
+ *  2. **限色板** —— 所有场景共用一套 16 色，颜色少才有像素画的统一感；
+ *     矢量那种连续渐变必须换成**有序抖动（ordered dithering）**来过渡
+ *  3. **硬边** —— 放大时绝不插值（imageSmoothingEnabled = false）
  *
- * 想换成真实图片素材：把 SceneAsset 的 `image` 填成图片路径即可，
- * 渲染层优先用 image，没有才走程序化生成 —— 不用改任何组件代码。
+ * 输出格式仍是 data URL，所以 SceneBackdrop 不需要改。
  */
 
 import { getAvatarStyle, type AvatarStyle } from '@/utils/avatarArt'
 
-/** 场景原型：决定几何构图 */
+/** 逻辑分辨率：16:9，且 160×90 的整数倍正好是 640×360（放大 4 倍） */
+const W = 160
+const H = 90
+
 export type SceneArchetype =
-  | 'interior'    // 室内：窗、桌、灯
-  | 'street'      // 街道：楼影、路灯、路
-  | 'forest'      // 林地：树干、雾
-  | 'mountain'    // 山野：层叠山脊
-  | 'coast'       // 海岸：水面、地平线
-  | 'ruins'       // 废墟：断柱、残垣
-  | 'underground' // 地下：洞穴拱顶
-  | 'sky'         // 高空/太空：星、云、星球
-  | 'night'       // 夜景：月亮、屋影
+  | 'interior' | 'street' | 'forest' | 'mountain' | 'coast'
+  | 'ruins' | 'underground' | 'sky' | 'night'
 
 export interface SceneAsset {
   id: string
-  /** 给 AI 看的场景描述 */
   label: string
   archetype: SceneArchetype
   /** 可选：真实图片路径。填了就优先用它，不再程序化生成 */
   image?: string
 }
 
-/** 场景原型的中文说明（给 AI 判断用） */
 const ARCHETYPE_LABEL: Record<SceneArchetype, string> = {
   interior: '室内',
   street: '城镇街道',
@@ -55,16 +47,11 @@ const ARCHETYPE_LABEL: Record<SceneArchetype, string> = {
 export function buildSceneCatalog(): SceneAsset[] {
   const out: SceneAsset[] = []
   const archetypes = Object.keys(ARCHETYPE_LABEL) as SceneArchetype[]
-  // 每个原型给 3 个变体（不同时间/氛围），够 AI 挑且不至于让清单膨胀
   const variants = ['', '·黄昏', '·深夜']
   let i = 0
   for (const archetype of archetypes) {
     for (const v of variants) {
-      out.push({
-        id: `s${String(i + 1).padStart(2, '0')}`,
-        label: `${ARCHETYPE_LABEL[archetype]}${v}`,
-        archetype,
-      })
+      out.push({ id: `s${String(i + 1).padStart(2, '0')}`, label: `${ARCHETYPE_LABEL[archetype]}${v}`, archetype })
       i++
     }
   }
@@ -72,137 +59,224 @@ export function buildSceneCatalog(): SceneAsset[] {
 }
 
 export const SCENE_CATALOG: SceneAsset[] = buildSceneCatalog()
-
 const SCENE_BY_ID = new Map(SCENE_CATALOG.map(s => [s.id, s]))
 
 export function isKnownSceneId(id?: string): boolean {
   return !!id && SCENE_BY_ID.has(id)
 }
-
 export function getSceneAsset(id?: string): SceneAsset | undefined {
   return id ? SCENE_BY_ID.get(id) : undefined
 }
-
-/** 给 AI 用的场景清单文本 */
 export function sceneCatalogPrompt(): string {
   return SCENE_CATALOG.map(s => `${s.id}=${s.label}`).join('；')
 }
 
+// ============================================================================
+// 限色板
+// ============================================================================
+
 /**
- * 画布 640×360（16:9）。
- * 之前是 480×270 —— 渲染到叙事区（约 656×676）时被放大 1.4 倍以上，
- * 线条会发虚。提高到 640×360 后同尺寸下基本 1:1，观感干净得多，
- * 单张 SVG 也只从约 1.5 KB 涨到约 2 KB。
+ * 共享的 16 色板，按「从最暗到最亮」排列。
+ * 所有场景、所有世界风格都从这里取色 —— 这是像素画统一感的关键。
+ * 刻意压低饱和度并偏冷，贴合本作的暗色调。
  */
-const W = 640
-const H = 360
+const PALETTE: [number, number, number][] = [
+  [10, 10, 14],    // 0  最暗（暗角/剪影）
+  [20, 20, 28],    // 1
+  [30, 30, 42],    // 2
+  [42, 42, 58],    // 3
+  [56, 56, 74],    // 4
+  [72, 74, 92],    // 5
+  [90, 94, 112],   // 6
+  [110, 116, 132], // 7
+  [132, 140, 152], // 8
+  [156, 164, 176], // 9
+  [180, 188, 198], // 10
+  [206, 212, 220], // 11
+  [232, 236, 242], // 12 最亮
+  [180, 140, 90],  // 13 暖（灯火）
+  [220, 180, 110], // 14 暖亮
+  [90, 130, 140],  // 15 冷（水/夜）
+]
+
+/** 有序抖动矩阵（4×4 Bayer）。像素画用抖动来过渡明暗，而不是渐变 */
+const BAYER = [
+  [0, 8, 2, 10],
+  [12, 4, 14, 6],
+  [3, 11, 1, 9],
+  [15, 7, 13, 5],
+]
+
+// ============================================================================
+// 像素画布
+// ============================================================================
+
+class PxCanvas {
+  readonly w: number
+  readonly h: number
+  private buf: Int16Array   // 存调色板索引，-1 = 透明
+
+  constructor(w: number, h: number, fill = 0) {
+    this.w = w
+    this.h = h
+    this.buf = new Int16Array(w * h).fill(fill)
+  }
+
+  set(x: number, y: number, ci: number) {
+    const xi = x | 0, yi = y | 0
+    if (xi < 0 || yi < 0 || xi >= this.w || yi >= this.h) return
+    this.buf[yi * this.w + xi] = ci
+  }
+
+  get(x: number, y: number): number {
+    const xi = x | 0, yi = y | 0
+    if (xi < 0 || yi < 0 || xi >= this.w || yi >= this.h) return -1
+    return this.buf[yi * this.w + xi]
+  }
+
+  /** 矩形填充 */
+  rect(x: number, y: number, w: number, h: number, ci: number) {
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) this.set(xx, yy, ci)
+  }
+
+  /**
+   * 抖动竖向渐变：在 y0..y1 之间从 c0 过渡到 c1。
+   * 像素画不画连续渐变 —— 用 Bayer 抖动混合两个索引色来造成"过渡"的错觉。
+   */
+  ditherV(x: number, y0: number, y1: number, w: number, c0: number, c1: number) {
+    const span = Math.max(1, y1 - y0)
+    for (let y = y0; y < y1; y++) {
+      const t = (y - y0) / span
+      for (let xx = x; xx < x + w; xx++) {
+        const threshold = (BAYER[(y & 3)][(xx + (x & 3)) & 3] + 0.5) / 16
+        this.set(xx, y, t > threshold ? c1 : c0)
+      }
+    }
+  }
+
+  /** 画一条山脊/地形线：给定每列高度，填到指定基线 */
+  terrainFromProfile(profile: (x: number) => number, baselineY: number, ci: number) {
+    for (let x = 0; x < this.w; x++) {
+      const top = Math.max(0, Math.min(baselineY, profile(x) | 0))
+      for (let y = top; y < baselineY; y++) this.set(x, y, ci)
+    }
+  }
+
+  /** 转成 ImageData（查调色板） */
+  toImageData(): ImageData {
+    const data = new Uint8ClampedArray(this.w * this.h * 4)
+    for (let i = 0; i < this.buf.length; i++) {
+      const ci = this.buf[i]
+      const o = i * 4
+      if (ci < 0) { data[o + 3] = 0; continue }
+      const c = PALETTE[Math.max(0, Math.min(PALETTE.length - 1, ci))]
+      data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255
+    }
+    return new ImageData(data, this.w, this.h)
+  }
+}
+
+// ============================================================================
+// 场景绘制
+// ============================================================================
 
 function hashSeed(input: string): number {
   let h = 0x811c9dc5
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i)
-    h = Math.imul(h, 0x01000193) >>> 0
-  }
+  for (let i = 0; i < input.length; i++) { h ^= input.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0 }
   return h >>> 0
 }
-
 function makeRng(seed: number) {
   let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-/** 每个原型一套配色（深底 + 远/中/近三层），与头像风格叠加 */
-const ARCHETYPE_PALETTE: Record<SceneArchetype, { sky: [string, string]; far: string; mid: string; near: string }> = {
-  interior: { sky: ['#20201d', '#2a2723'], far: '#3a342c', mid: '#4a4238', near: '#5c5245' },
-  street: { sky: ['#1c2028', '#262b34'], far: '#2e3440', mid: '#3a4150', near: '#474e5e' },
-  forest: { sky: ['#161d19', '#1e2a23'], far: '#25352c', mid: '#2f4437', near: '#3b5544' },
-  mountain: { sky: ['#1b2026', '#28303a'], far: '#2c3642', mid: '#38434f', near: '#46525f' },
-  coast: { sky: ['#131e26', '#1d2c36'], far: '#24333d', mid: '#2d4049', near: '#384e57' },
-  ruins: { sky: ['#221d1a', '#2e2724'], far: '#3a302a', mid: '#493c33', near: '#5a4a3e' },
-  underground: { sky: ['#141414', '#1c1a1a'], far: '#262220', mid: '#332d29', near: '#413934' },
-  sky: { sky: ['#0d1220', '#151d33'] as [string, string], far: '#1c2540', mid: '#26314f', near: '#333f60' },
-  night: { sky: ['#12141f', '#1b1f2e'], far: '#232838', mid: '#2d3348', near: '#3a425a' },
-}
-
-export interface GeneratedScene {
-  dataUrl: string
-  svg: string
-  archetype: SceneArchetype
+  return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
 }
 
 /**
- * 生成场景背景。
- * @param id    场景 id（决定构图随机性）
- * @param style 世界风格（复用头像风格，保持同一世界观感一致）
- * @param tone  世界点缀色
- * @param asset 可选：带 image 的素材则直接返回该图片
+ * 各原型的明暗基调（在共享色板里选哪几档）。
+ *
+ * ⚠️ 这里踩过一个坑，别再犯：
+ * 第一版把所有原型都压在 0–4 档（例如 sky:[1,2] far:2 mid:3 near:4），
+ * 而调色板 0–4 档是 [10,10,14]→[56,56,74]，在屏幕上几乎是同一个颜色 ——
+ * 结果山、树、楼、柱全糊成一块灰，9 个原型看起来一模一样。
+ *
+ * 规则：**同一个场景内，至少要有 5 档以上的明度跨度**，
+ * 而且"远/中/近"三层要能一眼分开（远最亮、近最暗，形成空气透视）。
  */
-export function generateScene(
-  id: string,
-  style: AvatarStyle | string = 'ink',
-  tone?: string,
-  asset?: SceneAsset
-): GeneratedScene {
-  const archetype = asset?.archetype || 'interior'
+const TONE: Record<SceneArchetype, { sky: [number, number]; far: number; mid: number; near: number }> = {
+  // 室内：墙中等亮、地板暗，靠窗光提对比
+  interior: { sky: [1, 3], far: 4, mid: 6, near: 3 },
+  // 街道：远景楼比地面亮（远处有雾气/灯光），近地面压暗
+  street: { sky: [0, 3], far: 3, mid: 7, near: 4 },
+  // 森林：树冠中等偏暗，近处树干压到最暗
+  forest: { sky: [2, 5], far: 5, mid: 4, near: 2 },
+  // 山：典型的空气透视 —— 远山最亮，近山最暗
+  mountain: { sky: [1, 5], far: 8, mid: 5, near: 3 },
+  // 海岸：天最亮，水面中等
+  coast: { sky: [2, 6], far: 7, mid: 15, near: 4 },
+  // 废墟：石柱偏亮，地面暗
+  ruins: { sky: [2, 5], far: 6, mid: 8, near: 3 },
+  // 地下：整体最暗，只有微光一处亮
+  underground: { sky: [0, 1], far: 4, mid: 2, near: 1 },
+  // 高空：星空最暗，行星中亮，舰体剪影最暗
+  sky: { sky: [0, 2], far: 5, mid: 7, near: 1 },
+  // 夜晚：天最暗，楼中等，屋顶剪影压黑
+  night: { sky: [0, 1], far: 3, mid: 5, near: 1 },
+}
 
-  // 有真实图片就用它 —— 这是替换成外部素材的唯一入口
-  if (asset?.image) {
-    return { dataUrl: asset.image, svg: '', archetype }
-  }
+function drawScene(archetype: SceneArchetype, seed: number, accentWarm: boolean): PxCanvas {
+  const rng = makeRng(seed)
+  const px = new PxCanvas(W, H, 0)
+  const t = TONE[archetype]
+  const horizon = Math.round(H * (0.55 + rng() * 0.1))
 
-  const styleDef = getAvatarStyle(style)
-  const pal = ARCHETYPE_PALETTE[archetype]
-  const accent = tone || styleDef.accent
-  const rng = makeRng(hashSeed(`${styleDef.id}::${id}`))
-  const parts: string[] = []
+  /*
+    天空：**主体用实色**，只在接近地平线的一小段做抖动过渡。
+    第一版把整个天空都 ditherV（0→horizon），结果满屏网点、什么形状都看不见 ——
+    像素画的抖动是**局部过渡技巧**，不是大面积填充手段。
+  */
+  px.rect(0, 0, W, horizon, t.sky[0])
+  const bandTop = Math.max(0, horizon - 14)
+  px.ditherV(0, bandTop, horizon, W, t.sky[0], t.sky[1])
 
-  // 天空/背景渐变
-  parts.push(`<defs><linearGradient id="sky${hashSeed(id)}" x1="0" y1="0" x2="0" y2="1">` +
-    `<stop offset="0%" stop-color="${pal.sky[0]}"/><stop offset="100%" stop-color="${pal.sky[1]}"/>` +
-    `</linearGradient></defs>`)
-  parts.push(`<rect width="${W}" height="${H}" fill="url(#sky${hashSeed(id)})"/>`)
+  const lit = accentWarm ? 14 : 15
 
-  const horizon = H * (0.55 + rng() * 0.12)
-
-  const drawMountains = (color: string, base: number, amp: number, steps: number) => {
-    let d = `M0 ${H} L0 ${base}`
-    for (let i = 1; i <= steps; i++) {
-      const x = (W / steps) * i
-      const y = base - amp * (0.4 + rng() * 0.9)
-      d += ` L${x.toFixed(1)} ${y.toFixed(1)}`
+  const drawMountains = (ci: number, base: number, amp: number) => {
+    const step = 7 + Math.floor(rng() * 7)
+    const heights: number[] = []
+    let y = base - amp * 0.7
+    for (let x = 0; x < W; x++) {
+      if (x % step === 0) y = base - amp * (0.4 + rng() * 0.9)
+      heights.push(y)
     }
-    d += ` L${W} ${H} Z`
-    parts.push(`<path d="${d}" fill="${color}"/>`)
+    for (let i = 1; i < W - 1; i++) heights[i] = (heights[i - 1] + heights[i] * 2 + heights[i + 1]) / 4
+    px.terrainFromProfile(x => heights[x], H, ci)
+    return heights
   }
 
-  const drawTrees = (color: string, base: number, count: number, scale: number) => {
+  const drawTrees = (ci: number, base: number, count: number, scale: number) => {
     for (let i = 0; i < count; i++) {
-      const x = (W / count) * (i + 0.5) + (rng() - 0.5) * 20
-      const h = (26 + rng() * 30) * scale
-      parts.push(`<rect x="${(x - 2 * scale).toFixed(1)}" y="${(base - h).toFixed(1)}" width="${(4 * scale).toFixed(1)}" height="${h.toFixed(1)}" fill="${color}"/>`)
-      parts.push(`<ellipse cx="${x.toFixed(1)}" cy="${(base - h).toFixed(1)}" rx="${(11 * scale).toFixed(1)}" ry="${(15 * scale).toFixed(1)}" fill="${color}"/>`)
+      const x = Math.round((W / count) * (i + 0.5) + (rng() - 0.5) * 8)
+      const h = Math.round((16 + rng() * 16) * scale)
+      px.rect(x, base - h, 2, h, ci)
+      const r = Math.round((5 + rng() * 4) * scale)
+      for (let dy = -r; dy <= r; dy += 1) {
+        const span = Math.round(Math.sqrt(Math.max(0, r * r - dy * dy)))
+        for (let dx = -span; dx <= span; dx += 1) px.set(x + dx, base - h + dy - 2, ci)
+      }
     }
   }
 
-  const drawBuildings = (color: string, base: number, count: number, lit: boolean) => {
+  const drawBuildings = (ci: number, base: number, count: number, windows: boolean) => {
     for (let i = 0; i < count; i++) {
-      const bw = W / count
-      const x = bw * i
-      const bh = 40 + rng() * 70
-      parts.push(`<rect x="${x.toFixed(1)}" y="${(base - bh).toFixed(1)}" width="${(bw - 1).toFixed(1)}" height="${bh.toFixed(1)}" fill="${color}"/>`)
-      if (lit) {
-        // 零星亮着的窗
-        for (let k = 0; k < 5; k++) {
-          if (rng() < 0.45) {
-            const wx = x + 4 + rng() * Math.max(2, bw - 12)
-            const wy = base - bh + 6 + rng() * Math.max(2, bh - 14)
-            parts.push(`<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="3" height="4" fill="${accent}" opacity="${(0.35 + rng() * 0.5).toFixed(2)}"/>`)
+      const bw = Math.floor(W / count)
+      const x = i * bw
+      const bh = Math.round(20 + rng() * 30)
+      px.rect(x, base - bh, bw - 2, bh, ci)
+      px.rect(x, base - bh, bw - 2, 1, Math.max(0, ci - 1))   // 顶沿高光
+      if (windows) {
+        for (let k = 0; k < 7; k++) {
+          if (rng() < 0.5) {
+            px.set(x + 1 + Math.floor(rng() * Math.max(1, bw - 4)),
+                   base - bh + 3 + Math.floor(rng() * Math.max(1, bh - 5)), lit)
           }
         }
       }
@@ -211,135 +285,215 @@ export function generateScene(
 
   const drawStars = (count: number) => {
     for (let i = 0; i < count; i++) {
-      const x = rng() * W
-      const y = rng() * horizon * 0.85
-      parts.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.5 + rng() * 1.1).toFixed(2)}" fill="#ffffff" opacity="${(0.25 + rng() * 0.6).toFixed(2)}"/>`)
+      px.set(Math.floor(rng() * W), Math.floor(rng() * horizon * 0.85), rng() < 0.3 ? 12 : 10)
+    }
+  }
+
+  const disc = (cx: number, cy: number, r: number, ci: number) => {
+    for (let dy = -r; dy <= r; dy++) {
+      const span = Math.round(Math.sqrt(Math.max(0, r * r - dy * dy)))
+      for (let dx = -span; dx <= span; dx++) px.set(cx + dx, cy + dy, ci)
     }
   }
 
   switch (archetype) {
     case 'interior': {
-      // 地板 + 后墙 + 一扇窗（窗里透光）
-      parts.push(`<rect x="0" y="${horizon.toFixed(1)}" width="${W}" height="${(H - horizon).toFixed(1)}" fill="${pal.near}"/>`)
-      parts.push(`<rect x="0" y="0" width="${W}" height="${horizon.toFixed(1)}" fill="${pal.mid}"/>`)
-      const wx = 60 + rng() * 100
-      const wy = 40 + rng() * 20
-      const ww = 90 + rng() * 50
-      const wh = 70 + rng() * 30
-      parts.push(`<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="${ww.toFixed(1)}" height="${wh.toFixed(1)}" fill="${pal.sky[1]}" stroke="${pal.far}" stroke-width="2"/>`)
-      parts.push(`<line x1="${(wx + ww / 2).toFixed(1)}" y1="${wy.toFixed(1)}" x2="${(wx + ww / 2).toFixed(1)}" y2="${(wy + wh).toFixed(1)}" stroke="${pal.far}" stroke-width="2"/>`)
-      // 一盏暖光
-      parts.push(`<circle cx="${(wx + ww / 2).toFixed(1)}" cy="${wy.toFixed(1)}" r="${(ww * 0.7).toFixed(1)}" fill="${accent}" opacity="0.07"/>`)
-      // 前景桌子
-      parts.push(`<rect x="${(W * 0.55).toFixed(1)}" y="${(H - 40).toFixed(1)}" width="${(W * 0.4).toFixed(1)}" height="10" fill="${pal.far}"/>`)
+      // 后墙 + 地板（两段实色，靠交界线区分）
+      px.rect(0, 0, W, horizon, t.mid)
+      px.rect(0, horizon, W, H - horizon, t.near)
+      px.rect(0, horizon, W, 1, Math.min(PALETTE.length - 1, t.mid + 2))  // 墙脚线
+      // 窗（带光）
+      const wx = 14 + Math.floor(rng() * 18), wy = 16 + Math.floor(rng() * 8)
+      const ww = 26 + Math.floor(rng() * 12), wh = 22 + Math.floor(rng() * 8)
+      px.rect(wx, wy, ww, wh, t.sky[1])
+      px.rect(wx + Math.floor(ww / 2), wy, 1, wh, t.far)
+      px.rect(wx, wy + Math.floor(wh / 2), ww, 1, t.far)
+      // 光斑：只在窗下方一小块做抖动
+      px.ditherV(wx - 4, wy + wh, Math.min(H - 1, wy + wh + 12), ww + 8, t.near, accentWarm ? 13 : 5)
+      // 前景桌沿
+      px.rect(Math.round(W * 0.52), H - 16, Math.round(W * 0.42), 4, t.far)
       break
     }
     case 'street': {
-      parts.push(`<rect x="0" y="${horizon.toFixed(1)}" width="${W}" height="${(H - horizon).toFixed(1)}" fill="${pal.near}"/>`)
-      drawBuildings(pal.mid, horizon, 5, true)
-      // 路面反光
-      parts.push(`<rect x="0" y="${(horizon + 22).toFixed(1)}" width="${W}" height="3" fill="${accent}" opacity="0.12"/>`)
-      // 路灯
-      const lx = 70 + rng() * 60
-      parts.push(`<rect x="${lx.toFixed(1)}" y="${(horizon - 70).toFixed(1)}" width="2" height="70" fill="${pal.far}"/>`)
-      parts.push(`<circle cx="${lx.toFixed(1)}" cy="${(horizon - 72).toFixed(1)}" r="4" fill="${accent}" opacity="0.9"/>`)
-      parts.push(`<circle cx="${lx.toFixed(1)}" cy="${(horizon - 72).toFixed(1)}" r="22" fill="${accent}" opacity="0.09"/>`)
+      px.rect(0, horizon, W, H - horizon, t.near)
+      drawBuildings(t.mid, horizon, 5, true)
+      px.rect(0, horizon + 1, W, 1, Math.max(0, t.near - 1))
+      // 路灯 + 光晕（小范围抖动）
+      const lx = 18 + Math.floor(rng() * 28)
+      px.rect(lx, horizon - 34, 1, 34, t.far)
+      px.set(lx, horizon - 35, lit)
+      px.set(lx - 1, horizon - 35, lit)
+      px.ditherV(lx - 7, horizon - 35, horizon + 4, 15, t.near, lit)
       break
     }
     case 'forest': {
-      drawTrees(pal.mid, horizon + 10, 9, 1)
-      drawTrees(pal.near, H - 6, 5, 1.5)
-      // 雾带
-      parts.push(`<rect x="0" y="${(horizon - 6).toFixed(1)}" width="${W}" height="20" fill="${pal.sky[1]}" opacity="0.35"/>`)
+      drawTrees(t.mid, horizon + 4, 7, 1)
+      drawTrees(t.near, H + 6, 4, 1.7)
+      // 雾带只在一条窄缝里
+      px.ditherV(0, horizon - 8, horizon + 4, W, t.sky[1], t.mid)
       break
     }
     case 'mountain': {
-      drawMountains(pal.far, horizon - 20, 46, 7)
-      drawMountains(pal.mid, horizon + 6, 34, 5)
-      drawMountains(pal.near, H - 30, 22, 4)
+      drawMountains(t.far, horizon - 4, 30)
+      drawMountains(t.mid, horizon + 10, 22)
+      drawMountains(t.near, H + 6, 14)
       break
     }
     case 'coast': {
-      parts.push(`<rect x="0" y="${horizon.toFixed(1)}" width="${W}" height="${(H - horizon).toFixed(1)}" fill="${pal.mid}"/>`)
-      // 波纹
-      for (let i = 0; i < 14; i++) {
-        const y = horizon + 6 + rng() * (H - horizon - 10)
-        const x = rng() * W
-        parts.push(`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(10 + rng() * 40).toFixed(1)}" height="1.2" fill="${accent}" opacity="${(0.08 + rng() * 0.14).toFixed(2)}"/>`)
+      px.rect(0, horizon, W, H - horizon, t.mid)
+      // 水面：稀疏短横线当波纹
+      for (let i = 0; i < 30; i++) {
+        const y = horizon + 2 + Math.floor(rng() * (H - horizon - 4))
+        px.rect(Math.floor(rng() * W), y, 2 + Math.floor(rng() * 7), 1, rng() < 0.5 ? 9 : 5)
       }
-      parts.push(`<circle cx="${(W * 0.72).toFixed(1)}" cy="${(horizon - 18).toFixed(1)}" r="11" fill="${accent}" opacity="0.5"/>`)
+      const mx = Math.round(W * 0.74), my = horizon - 12
+      disc(mx, my, 5, 12)
+      // 月光在水面的一条反光（窄且短）
+      px.ditherV(mx - 7, my + 4, horizon + 14, 15, t.mid, 8)
       break
     }
     case 'ruins': {
-      parts.push(`<rect x="0" y="${horizon.toFixed(1)}" width="${W}" height="${(H - horizon).toFixed(1)}" fill="${pal.near}"/>`)
-      // 断柱
-      for (let i = 0; i < 6; i++) {
-        const x = 20 + i * 76 + (rng() - 0.5) * 16
-        const h = 30 + rng() * 60
-        parts.push(`<rect x="${x.toFixed(1)}" y="${(horizon - h).toFixed(1)}" width="14" height="${h.toFixed(1)}" fill="${pal.mid}"/>`)
-        parts.push(`<rect x="${(x - 3).toFixed(1)}" y="${(horizon - h - 5).toFixed(1)}" width="20" height="5" fill="${pal.far}"/>`)
+      px.rect(0, horizon, W, H - horizon, t.near)
+      for (let i = 0; i < 5; i++) {
+        const x = 10 + i * 30 + Math.floor((rng() - 0.5) * 10)
+        const h = 18 + Math.floor(rng() * 28)
+        px.rect(x, horizon - h, 7, h, t.mid)
+        px.rect(x - 2, horizon - h - 3, 11, 3, t.far)   // 柱头
+        px.rect(x, horizon - h, 7, 1, Math.max(0, t.mid - 1))
       }
       break
     }
     case 'underground': {
-      // 拱顶
-      parts.push(`<path d="M0 ${H} L0 ${horizon} Q${W / 2} ${horizon - 80} ${W} ${horizon} L${W} ${H} Z" fill="${pal.mid}"/>`)
-      parts.push(`<path d="M0 ${H} L0 ${H - 40} Q${W / 2} ${H - 90} ${W} ${H - 40} L${W} ${H} Z" fill="${pal.near}"/>`)
+      px.rect(0, 0, W, H, 1)
+      // 拱顶：整块实色，边缘留一圈更暗的
+      px.terrainFromProfile(x => {
+        const dx = (x - W / 2) / (W / 2)
+        return Math.round(horizon - 22 * Math.cos(dx * 1.15))
+      }, H, t.mid)
+      px.rect(0, H - 18, W, 1, t.near)
+      px.rect(0, H - 17, W, 17, Math.max(0, t.near - 1))
       // 石笋
       for (let i = 0; i < 5; i++) {
-        const x = 30 + i * 100 + rng() * 30
-        const h = 20 + rng() * 45
-        parts.push(`<path d="M${x.toFixed(1)} ${H} L${(x + 7).toFixed(1)} ${(H - h).toFixed(1)} L${(x + 14).toFixed(1)} ${H} Z" fill="${pal.far}"/>`)
+        const x = 12 + i * 30 + Math.floor(rng() * 10)
+        const h = 10 + Math.floor(rng() * 16)
+        for (let dy = 0; dy < h; dy++) {
+          const wdt = Math.max(1, Math.round(4 * (1 - dy / h)))
+          px.rect(x, H - 17 - dy, wdt, 1, t.far)
+        }
       }
-      // 微光
-      parts.push(`<circle cx="${(W * 0.5).toFixed(1)}" cy="${(horizon + 20).toFixed(1)}" r="50" fill="${accent}" opacity="0.06"/>`)
+      disc(Math.round(W / 2), horizon + 4, 7, accentWarm ? 13 : 15)
       break
     }
     case 'sky': {
-      drawStars(70)
-      // 行星/巨物
-      const px = W * (0.2 + rng() * 0.6)
-      const py = 50 + rng() * 60
-      parts.push(`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${(26 + rng() * 22).toFixed(1)}" fill="${pal.mid}"/>`)
-      parts.push(`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${(26 + rng() * 22).toFixed(1)}" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.5"/>`)
-      parts.push(`<rect x="0" y="${(H - 26).toFixed(1)}" width="${W}" height="26" fill="${pal.near}" opacity="0.85"/>`)
+      px.rect(0, 0, W, H, t.sky[0])
+      drawStars(90)
+      const cx = Math.round(W * (0.25 + rng() * 0.45)), cy = 34 + Math.floor(rng() * 14)
+      const r = 16 + Math.floor(rng() * 10)
+      disc(cx, cy, r, t.mid)
+      px.rect(cx - r - 4, cy, (r + 4) * 2, 1, 15)      // 行星环
+      px.rect(cx - r - 2, cy + 1, (r + 2) * 2, 1, 15)
+      px.rect(0, H - 12, W, 12, t.near)                 // 舰体剪影
       break
     }
     case 'night': {
-      drawStars(45)
-      parts.push(`<circle cx="${(W * 0.78).toFixed(1)}" cy="${(34 + rng() * 16).toFixed(1)}" r="14" fill="#e8e4d8" opacity="0.85"/>`)
-      drawBuildings(pal.mid, horizon + 20, 6, true)
-      parts.push(`<rect x="0" y="${(horizon + 20).toFixed(1)}" width="${W}" height="${(H - horizon - 20).toFixed(1)}" fill="${pal.near}"/>`)
+      px.rect(0, 0, W, H, t.sky[0])
+      drawStars(60)
+      const mx = Math.round(W * 0.76), my = 18 + Math.floor(rng() * 8)
+      disc(mx, my, 5, 12)
+      px.rect(mx - 4, my - 5, 3, 1, 12)
+      drawBuildings(t.mid, H, 6, true)
+      // 屋顶剪影压在最前
+      px.rect(0, H - 10, W, 10, 0)
       break
     }
   }
 
-  // 统一的暗角，让文字压在上面也能读
-  parts.push(
-    `<radialGradient id="vig${hashSeed(id)}" cx="50%" cy="50%" r="75%">` +
-    `<stop offset="45%" stop-color="#000000" stop-opacity="0"/>` +
-    `<stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>` +
-    `</radialGradient>` +
-    `<rect width="${W}" height="${H}" fill="url(#vig${hashSeed(id)})"/>`
-  )
-
-  // 风格化的扫描线
-  if (styleDef.scanlines) {
-    const lines: string[] = []
-    for (let y = 0; y < H; y += 4) {
-      lines.push(`<rect x="0" y="${y}" width="${W}" height="1" fill="${styleDef.stroke}" opacity="0.035"/>`)
+  /*
+    暗角：**范围要小、只压一档**。
+    第一版 d > 0.72 且乘 0.42，而对角距离能到 √2 ≈ 1.41，
+    等于大半个画面都被压黑。第二版改成只压最外圈、且只降一档色阶 ——
+    降一档在 0–4 区间几乎看不出来，在 5–8 区间才有效果，
+    所以它只对中等亮度的场景有意义（这正是想要的：亮场景有暗角、暗场景不再糊）。
+  */
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const dx = (x - W / 2) / (W / 2), dy = (y - H / 2) / (H / 2)
+      const d = Math.sqrt(dx * dx + dy * dy)
+      if (d < 1.0) continue
+      const th = (BAYER[y & 3][x & 3] + 0.5) / 16
+      if ((d - 1.0) / 0.4 > th) {
+        const cur = px.get(x, y)
+        if (cur > 0) px.set(x, y, cur - 1)
+      }
     }
-    parts.push(lines.join(''))
   }
 
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice">` +
-    parts.join('') +
-    `</svg>`
+  return px
+}
 
-  return {
-    dataUrl: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
-    svg,
+export interface GeneratedScene {
+  dataUrl: string
+  svg: string
+  archetype: SceneArchetype
+}
+
+/** 缓存：同一场景 + 风格只画一次 */
+const cache = new Map<string, GeneratedScene>()
+
+export function generateScene(
+  id: string,
+  style: AvatarStyle | string = 'ink',
+  tone?: string,
+  asset?: SceneAsset
+): GeneratedScene {
+  /*
+    id 是场景 id，但**光靠 id 无法确定 archetype** ——
+    调用方不传 asset 时会退回 interior。所以缓存键必须把 archetype 也算进去，
+    否则「先不传 asset 调一次」就会把 interior 的结果缓存住，
+    之后再怎么传正确的 asset 都只会拿到那个缓存。
+    （我正是在这里栽过一次：画廊脚本不传 asset，结果 9 个原型全显示成室内。）
+  */
+  const resolved = asset ?? getSceneAsset(id)
+  const archetype = resolved?.archetype || 'interior'
+
+  if (resolved?.image) {
+    return { dataUrl: resolved.image, svg: '', archetype }
+  }
+
+  const key = `${id}|${style}|${tone || ''}|${archetype}`
+  const hit = cache.get(key)
+  if (hit) return hit
+
+  const def = getAvatarStyle(style)
+  const seed = hashSeed(`${def.id}::${id}`)
+  // 冷色风格（霓虹/全息）用暖色点缀会显得脏，改用冷色
+  const accentWarm = !def.cool
+
+  const px = drawScene(archetype, seed, accentWarm)
+
+  // 放大到 640×360（整数 4 倍），关掉插值保证硬边
+  const SCALE = 4
+  const canvas = document.createElement('canvas')
+  canvas.width = W * SCALE
+  canvas.height = H * SCALE
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('无法获取 canvas 上下文')
+  ctx.imageSmoothingEnabled = false
+
+  // 先画到 1:1 的小画布，再放大 —— 避免直接把 ImageData 放大时的插值
+  const small = document.createElement('canvas')
+  small.width = W
+  small.height = H
+  const sctx = small.getContext('2d')
+  if (!sctx) throw new Error('无法获取 canvas 上下文')
+  sctx.putImageData(px.toImageData(), 0, 0)
+  ctx.drawImage(small, 0, 0, W, H, 0, 0, W * SCALE, H * SCALE)
+
+  const out: GeneratedScene = {
+    dataUrl: canvas.toDataURL('image/png'),
+    svg: '',   // 像素版不再有 SVG（保留字段是为了不改调用方）
     archetype,
   }
+  cache.set(key, out)
+  return out
 }
