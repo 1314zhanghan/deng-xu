@@ -3,7 +3,8 @@ import { useSessionStore } from '@/stores/session';
 import { MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { CharacterAvatar } from '@/components/CharacterAvatar'
-import { CharacterSprite } from '@/components/CharacterSprite';
+import { CharacterSprite } from '@/components/CharacterSprite'
+import { PortraitTrigger } from '@/components/PortraitPanel';
 
 interface RelationshipPanelProps {
   className?: string;
@@ -49,24 +50,28 @@ export function RelationshipPanel({ className = '' }: RelationshipPanelProps) {
                       角色卡若自带图片，仍以自带图片优先 —— 那代表作者的明确意图。
                     */}
                     {char.avatar ? (
-                      <CharacterAvatar
-                        name={char.name}
-                        id={char.id}
-                        avatar={char.avatar}
-                        avatarId={char.avatarId}
-                        style={world?.avatarStyle}
-                        tone={world?.avatarTone}
-                        size={48}
-                      />
+                      <PortraitTrigger characterId={char.id}>
+                        <CharacterAvatar
+                          name={char.name}
+                          id={char.id}
+                          avatar={char.avatar}
+                          avatarId={char.avatarId}
+                          style={world?.avatarStyle}
+                          tone={world?.avatarTone}
+                          size={48}
+                        />
+                      </PortraitTrigger>
                     ) : (
-                      <CharacterSprite
-                        name={char.name}
-                        id={char.id}
-                        scale={3}
-                        /* 48px 显示，3 倍合成源（192px）在 2x/3x 屏上都够锐 */
-                        className="w-12 h-12 shrink-0 rounded border border-text-muted/25 bg-black/30"
-                        headOnly
-                      />
+                      <PortraitTrigger characterId={char.id}>
+                        <CharacterSprite
+                          name={char.name}
+                          id={char.id}
+                          scale={3}
+                          /* 48px 显示，3 倍合成源（192px）在 2x/3x 屏上都够锐 */
+                          className="w-12 h-12 bg-black/30"
+                          headOnly
+                        />
+                      </PortraitTrigger>
                     )}
                     <div className="flex-1">
                       <div className="flex justify-between items-start">

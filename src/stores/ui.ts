@@ -28,6 +28,15 @@ interface UIState {
    */
   pendingSetup: SetupSeed | null
   setPendingSetup: (seed: SetupSeed | null) => void
+
+  /**
+   * 立绘面板：点开某个角色时显示他的全身像素立绘。
+   *
+   * 存 id 而不是角色对象：角色数据在 gameStore 里会持续更新（关系、状态、位置），
+   * 面板要跟着变；存快照就会显示过期信息。
+   */
+  portraitCharacterId: string | null
+  setPortraitCharacterId: (id: string | null) => void
 }
 
 /** 切换服务商时同步默认地址与模型 */
@@ -68,6 +77,9 @@ export const useUIStore = create<UIState>()(
 
       pendingSetup: null,
       setPendingSetup: (seed) => set({ pendingSetup: seed }),
+
+  portraitCharacterId: null,
+  setPortraitCharacterId: (id) => set({ portraitCharacterId: id }),
     }),
     {
       name: 'pale-notes-ui',

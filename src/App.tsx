@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { ApiKeyModal } from '@/components/ApiKeyModal'
 import { ChoicePanel } from '@/components/ChoicePanel'
 import { StatusPanel } from '@/components/StatusPanel'
+import { PortraitPanel } from '@/components/PortraitPanel'
 import { InventoryPanel } from '@/components/InventoryPanel'
 import { RelationshipPanel } from '@/components/RelationshipPanel'
 import { DebugPanel } from '@/components/DebugPanel'
@@ -113,6 +114,8 @@ function App() {
       <div className="absolute inset-0 bg-radial-gradient from-transparent via-background/50 to-background pointer-events-none z-0" />
 
       <ApiKeyModal />
+      {/* 全身立绘面板（点角色头像打开） */}
+      <PortraitPanel />
 
       {/* Desktop Left Panel (Status) */}
       <aside className="hidden md:block w-64 flex-shrink-0 z-10 relative border-r border-text-muted/30">

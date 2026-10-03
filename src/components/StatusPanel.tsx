@@ -4,6 +4,7 @@ import { useSessionStore } from '@/stores/session';
 import { CharacterAvatar } from '@/components/CharacterAvatar';
 import { CharacterSprite } from '@/components/CharacterSprite';
 import { playerSpriteSeed } from '@/utils/lpcSprite';
+import { PortraitTrigger } from '@/components/PortraitPanel';
 import {
   Sparkles,
   Zap,
@@ -51,23 +52,27 @@ export function StatusPanel({ className = '' }: StatusPanelProps) {
             在状态栏是几何头 —— 两套视觉语言并存，是本项目最刺眼的观感问题。
           */}
           {playerAvatar ? (
-            <CharacterAvatar
-              name={playerName || '主角'}
-              id={playerAvatarSeed}
-              avatar={playerAvatar}
-              style={world?.avatarStyle}
-              tone={world?.avatarTone}
-              size={48}
-            />
+            <PortraitTrigger characterId="__player__">
+              <CharacterAvatar
+                name={playerName || '主角'}
+                id={playerAvatarSeed}
+                avatar={playerAvatar}
+                style={world?.avatarStyle}
+                tone={world?.avatarTone}
+                size={48}
+              />
+            </PortraitTrigger>
           ) : (
-            <CharacterSprite
-              name={playerName || '主角'}
-              seed={playerAvatarSeed}
-              gender={playerGender}
-              headOnly
-              scale={4}
-              className="w-12 h-12 shrink-0 rounded border border-text-muted/25 bg-black/30"
-            />
+            <PortraitTrigger characterId="__player__">
+              <CharacterSprite
+                name={playerName || '主角'}
+                seed={playerAvatarSeed}
+                gender={playerGender}
+                headOnly
+                scale={4}
+                className="w-12 h-12 bg-black/30"
+              />
+            </PortraitTrigger>
           )}
           <div className="min-w-0 flex-1">
             <div className="text-sm font-serif text-text-primary truncate" title={playerName}>
