@@ -1,0 +1,9 @@
+{
+  "name": "灯叙 - Z测试版",
+  "short_name": "灯叙",
+  "description": "灯叙 —— 通用 AI 文字角色扮演 / 跑团引擎，世界观与角色卡完全自定义。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a"
+}

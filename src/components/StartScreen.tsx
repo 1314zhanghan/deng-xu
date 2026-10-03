@@ -1,0 +1,577 @@
+import { useEffect, useMemo, useRef, useState, Suspense } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Plus, Upload, Download, Settings, Trash2, Copy, Pencil, Play,
+  Users, Sliders, BookOpen, Layers, AlertTriangle
+} from 'lucide-react'
+import { useLibraryStore } from '@/stores/library'
+import { useUIStore } from '@/stores/ui'
+import { useGameStore } from '@/stores/game'
+import { useSessionStore } from '@/stores/session'
+import { TutorialModal } from '@/components/TutorialModal'
+import { ApiKeyModal } from '@/components/ApiKeyModal'
+import { SessionSetup } from '@/components/SessionSetup'
+import { lazyWithRetry } from '@/utils/lazyWithRetry'
+import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
+
+/**
+ * 世界卡编辑器懒加载。
+ * 它是全项目最大的单个组件（含酒馆卡解析、头像生成、五个页签的表单），
+ * 但只有用户点「新建/编辑世界卡」时才需要 —— 不该压在首屏。
+ */
+const CardEditor = lazyWithRetry(() =>
+  import('@/components/CardEditor').then(m => ({ default: m.CardEditor }))
+)
+import { downloadFile, readFileAsText, timestampSuffix } from '@/utils/files'
+import type { CardBundle, WorldCard } from '@/types/cards'
+
+/**
+ * 卡库首页
+ *
+ * 原版这里是一个写死剧本的封面页（1900 年代伦敦 + 三个固定出身）。
+ * 现在它是一张张「世界卡」的卡片墙：任何题材都只是库里的一个条目。
+ */
+export function StartScreen() {
+  const { worlds, loaded, loadError, loadWorlds, deleteWorld, duplicateWorld, importWorlds } = useLibraryStore()
+  const { setCardEditorOpen, setEditingWorldId, setApiKeyModalOpen, showTutorial, setShowTutorial, llm, pendingSetup, setPendingSetup } = useUIStore()
+  const { resetGame, startGame, isGameStarted } = useGameStore()
+  const clearSession = useSessionStore(s => s.clearSession)
+
+  const [setupWorldId, setSetupWorldId] = useState<string | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [confirmResume, setConfirmResume] = useState(false)
+  const importRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    loadWorlds()
+  }, [loadWorlds])
+
+  // 首次进入时的引导
+  useEffect(() => {
+    if (!localStorage.getItem('hasSeenTutorial')) {
+      const t = setTimeout(() => setShowTutorial(true), 800)
+      return () => clearTimeout(t)
+    }
+  }, [setShowTutorial])
+
+  const closeTutorial = () => {
+    setShowTutorial(false)
+    localStorage.setItem('hasSeenTutorial', 'true')
+  }
+
+  const flash = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast((cur) => (cur === msg ? null : cur)), 3200)
+  }
+
+  /**
+   * 待配置的世界卡：优先用编辑器直接带来的对象（新卡可能刚落库，按 id 也能查到），
+   * 查不到时退回 pendingSetup，绝不出现「空的世界卡」。
+   */
+  const setupWorld = useMemo(() => {
+    if (pendingSetup?.world) return pendingSetup.world
+    if (setupWorldId) return worlds.find(w => w.id === setupWorldId) || null
+    return null
+  }, [pendingSetup, setupWorldId, worlds])
+
+  /**
+   * 可继续的存档。
+   *
+   * 刷新后 isGameStarted 会被重置（故意的，见 game store 的 partialize），
+   * 但 localStorage 里的存档其实一直都在：session 存了世界卡与玩家，
+   * game 存了对话历史与全部数值。所以这里只要把它们读出来就能「继续」，
+   * 完全不需要重新生成剧情。
+   */
+  // 注意：这里逐个字段取值，不要返回新对象。
+  // zustand v4 用 Object.is 比较选择器结果，返回新对象会导致无限重渲染。
+  const history = useGameStore(s => s.history)
+  const gameTime = useGameStore(s => s.time)
+  const saveLocation = useGameStore(s => s.location)
+  const savedPlayerName = useGameStore(s => s.playerName)
+  const sessionWorld = useSessionStore(s => s.world)
+
+  // 有世界卡 + 至少推进过一轮，才算可继续
+  const canResume = !!sessionWorld && history.length > 0
+
+  const lastNarrative = useMemo(() => {
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].role === 'assistant' && history[i].content.trim()) return history[i].content.trim()
+    }
+    return ''
+  }, [history])
+
+  /** 存档时间：取最后一条消息的时间戳 */
+  const savedAtLabel = useMemo(() => {
+    for (let i = history.length - 1; i >= 0; i--) {
+      const ts = history[i].timestamp
+      if (ts) {
+        const d = new Date(ts)
+        const pad = (n: number) => String(n).padStart(2, '0')
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+      }
+    }
+    return ''
+  }, [history])
+
+  const fmtTime = (t: typeof gameTime) => {
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${t.year}-${pad(t.month)}-${pad(t.day)} ${pad(t.hour)}:${pad(t.minute)}`
+  }
+
+  /** 继续上次的进度：状态本来就在，只需要重新打开游戏界面 */
+  const handleResume = () => {
+    setPendingSetup(null)
+    setSetupWorldId(null)
+    startGame()
+  }
+
+  /** 放弃当前存档，从头开始（真正清掉历史与数值） */
+  const handleDiscardSave = () => {
+    resetGame()
+    clearSession()
+    setConfirmResume(false)
+    flash('已清除存档，可以重新开始了。')
+  }
+
+  const needsKey = !llm.apiKey && llm.provider !== 'ollama'
+
+  // —— 导入 / 导出 ——
+
+  const handleImport = async (files: FileList | null) => {
+    if (!files?.length) return
+    const collected: WorldCard[] = []
+    let failed = 0
+
+    for (const file of Array.from(files)) {
+      try {
+        const text = await readFileAsText(file)
+        const parsed = JSON.parse(text)
+
+        // 支持三种形态：单卡、卡包 bundle、卡数组
+        if (parsed && typeof parsed === 'object' && parsed.format === 'pale-notes-bundle') {
+          const bundle = parsed as CardBundle
+          if (bundle.world) collected.push(bundle.world)
+          else failed++
+        } else if (Array.isArray(parsed)) {
+          collected.push(...parsed.filter((w: any) => w && typeof w === 'object' && w.title))
+        } else if (parsed && typeof parsed === 'object' && typeof parsed.title === 'string') {
+          collected.push(parsed as WorldCard)
+        } else {
+          failed++
+        }
+      } catch {
+        failed++
+      }
+    }
+
+    if (!collected.length) {
+      flash('导入失败：没有识别到世界卡（请选择导出的 .world.json 或卡包文件）。')
+      return
+    }
+
+    const imported = await importWorlds(collected)
+    flash(`已导入 ${imported.length} 张世界卡${failed ? `，${failed} 个文件无法识别` : ''}。`)
+  }
+
+  const handleExportAll = () => {
+    downloadFile(
+      `world-cards-${timestampSuffix()}.json`,
+      { format: 'pale-notes-bundle', version: 1, exportedAt: new Date().toISOString(), characters: [], world: undefined, worlds },
+      'application/json'
+    )
+    flash(`已导出 ${worlds.length} 张世界卡。`)
+  }
+
+  const handleLaunch = () => {
+    if (!setupWorld) return
+    // 注意：这里**不能**调用 clearSession()。
+    // SessionSetup 已经用 setSession() 写好了本局会话，再清一次会把 world 抹成 null，
+    // 结果 isGameStarted 为真而 session.world 为空，游戏界面会卡在
+    // 「尚未选择世界卡」并且没有任何办法回到正常流程。
+    // 清空旧存档由 resetGame() 负责，它和 session 是两套独立的存储。
+    resetGame()
+    setPendingSetup(null)
+    startGame()
+  }
+
+  if (isGameStarted) return null
+
+  // 会话配置独立成一屏
+  if (setupWorld) {
+    return (
+      <SessionSetup
+        world={setupWorld}
+        onCancel={() => { setSetupWorldId(null); setPendingSetup(null) }}
+        onLaunch={handleLaunch}
+      />
+    )
+  }
+
+  return (
+    <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
+      <div className="absolute inset-0 bg-neutral-900 opacity-[0.04] pointer-events-none" />
+      <ApiKeyModal />
+      <AnimatePresence>{showTutorial && <TutorialModal onClose={closeTutorial} />}</AnimatePresence>
+      <ChunkErrorBoundary label="卡片编辑器加载失败">
+        <Suspense fallback={null}>
+          <CardEditor />
+        </Suspense>
+      </ChunkErrorBoundary>
+
+      {/* 顶栏 */}
+      <header className="relative z-10 flex items-center justify-between gap-4 px-6 py-4 border-b border-text-muted/20">
+        <div className="flex items-center gap-3 min-w-0">
+          <Layers size={22} className="text-accent-lantern flex-shrink-0" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <h1 className="font-serif font-bold tracking-widest text-accent-lantern truncate">灯叙</h1>
+              <span className="text-[10px] px-1.5 py-0.5 rounded border border-accent-forge/50 text-accent-forge whitespace-nowrap flex-shrink-0">
+                Z测试版
+              </span>
+            </div>
+            <p className="text-[10px] text-text-muted font-mono truncate">
+              {loaded ? `${worlds.length} 张世界卡` : '正在载入卡库…'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => setApiKeyModalOpen(true)}
+            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded border transition-colors
+              ${needsKey
+                ? 'border-accent-forge/50 text-accent-forge hover:bg-accent-forge/10'
+                : 'border-text-muted/40 text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40'}`}
+            title="模型设置"
+          >
+            <Settings size={14} />
+            {needsKey ? '未配置模型' : llm.narrativeModel}
+          </button>
+          <button
+            onClick={() => importRef.current?.click()}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors"
+          >
+            <Upload size={14} /> <span className="hidden sm:inline">导入</span>
+          </button>
+          <input ref={importRef} type="file" multiple accept=".json,application/json" className="hidden"
+            onChange={e => { handleImport(e.target.files); e.target.value = '' }} />
+          <button
+            onClick={handleExportAll}
+            disabled={!worlds.length}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors disabled:opacity-40"
+          >
+            <Download size={14} /> 导出全部
+          </button>
+          <button
+            onClick={() => { setEditingWorldId(null); setCardEditorOpen(true) }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
+          >
+            <Plus size={14} /> <span className="hidden sm:inline">新建世界卡</span>
+          </button>
+        </div>
+      </header>
+
+      {/* 提示条 */}
+      {loadError && (
+        <div className="relative z-10 flex items-start gap-2 px-6 py-2 text-xs bg-accent-forge/10 border-b border-accent-forge/30 text-accent-forge">
+          <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+          <span>{loadError}</span>
+        </div>
+      )}
+      {needsKey && !loadError && (
+        <div
+          onClick={() => setApiKeyModalOpen(true)}
+          className="relative z-10 flex items-start gap-2 px-6 py-2 text-xs bg-accent-forge/10 border-b border-accent-forge/30 text-accent-forge cursor-pointer hover:bg-accent-forge/15 transition-colors"
+        >
+          <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+          <span>还没有配置模型接口，点此填写 API Key 后才能开始游戏。</span>
+        </div>
+      )}
+
+      {/* 卡片墙 */}
+      <main className="relative z-10 flex-1 overflow-y-auto px-6 py-8">
+        {/* 继续游戏。
+            存档一直在 localStorage 里，刷新后只是没回到游戏界面 ——
+            这里给一个明确的入口，避免每次刷新都要从头开始。 */}
+        {canResume && sessionWorld && (
+          <div className="max-w-[100rem] mx-auto mb-8">
+            <div className="rounded-lg border border-accent-lantern/40 bg-accent-lantern/[0.06] overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 p-4 md:p-5">
+                {sessionWorld.cover && (
+                  <img src={sessionWorld.cover} alt=""
+                    className="w-full md:w-28 h-24 md:h-20 object-cover rounded border border-text-muted/30 flex-shrink-0" />
+                )}
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/20 text-accent-lantern border border-accent-lantern/40">
+                      进行中
+                    </span>
+                    <h2 className="font-serif font-bold text-lg text-text-primary truncate">
+                      {sessionWorld.title}
+                    </h2>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-text-muted font-mono">
+                    {savedPlayerName && <span>角色：{savedPlayerName}</span>}
+                    <span>已记录 {history.length} 条</span>
+                    {saveLocation && <span>位置：{saveLocation}</span>}
+                    <span>世界时间：{fmtTime(gameTime)}</span>
+                    {savedAtLabel && <span>存档于 {savedAtLabel}</span>}
+                  </div>
+                  {lastNarrative && (
+                    <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 font-serif">
+                      …{lastNarrative.replace(/[#*`>]/g, '').slice(-90)}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={handleResume}
+                    className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-accent-lantern text-black rounded hover:bg-accent-lantern/90 transition-colors"
+                  >
+                    <Play size={15} /> 继续游戏
+                  </button>
+                  <button
+                    onClick={() => setConfirmResume(true)}
+                    className="px-3 py-2.5 text-xs border border-text-muted/40 rounded text-text-muted hover:text-red-400 hover:border-red-900/50 transition-colors"
+                    title="清除存档，从头开始"
+                  >
+                    新游戏
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loaded && (
+          <div className="text-center text-sm text-text-muted py-20">正在载入卡库…</div>
+        )}
+
+        {loaded && worlds.length === 0 && (
+          <div className="max-w-md mx-auto text-center py-20 space-y-4">
+            <BookOpen size={40} className="mx-auto text-text-muted" />
+            <p className="text-sm text-text-secondary">卡库是空的。</p>
+            <p className="text-xs text-text-muted leading-relaxed">
+              新建一张世界卡来定义你的世界，或导入别人分享的卡包。
+            </p>
+            <button
+              onClick={() => { setEditingWorldId(null); setCardEditorOpen(true) }}
+              className="px-5 py-2 text-sm bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
+            >
+              新建世界卡
+            </button>
+          </div>
+        )}
+
+        {loaded && worlds.length > 0 && (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[100rem] mx-auto">
+            {worlds.map(world => (
+              <motion.div
+                key={world.id}
+                layout
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="group bg-surface/40 border border-text-muted/20 rounded-lg overflow-hidden flex flex-col hover:border-accent-lantern/40 transition-colors"
+              >
+                {/* 封面 */}
+                <button
+                  onClick={() => setSetupWorldId(world.id)}
+                  className="relative block w-full h-36 overflow-hidden bg-black/40 text-left"
+                >
+                  {world.cover
+                    ? <img src={world.cover} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+                    : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface to-black/60">
+                      <span className="font-serif text-3xl text-text-muted/40">{world.title.slice(0, 1)}</span>
+                    </div>}
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 to-transparent" />
+                  {world.builtin && (
+                    <span className="absolute top-2 left-2 text-[10px] px-1.5 py-0.5 bg-black/70 border border-text-muted/40 rounded text-text-muted">
+                      内置示例
+                    </span>
+                  )}
+                  {!world.enableMechanics && (
+                    <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 bg-black/70 border border-accent-mansus/40 rounded text-accent-mansus">
+                      纯叙事
+                    </span>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 p-3">
+                    <h3 className="font-serif font-bold text-text-primary truncate">{world.title}</h3>
+                  </div>
+                </button>
+
+                {/* 信息 */}
+                <div className="p-3 flex-1 flex flex-col gap-3">
+                  <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                    {world.tagline || world.worldLore.replace(/[#*`>]/g, '').trim().slice(0, 70) || '（还没有写简介）'}
+                  </p>
+
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-text-muted font-mono">
+                    <span className="flex items-center gap-1"><Users size={10} /> {world.characters.length} 角色</span>
+                    {world.enableMechanics && (
+                      <>
+                        <span className="flex items-center gap-1"><Sliders size={10} /> {world.attributes.length} 属性</span>
+                        <span>{world.resources.length} 资源</span>
+                      </>
+                    )}
+                    {world.story.stages.length > 0 && (
+                      <span className="flex items-center gap-1"><BookOpen size={10} /> {world.story.stages.length} 事件</span>
+                    )}
+                  </div>
+
+                  <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-text-muted/10">
+                    <button
+                      onClick={() => setSetupWorldId(world.id)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
+                    >
+                      <Play size={12} /> 开始
+                    </button>
+
+                    {world.builtin ? (
+                      <button
+                        onClick={() => duplicateWorld(world.id)}
+                        title="复制一份以便修改"
+                        className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40 transition-colors"
+                      >
+                        <Copy size={13} />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => { setEditingWorldId(world.id); setCardEditorOpen(true) }}
+                        title="编辑"
+                        className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40 transition-colors"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => setConfirmDelete(world.id)}
+                      title="删除"
+                      className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-red-400 hover:border-red-900/50 transition-colors"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+
+                  {world.builtin && (
+                    <p className="text-[10px] text-text-muted -mt-1">内置示例不可直接编辑，请先复制。</p>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* 清除存档确认 */}
+      <AnimatePresence>
+        {confirmResume && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[95] bg-black/80 flex items-center justify-center p-4"
+          >
+            <div className="bg-surface border border-text-muted/30 rounded-lg p-5 max-w-sm w-full space-y-4">
+              <h3 className="font-serif font-bold text-text-primary">放弃当前存档？</h3>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                会清除「{sessionWorld?.title}」的对话历史、数值与人物关系，无法恢复。
+                <br />
+                清除后可以从头开始一场新游戏。
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setConfirmResume(false)}
+                  className="px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:text-text-primary transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleDiscardSave}
+                  className="px-3 py-1.5 text-xs bg-red-900/40 border border-red-700/60 text-red-200 rounded hover:bg-red-900/60 transition-colors"
+                >
+                  清除并重新开始
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 删除世界卡确认 */}
+      <AnimatePresence>
+        {confirmDelete && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[95] bg-black/80 flex items-center justify-center p-4"
+          >
+            <div className="bg-surface border border-text-muted/30 rounded-lg p-5 max-w-sm w-full space-y-4">
+              <h3 className="font-serif font-bold text-text-primary">删除这张世界卡？</h3>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                「{worlds.find(w => w.id === confirmDelete)?.title}」及其中的角色卡会被永久删除，无法恢复。
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setConfirmDelete(null)}
+                  className="px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:text-text-primary transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={async () => {
+                    const id = confirmDelete
+                    setConfirmDelete(null)
+                    await deleteWorld(id)
+                    flash('已删除。')
+                  }}
+                  className="px-3 py-1.5 text-xs bg-red-900/40 border border-red-700/60 text-red-200 rounded hover:bg-red-900/60 transition-colors"
+                >
+                  确认删除
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 浮动提示 */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[96] px-4 py-2 bg-black/90 border border-accent-lantern/40 text-accent-lantern text-xs rounded shadow-xl max-w-[90vw]"
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 底部说明 */}
+      <footer className="relative z-10 px-6 py-3 border-t border-text-muted/20 text-[10px] text-text-muted text-center leading-relaxed">
+        灯叙 · Z测试版 · 世界观与角色卡完全自定义，可导入 SillyTavern 角色卡 · API Key 仅保存在本地浏览器
+        <br />
+        基于开源项目 <span className="text-text-secondary">pale-notes</span> 改造，剥离原有题材
+        <br />
+        {/*
+          署名是**授权要求**，不是可选项：
+          人物像素立绘来自 Universal LPC Spritesheet，
+          其中 OGA-BY 3.0 与 CC-BY-SA 3.0 强制要求署名。
+        */}
+        人物像素素材来自{' '}
+        <a
+          href="https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator"
+          target="_blank"
+          rel="noreferrer"
+          className="text-text-secondary hover:text-accent-lantern underline decoration-dotted"
+        >
+          Universal LPC Spritesheet
+        </a>
+        （CC0 / OGA-BY 3.0 / CC-BY-SA 3.0）·{' '}
+        <a href="./CREDITS.md" target="_blank" rel="noreferrer" className="text-text-secondary hover:text-accent-lantern underline decoration-dotted">
+          完整署名
+        </a>
+      </footer>
+    </div>
+  )
+}

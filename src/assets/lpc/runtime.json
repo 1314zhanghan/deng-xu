@@ -1,0 +1,601 @@
+{
+  "frameSize": 64,
+  "directions": [
+    "up",
+    "left",
+    "down",
+    "right"
+  ],
+  "parts": [
+    {
+      "id": "body",
+      "kind": "body",
+      "zPos": 10,
+      "file": "body.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "body",
+      "matchBodyColor": true
+    },
+    {
+      "id": "feet_shoes_basic",
+      "kind": "shoes",
+      "zPos": 15,
+      "file": "feet_shoes_basic.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "feet_shoes_ghillies",
+      "kind": "shoes",
+      "zPos": 15,
+      "file": "feet_shoes_ghillies.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "feet_shoes_revised",
+      "kind": "shoes",
+      "zPos": 15,
+      "file": "feet_shoes_revised.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "legs_cuffed",
+      "kind": "legs",
+      "zPos": 20,
+      "file": "legs_cuffed.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "legs_formal",
+      "kind": "legs",
+      "zPos": 20,
+      "file": "legs_formal.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "legs_leggings",
+      "kind": "legs",
+      "zPos": 20,
+      "file": "legs_leggings.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "legs_pants",
+      "kind": "legs",
+      "zPos": 20,
+      "file": "legs_pants.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "legs_skirt_belle",
+      "kind": "legs",
+      "zPos": 20,
+      "file": "legs_skirt_belle.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "feet_boots_basic",
+      "kind": "shoes",
+      "zPos": 25,
+      "file": "feet_boots_basic.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "feet_boots_revised",
+      "kind": "shoes",
+      "zPos": 25,
+      "file": "feet_boots_revised.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "feet_boots_rim",
+      "kind": "shoes",
+      "zPos": 25,
+      "file": "feet_boots_rim.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "legs_skirt_overskirt",
+      "kind": "apron",
+      "zPos": 35,
+      "file": "legs_skirt_overskirt.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_longsleeve",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_longsleeve.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_longsleeve2",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_longsleeve2.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_longsleeve2_buttoned",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_longsleeve2_buttoned.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_longsleeve2_cardigan",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_longsleeve2_cardigan.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_longsleeve2_polo",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_longsleeve2_polo.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_longsleeve2_scoop",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_longsleeve2_scoop.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_shortsleeve",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_shortsleeve.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_shortsleeve_cardigan",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_shortsleeve_cardigan.png",
+      "w": 128,
+      "h": 320,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_shortsleeve_polo",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_shortsleeve_polo.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_clothes_tshirt",
+      "kind": "clothes",
+      "zPos": 35,
+      "file": "torso_clothes_tshirt.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "cloth",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_armour_leather",
+      "kind": "armour",
+      "zPos": 60,
+      "file": "torso_armour_leather.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_armour_legion",
+      "kind": "armour",
+      "zPos": 60,
+      "file": "torso_armour_legion.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "metal",
+      "matchBodyColor": false
+    },
+    {
+      "id": "torso_armour_plate",
+      "kind": "armour",
+      "zPos": 60,
+      "file": "torso_armour_plate.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "metal",
+      "matchBodyColor": false
+    },
+    {
+      "id": "heads_human_elderly_small",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_elderly_small.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_female",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_female.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_female_elderly",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_female_elderly.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_female_small",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_female_small.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_male",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_male.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_male_elderly",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_male_elderly.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_male_gaunt",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_male_gaunt.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_male_plump",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_male_plump.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "heads_human_male_small",
+      "kind": "head",
+      "zPos": 100,
+      "file": "heads_human_male_small.png",
+      "w": 128,
+      "h": 256,
+      "matchBodyColor": true
+    },
+    {
+      "id": "head_nose_big",
+      "kind": "nose",
+      "zPos": 105,
+      "file": "head_nose_big.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "body",
+      "matchBodyColor": true
+    },
+    {
+      "id": "head_nose_button",
+      "kind": "nose",
+      "zPos": 105,
+      "file": "head_nose_button.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "body",
+      "matchBodyColor": true
+    },
+    {
+      "id": "head_nose_elderly",
+      "kind": "nose",
+      "zPos": 105,
+      "file": "head_nose_elderly.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "body",
+      "matchBodyColor": true
+    },
+    {
+      "id": "head_nose_large",
+      "kind": "nose",
+      "zPos": 105,
+      "file": "head_nose_large.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "body",
+      "matchBodyColor": true
+    },
+    {
+      "id": "head_nose_straight",
+      "kind": "nose",
+      "zPos": 105,
+      "file": "head_nose_straight.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "body",
+      "matchBodyColor": true
+    },
+    {
+      "id": "eyebrows_thick",
+      "kind": "eyebrows",
+      "zPos": 106,
+      "file": "eyebrows_thick.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "eyebrows_thin",
+      "kind": "eyebrows",
+      "zPos": 106,
+      "file": "eyebrows_thin.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_afro",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_afro.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_balding",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_balding.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_bedhead",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_bedhead.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_bob",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_bob.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_buzzcut",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_buzzcut.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_cornrows",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_cornrows.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_dreadlocks_long",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_dreadlocks_long.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_dreadlocks_short",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_dreadlocks_short.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_flat_top_fade",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_flat_top_fade.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_flat_top_straight",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_flat_top_straight.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_high_and_tight",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_high_and_tight.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_lob",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_lob.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_long",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_long.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_natural",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_natural.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_relm_short",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_relm_short.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_shorthawk",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_shorthawk.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_twists_fade",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_twists_fade.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    },
+    {
+      "id": "hair_twists_straight",
+      "kind": "hair",
+      "zPos": 120,
+      "file": "hair_twists_straight.png",
+      "w": 128,
+      "h": 256,
+      "recolors": "hair",
+      "matchBodyColor": false
+    }
+  ]
+}

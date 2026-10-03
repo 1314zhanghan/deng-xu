@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  /* 用 dvh 而不是 vh：安卓/移动端浏览器地址栏会动态收起，
+     vh 按「最大视口」计算，导致页面底部被地址栏盖住。 */
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #0c0c0c;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.8) 0%, rgba(0, 0, 0, 1) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  /* 移动端点击时不显示灰色高亮块 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 输入框在安卓/iOS 下若字号小于 16px，聚焦时浏览器会强制缩放页面 */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #404040; 
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #525252; 
+}
+
+/*
+  衬线字体栈全部走系统字体。
+  原因见 index.html 顶部的注释：Google Fonts 那个中文衬线体会按分片拉上百个文件，
+  在会掐连接的 CDN 上足以把整页拖垮。系统衬线体在中文下观感足够，且零请求。
+*/
+.font-serif {
+  font-family: Georgia, "Songti SC", "SimSun", "Noto Serif SC", "Source Han Serif SC",
+    "Songti TC", "Times New Roman", serif;
+}
+
+

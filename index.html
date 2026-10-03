@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 内联 SVG 图标：原项目引用的 public/images/icons/*.png 属于 Weather Factory 的美术素材，已随题材一并移除。
+         用 data URL 可以在不引入任何二进制资源的前提下保留一个可用的站点图标。 -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1a'/%3E%3Cpath d='M16 6 L24 11 L24 21 L16 26 L8 21 L8 11 Z' fill='none' stroke='%23f59e0b' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23f59e0b'/%3E%3C/svg%3E"
+    />
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="灯叙 —— 通用 AI 文字角色扮演 / 跑团引擎。世界观与角色卡完全自定义，支持导入 SillyTavern 角色卡。" />
+    <title>灯叙 - Z测试版</title>
+    <!--
+      刻意不引入 Google Fonts。
+      原项目从 fonts.googleapis.com 加载 Merriweather + Noto Serif SC，
+      其中 Noto Serif SC 是中文衬线体，会被切成 100+ 个分片字体文件按需下载。
+      实测打开首页会额外发起约 20 个 woff2 请求，且 stylesheet 是渲染阻塞的 ——
+      在 surge 这种会掐断连接的 CDN 上，这些并发请求会把连接预算耗光，
+      直接导致 5 个关键 JS/CSS 资源里的某一个被重置，整页白屏。
+      改用系统字体后：少一个阻塞请求、少约 20 个字体请求，中文观感基本不变。
+      详见 src/index.css 的字体栈。
+    -->
+  </head>
+  <body class="bg-background text-text-primary font-sans antialiased">
+    <div id="root"></div>
+
+    <!-- 白屏自检守卫。
+         三种真实场景：
+         1) file:// 双击打开了 index.html —— 它只是 Vite 入口模板，/src/main.tsx 是 TypeScript，
+            不编译无法运行；
+         2) 公网站点上模块没加载成功 —— surge 免费 CDN 会随机把连接掐断
+            （ERR_CONNECTION_RESET），实测冷启动约 1/3 的概率会中招；
+         3) 浏览器缓存了旧版 index.html，里面引用的 JS 文件名在新部署里已不存在。
+         策略：先自动重载自愈（最多 2 次），仍失败才显示手动界面。
+         绝对不能在线上提示「运行 pnpm dev」—— 访客根本没有那个项目目录。 -->
+    <script>
+      (function () {
+        var isFile = location.protocol === 'file:'
+        var isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
+        var shown = false
+
+        // 自动重载计数：只在"整页健康跑起来"之后才清零（见 src/App.tsx 的 appLoadedCleanly）
+        var RETRY_KEY = 'dengxu:guard-retry'
+        var MAX_AUTO_RETRY = 2
+        function readRetry() {
+          try { return Number(sessionStorage.getItem(RETRY_KEY) || '0') } catch (e) { return 0 }
+        }
+        function bumpRetry() {
+          try { sessionStorage.setItem(RETRY_KEY, String(readRetry() + 1)) } catch (e) {}
+        }
+
+        /** 自动重载自愈。返回 true 表示已经发起重载，调用方不要再显示提示。 */
+        function tryAutoRecover(why) {
+          if (isFile) return false
+          var used = readRetry()
+          if (used >= MAX_AUTO_RETRY) return false
+          bumpRetry()
+          var u = location.href.split('#')[0]
+          u += (u.indexOf('?') === -1 ? '?' : '&') + '_retry=' + (used + 1) + '&_t=' + Date.now()
+          console.warn('[boot] ' + why + '，自动重载第 ' + (used + 1) + ' 次')
+          location.replace(u)
+          return true
+        }
+
+        function show(reason) {
+          if (shown) return
+          shown = true
+          var box = document.createElement('div')
+          box.setAttribute('style', [
+            'position:fixed', 'inset:0', 'z-index:99999', 'display:flex',
+            'align-items:center', 'justify-content:center', 'padding:24px',
+            'background:#0c0c0c', 'color:#e5e5e5', 'overflow:auto',
+            'font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif'
+          ].join(';'))
+
+          var block = 'background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 16px;margin:16px 0'
+          var pre = 'margin:0;font-family:ui-monospace,Consolas,monospace;font-size:13px;color:#84cc16;white-space:pre-wrap;word-break:break-all'
+          var btn = 'display:inline-block;margin:4px 8px 4px 0;padding:10px 18px;border-radius:6px;' +
+                    'border:1px solid #f59e0b;background:rgba(245,158,11,.12);color:#f59e0b;' +
+                    'font-size:15px;font-weight:700;cursor:pointer'
+
+          var body = ''
+          if (isFile) {
+            body =
+              '<p style="margin:0 0 12px">你是<b>直接双击打开 index.html</b>（地址栏以 <code>file://</code> 开头）。' +
+              '这个文件只是 Vite 的入口模板，里面的 <code>/src/main.tsx</code> 是 TypeScript，' +
+              '必须经过编译才能运行，所以页面上什么都没有。</p>' +
+              '<div style="' + block + '">' +
+              '<div style="color:#a3a3a3;font-size:13px;margin-bottom:8px">在项目目录里这样启动：</div>' +
+              '<pre style="' + pre + '">pnpm install\npnpm dev</pre>' +
+              '<div style="color:#a3a3a3;font-size:13px;margin-top:10px">或直接双击项目里的 <b>start.bat</b>。</div>' +
+              '</div>' +
+              '<p style="color:#737373;font-size:13px;margin:0">' +
+              '<code>pnpm build</code> 生成的 dist 也不能双击打开：ES 模块在 <code>file://</code> 下会被浏览器拦截。</p>'
+          } else {
+            body =
+              '<p style="margin:0 0 12px">页面脚本没能加载完成。' +
+              (reason ? '<span style="color:#737373;font-size:13px">（' + reason + '）</span>' : '') +
+              '</p>' +
+              '<p style="margin:0 0 4px;color:#a3a3a3;font-size:14px">最常见的原因是浏览器缓存了旧版本页面。按下面顺序试：</p>' +
+              '<div style="' + block + '">' +
+              '<div style="color:#e5e5e5;font-size:14px;margin-bottom:10px"><b>1. 点这里强制重新加载</b></div>' +
+              '<button id="dsh-reload" style="' + btn + '">重新加载</button>' +
+              '<div style="color:#737373;font-size:12px;margin-top:6px">会附加一个随机参数，绕过缓存。</div>' +
+              '<div style="color:#e5e5e5;font-size:14px;margin:18px 0 8px"><b>2. 还不行就清一下缓存</b></div>' +
+              '<div style="color:#a3a3a3;font-size:13px;line-height:1.8">' +
+              '手机 Chrome：⋮ → 设置 → 隐私和安全 → 删除浏览数据 → 缓存的图片和文件<br>' +
+              '或用<b>无痕/隐身窗口</b>打开这个网址，一定能看到最新版</div>' +
+              '<div style="color:#e5e5e5;font-size:14px;margin:18px 0 8px"><b>3. 确认网络能访问本站</b></div>' +
+              '<div style="color:#a3a3a3;font-size:13px;line-height:1.8">' +
+              '本站托管在 surge.sh。如果切换过 VPN，或所在网络屏蔽了它，页面同样打不开。</div>' +
+              '</div>' +
+              (isLocal
+                ? '<p style="color:#737373;font-size:13px;margin:0">本机开发时，请确认 dev server 已启动，' +
+                  '并且控制台（F12）里没有报错。</p>'
+                : '<p style="color:#737373;font-size:13px;margin:0">按 F12 打开控制台可以看到具体报错。</p>')
+          }
+
+          box.innerHTML =
+            '<div style="max-width:640px;line-height:1.9">' +
+            '<div style="font-size:20px;font-weight:700;color:#f59e0b;margin-bottom:14px">页面没能加载出来</div>' +
+            body +
+            '</div>'
+          document.body.appendChild(box)
+
+          var btnEl = document.getElementById('dsh-reload')
+          if (btnEl) {
+            btnEl.onclick = function () {
+              var u = location.href.split('#')[0]
+              u += (u.indexOf('?') === -1 ? '?' : '&') + '_r=' + Date.now()
+              location.replace(u)
+            }
+          }
+        }
+
+        // 模块加载失败会立刻触发 script 的 error 事件，
+        // 比等超时更快、更准（超时只能说明「没渲染」，猜不出是加载失败）。
+        window.addEventListener('error', function (e) {
+          var t = e && e.target
+          if (!t) return
+          // 脚本或 modulepreload 失败都算 —— 两者任一断掉都足以让应用起不来
+          var isScript = t.tagName === 'SCRIPT'
+          var isPreload = t.tagName === 'LINK' && t.rel === 'modulepreload'
+          if (!isScript && !isPreload) return
+          var name = (t.src || t.href || '').split('/').pop()
+          // 先尝试静默自愈；只有自愈次数用尽才打扰用户
+          if (tryAutoRecover(name + ' 传输中断')) return
+          show('脚本 ' + name + ' 加载失败')
+        }, true)
+
+        // 兜底：超时仍未挂载。给足时间（冷缓存 + 慢网），
+        // 避免把"还在下载"误判成"挂了"而白白触发一次重载。
+        setTimeout(function () {
+          if (window.__APP_MOUNTED__) return
+          var root = document.getElementById('root')
+          if (root && root.childElementCount > 0) return
+          if (tryAutoRecover('首屏 20 秒未挂载')) return
+          show('')
+        }, 20000)
+      })()
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

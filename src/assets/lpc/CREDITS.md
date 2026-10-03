@@ -1,0 +1,174 @@
+# 美术素材署名（CREDITS）
+
+本站的人物像素立绘来自 **Universal LPC Spritesheet Character Generator**：
+https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator
+
+该项目素材分别以 **CC0 / OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0** 发布。
+其中 OGA-BY 与 CC-BY-SA **强制要求署名**，因此本文件必须随作品一同提供。
+
+## 作者
+
+- **??** —— heads_human_male_plump
+- **Benjamin K. Smith (BenCreating)** —— body、heads_human_female、heads_human_female_elderly、heads_human_male、heads_human_male_elderly
+- **Bluecarrot16** —— feet_boots_revised、feet_shoes_revised、legs_cuffed
+- **Durrani** —— body
+- **Eliza Wyatt (ElizaWy)** —— body、heads_human_female_elderly、heads_human_male_elderly
+- **ElizaWy** —— body、eyebrows_thick、eyebrows_thin、feet_boots_revised、feet_shoes_revised、hair_balding、hair_bob、hair_buzzcut、hair_cornrows、hair_dreadlocks_short、hair_flat_top_fade、hair_flat_top_straight、hair_natural、head_nose_elderly、head_nose_large、heads_human_elderly_small、heads_human_female_small、heads_human_male_small、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
+- **Evert** —— body
+- **JaidynReiman** —— body、feet_boots_basic、feet_boots_revised、feet_boots_rim、feet_shoes_basic、feet_shoes_ghillies、feet_shoes_revised、hair_bedhead、hair_long、hair_relm_short、hair_shorthawk、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_armour_leather、torso_armour_legion、torso_armour_plate、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
+- **Joe White** —— feet_shoes_basic、legs_pants
+- **Johannes Sjölund (wulax)** —— body、feet_boots_revised、feet_shoes_basic、feet_shoes_revised、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_armour_leather、torso_armour_plate、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
+- **Lanea Zimmerman (Sharm)** —— legs_skirt_belle、legs_skirt_overskirt
+- **Mandi Paugh** —— legs_leggings
+- **Manuel Riecke (MrBeast)** —— hair_bedhead、hair_long、hair_shorthawk
+- **Matthew Krohn (makrohn)** —— body、feet_shoes_ghillies、head_nose_big、head_nose_button、head_nose_straight、legs_pants、legs_skirt_belle、legs_skirt_overskirt、torso_armour_leather、torso_armour_plate
+- **Michael Whitlock (bigbeargames)** —— torso_armour_leather、torso_armour_plate
+- **MuffinElZangano** —— body
+- **Napsio (Vitruvian Studio)** —— torso_armour_legion、torso_armour_plate
+- **Nila122** —— body、feet_boots_basic、torso_armour_legion
+- **Nyom** —— torso_clothes_shortsleeve
+- **Pierre Vigier (pvigier)** —— body
+- **Sander Frenken (castelonia)** —— body
+- **Skorpio** —— hair_high_and_tight
+- **Stephen Challener (Redshrike)** —— body、feet_boots_revised、feet_shoes_revised、heads_human_elderly_small、heads_human_female、heads_human_female_elderly、heads_human_female_small、heads_human_male、heads_human_male_elderly、heads_human_male_gaunt、heads_human_male_plump、heads_human_male_small、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
+- **Thane Brimhall (pennomi)** —— feet_shoes_ghillies、head_nose_big、head_nose_button、head_nose_straight
+- **TheraHedwig** —— body
+- **William.Thompsonj** —— legs_leggings
+- **bluecarrot16** —— body、feet_boots_basic、feet_shoes_basic、feet_shoes_ghillies、hair_afro、hair_bob、hair_cornrows、hair_dreadlocks_long、hair_dreadlocks_short、hair_flat_top_fade、hair_flat_top_straight、hair_high_and_tight、hair_lob、hair_natural、hair_twists_fade、hair_twists_straight、heads_human_female、heads_human_male、heads_human_male_gaunt、legs_formal、legs_leggings、legs_pants、legs_skirt_belle、legs_skirt_overskirt、torso_armour_leather、torso_armour_legion、torso_armour_plate、torso_clothes_longsleeve、torso_clothes_shortsleeve
+- **dalonedrau** —— body
+- **kheftel** —— body
+- **laetissima** —— feet_shoes_ghillies、head_nose_big、head_nose_button、head_nose_straight
+
+## 各部件授权
+
+- `body` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `heads_human_male` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `heads_human_female` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `heads_human_male_elderly` —— OGA-BY 3.0 / CC-BY 3.0
+- `face_neutral` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `face_happy` —— OGA-BY 3.0
+- `face_angry` —— OGA-BY 3.0
+- `eyebrows_thick` —— OGA-BY 3.0
+- `eyebrows_thin` —— OGA-BY 3.0
+- `head_nose_straight` —— GPL 3.0 / CC-BY-SA 3.0
+- `head_nose_button` —— GPL 3.0 / CC-BY-SA 3.0
+- `hair_bob` —— CC0
+- `hair_long` —— CC-BY-SA 3.0 / GPL 3.0
+- `hair_buzzcut` —— OGA-BY 3.0
+- `hair_bedhead` —— CC-BY-SA 3.0 / GPL 3.0
+- `torso_clothes_tunic` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `torso_clothes_longsleeve` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `torso_armour_leather` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `legs_pants` —— OGA-BY 3.0 / GPL 3.0 / CC-BY-SA 3.0
+- `legs_leggings` —— OGA-BY 3.0 / GPL 3.0
+- `feet_boots_basic` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 2.0 / GPL 3.0
+- `feet_shoes_basic` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `weapon_sword_arming` —— OGA-BY 3.0
+- `weapon_sword_longsword` —— OGA-BY 3.0 / CC-BY-SA 3.0
+- `weapon_magic_wand` —— CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0
+- `hair_afro` —— CC0
+- `hair_cornrows` —— CC0
+- `hair_dreadlocks_long` —— CC0
+- `hair_dreadlocks_short` —— CC0
+- `hair_flat_top_fade` —— CC0
+- `hair_flat_top_straight` —— CC0
+- `hair_natural` —— CC0
+- `hair_twists_fade` —— CC0
+- `hair_twists_straight` —— CC0
+- `hair_balding` —— OGA-BY 3.0
+- `hair_high_and_tight` —— CC-BY-SA 3.0 / GPL 3.0
+- `hair_shorthawk` —— CC-BY-SA 3.0 / GPL 3.0
+- `hair_lob` —— CC0
+- `hair_relm_short` —— OGA-BY 3.0+ / CC-BY 3.0+ / GPL 3.0
+- `torso_clothes_longsleeve2` —— OGA-BY 3.0
+- `torso_clothes_longsleeve2_buttoned` —— OGA-BY 3.0
+- `torso_clothes_longsleeve2_cardigan` —— OGA-BY 3.0
+- `torso_clothes_longsleeve2_polo` —— OGA-BY 3.0
+- `torso_clothes_longsleeve2_scoop` —— OGA-BY 3.0
+- `torso_clothes_shortsleeve` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `torso_clothes_shortsleeve_cardigan` —— OGA-BY 3.0
+- `torso_clothes_shortsleeve_polo` —— OGA-BY 3.0
+- `torso_clothes_tshirt` —— OGA-BY 3.0
+- `torso_clothes_tunic_sara` —— OGA-BY 3.0
+- `torso_armour_legion` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 2.0 / GPL 3.0
+- `torso_armour_plate` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `legs_childpants` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `legs_cuffed` —— OGA-BY 3.0 / GPL 3.0
+- `legs_formal` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `legs_childskirts` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `legs_skirt_belle` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `legs_skirt_overskirt` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `feet_boots_revised` —— OGA-BY 3.0 / GPL 3.0
+- `feet_boots_rim` —— OGA-BY 3.0+ / CC-BY 3.0+ / GPL 3.0
+- `feet_shoes_ghillies` —— CC-BY-SA 3.0 / GPL 3.0
+- `feet_shoes_revised` —— OGA-BY 3.0 / GPL 3.0
+- `head_nose_big` —— GPL 3.0 / CC-BY-SA 3.0
+- `head_nose_elderly` —— OGA-BY 3.0
+- `head_nose_large` —— OGA-BY 3.0
+- `heads_human_child` —— OGA-BY 3.0 / CC-BY 3.0 / GPL 3.0
+- `heads_human_elderly_small` —— OGA-BY 3.0 / CC-BY
+- `heads_human_female_elderly` —— OGA-BY 3.0 / CC-BY 3.0
+- `heads_human_female_small` —— OGA-BY 3.0 / CC-BY
+- `heads_human_male_gaunt` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+- `heads_human_male_plump` —— CC-BY-SA 3.0 / GPL 3.0
+- `heads_human_male_small` —— OGA-BY 3.0 / CC-BY
+
+## 原始出处
+
+- http://opengameart.org/content/lpc-clothing-updates
+- http://opengameart.org/content/lpc-revised-character-basics
+- http://opengameart.org/content/sara-wizard
+- https://github.com/ElizaWy/LPC/blob/main/Characters/Hair
+- https://github.com/ElizaWy/LPC/tree/main/Characters/Clothing
+- https://github.com/ElizaWy/LPC/tree/main/Characters/Hair
+- https://github.com/ElizaWy/LPC/tree/main/Characters/Head
+- https://github.com/ElizaWy/LPC/tree/main/Characters/Head/Head%20Overlay%2001%20-%20Large%20Nose
+- https://github.com/ElizaWy/LPC/tree/main/Characters/Props/Sword%2001%20-%20Arming%20Sword
+- https://gitlab.com/vagabondgame/lpc-characters
+- https://opengameart.org/content/
+- https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+- https://opengameart.org/content/lpc-2-characters
+- https://opengameart.org/content/lpc-7-womens-shirts
+- https://opengameart.org/content/lpc-barbarian-sprite-base
+- https://opengameart.org/content/lpc-base-character-expressions
+- https://opengameart.org/content/lpc-be-seated
+- https://opengameart.org/content/lpc-character-bases
+- https://opengameart.org/content/lpc-child-standing-template
+- https://opengameart.org/content/lpc-children-walk-animation
+- https://opengameart.org/content/lpc-clothes-and-hair
+- https://opengameart.org/content/lpc-clothes-for-children
+- https://opengameart.org/content/lpc-clothing-updates
+- https://opengameart.org/content/lpc-combat-armor-for-women
+- https://opengameart.org/content/lpc-curly-hair-elven-ears-white-cape-with-blue-trim-and-more
+- https://opengameart.org/content/lpc-dress-in-combat-poses
+- https://opengameart.org/content/lpc-expanded-armor
+- https://opengameart.org/content/lpc-expanded-hair
+- https://opengameart.org/content/lpc-expanded-pants
+- https://opengameart.org/content/lpc-expanded-simple-shirts
+- https://opengameart.org/content/lpc-expanded-sit-run-jump-more
+- https://opengameart.org/content/lpc-expanded-socks-shoes
+- https://opengameart.org/content/lpc-extended-weapon-animations
+- https://opengameart.org/content/lpc-female-orcogregoblintroll-base-walkcycle
+- https://opengameart.org/content/lpc-folk
+- https://opengameart.org/content/lpc-gentleman
+- https://opengameart.org/content/lpc-hair
+- https://opengameart.org/content/lpc-jump-expanded
+- https://opengameart.org/content/lpc-kimono-relm
+- https://opengameart.org/content/lpc-ladies
+- https://opengameart.org/content/lpc-male-jumping-animation-by-durrani
+- https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+- https://opengameart.org/content/lpc-muscular-hurt-animation
+- https://opengameart.org/content/lpc-muscular-swing-animation
+- https://opengameart.org/content/lpc-pregnancy-bases-maternity-wear
+- https://opengameart.org/content/lpc-relm-hair-xlong-ponytail
+- https://opengameart.org/content/lpc-revised-character-basics
+- https://opengameart.org/content/lpc-revised-elders
+- https://opengameart.org/content/lpc-roman-armor
+- https://opengameart.org/content/lpc-runcycle-and-diagonal-walkcycle
+- https://opengameart.org/content/lpc-runcycle-for-male-muscular-and-pregnant-character-bases-with-modular-heads
+- https://opengameart.org/content/lpc-sara
+- https://opengameart.org/content/lpc-skorpios-scifi-sprite-pack
+- https://opengameart.org/content/lpc-teen-androgynous-short-sleeve-shirt
+- https://opengameart.org/content/lpc-teen-unisex-base-clothes
+- https://opengameart.org/content/lpc-wands
+- https://opengameart.org/content/ulpc-expanded-expressions

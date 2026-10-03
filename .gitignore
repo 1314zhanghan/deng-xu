@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.tmp/
+.probe/
+*.local
+.DS_Store
+__pycache__/
+*.log
+.tools/
