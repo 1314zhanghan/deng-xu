@@ -87,7 +87,9 @@ export function collectSave(): SaveFile {
   try {
     const g = (data[STORAGE_KEYS.game] as any)?.state
     playerName = g?.playerName || undefined
-    messageCount = Array.isArray(g?.narrativeMessages) ? g.narrativeMessages.length : undefined
+    // 字段名是 history（不是 narrativeMessages —— 我在第一版里猜错了，
+    // 结果元信息里的条数一直是 undefined，导出的文件名也少了这个线索）
+    messageCount = Array.isArray(g?.history) ? g.history.length : undefined
     savedAt = g?.lastPlayedAt || g?.savedAt || undefined
     const s = (data[STORAGE_KEYS.session] as any)?.state
     worldTitle = s?.world?.title || undefined
