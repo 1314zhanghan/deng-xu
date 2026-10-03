@@ -26,26 +26,30 @@ import {
 /**
  * 按需把较旧的叙事归档到 IndexedDB，让 localStorage 里的热数据保持有界。
  *
- * 触发条件有两个，任一满足就动手：
+ * 触发条件有三个，任一满足就动手：
  *  - 条数超过阈值（常规滚动）
- *  - 估算体积已经偏高（提前抢救，不等配额真的写满）
+ *  - 估算**体积**已偏高（提前抢救，不等配额真的写满）
  *
- * 归档失败时**不裁剪** —— 宁可继续撑在内存/localStorage 里并让容量警告提示用户导出，
- * 也不能因为归档没写成功就把玩家的历史丢掉（见 historyArchive 里的说明）。
+ * 为什么要同时看条数和体积：
+ * 只按条数会漏 —— 某些模型一次就吐两三千字，120 条热数据能有 3MB+，
+ * 照样撞上 localStorage 的 5MB 配额。体积才是真正的约束，
+ * 条数只是"别让数组无限长"的粗略护栏。
  */
 async function maybeArchiveHistory(): Promise<void> {
   const st = useGameStore.getState()
   const history = st.history as HistoryMessage[]
   if (!history?.length) return
-  if (!needsArchive(history) && !isHistoryPressureHigh(history)) return
 
-  const { hot, archived, ok } = await archiveOldMessages(history)
+  const pressure = isHistoryPressureHigh(history)
+  const tooMany = needsArchive(history, pressure)
+  if (!pressure && !tooMany) return
+
+  const { hot, archived, ok } = await archiveOldMessages(history, pressure)
   if (!ok) {
     console.warn('[archive] 归档写入失败，保持历史不裁剪以免丢数据')
     return
   }
   if (archived > 0) {
-    // 用 setState 直接替换 history：这是引擎内部的维护动作，不该走 addHistory
     useGameStore.setState({ history: hot })
     console.info(`[archive] 已归档 ${archived} 条旧叙事，热数据保留 ${hot.length} 条`)
   }

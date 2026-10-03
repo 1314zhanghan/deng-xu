@@ -71,26 +71,33 @@ export async function clearArchive(): Promise<void> {
 /**
  * 判断是否需要归档。
  * @param history 当前热历史
- * @param force   忽略条数阈值，直接归档（用于配额已经告急时抢救）
+ * @param force   体积已吃紧，直接归档（不再等到两倍阈值）
  */
 export function needsArchive(history: HistoryMessage[], force = false): boolean {
-  if (force) return history.length > HOT_HISTORY_LIMIT
+  if (force) return history.length > HOT_HISTORY_LIMIT / 2
   return history.length > HOT_HISTORY_LIMIT * 2
 }
 
 /**
- * 执行归档：把超出 HOT_HISTORY_LIMIT 的旧消息移进归档。
+ * 执行归档：把超出保留量的旧消息移进归档。
+ *
+ * @param history 当前热历史
+ * @param pressure 体积是否已经吃紧。吃紧时**只保留更少的热数据**（压到一半），
+ *                 否则按体积触发却只裁掉几条，下一轮马上又触发 —— 白折腾。
  *
  * 返回新的热历史与归档结果。**不修改传入数组**（zustand 要引用变化）。
  */
 export async function archiveOldMessages(
-  history: HistoryMessage[]
+  history: HistoryMessage[],
+  pressure = false
 ): Promise<{ hot: HistoryMessage[]; archived: number; ok: boolean }> {
-  if (history.length <= HOT_HISTORY_LIMIT) {
+  // 体积吃紧时把热数据压到一半，给后续几轮留出余量
+  const keep = pressure ? Math.max(20, Math.floor(HOT_HISTORY_LIMIT / 2)) : HOT_HISTORY_LIMIT
+  if (history.length <= keep) {
     return { hot: history, archived: 0, ok: true }
   }
 
-  const cut = history.length - HOT_HISTORY_LIMIT
+  const cut = history.length - keep
   const toArchive = history.slice(0, cut)
   const hot = history.slice(cut)
 

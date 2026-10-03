@@ -3,6 +3,7 @@ import { Package, PackagePlus, Check, X, AlertTriangle } from 'lucide-react'
 import { useLibraryStore } from '@/stores/library'
 import { exportPack, importPackFile } from '@/utils/worldPack'
 import { collectSave } from '@/utils/saveFile'
+import { parseWorldbook, worldbookToPack } from '@/utils/worldbook'
 
 /**
  * 世界包导出 / 导入。
@@ -66,6 +67,39 @@ export function WorldPackManager() {
 
   const handleImport = async (file: File | undefined) => {
     if (!file) return
+
+    // 先看是不是世界书 —— 两者都是 JSON，靠 format 字段区分，
+    // 让用户不必先分辨自己手里是哪种文件该走哪个按钮
+    let raw: unknown = null
+    try {
+      raw = JSON.parse(await file.text())
+    } catch {
+      setMsg({ kind: 'err', text: '文件不是合法 JSON' })
+      return
+    }
+
+    const fmt = (raw as any)?.format
+    if (fmt === 'deng-xu-worldbook') {
+      const book = parseWorldbook(raw)
+      if (!book.ok) {
+        setMsg({ kind: 'err', text: book.error || '世界书校验失败' })
+        return
+      }
+      try {
+        // 转成世界包再走同一条导入通道 —— 不另写一套合并逻辑
+        const asPack = worldbookToPack(book.book!)
+        const imported = await importWorlds(asPack.worlds)
+        setMsg({
+          kind: 'ok',
+          text: `已导入世界书《${book.book!.title}》：新增 ${imported.length} 个世界。`
+            + (book.summary ? '（' + book.summary + '）' : ''),
+        })
+      } catch (e) {
+        setMsg({ kind: 'err', text: `写入失败：${(e as Error)?.message || e}` })
+      }
+      return
+    }
+
     const r = await importPackFile(file)
     if (!r.ok) {
       setMsg({ kind: 'err', text: r.error || '导入失败' })
@@ -160,8 +194,17 @@ export function WorldPackManager() {
           onChange={e => { void handleImport(e.target.files?.[0]); e.target.value = '' }}
         />
       </div>
+{/* 官方世界书既是范例也是可直接导入的成品 */}
+<div className="text-[10px] text-text-muted leading-relaxed">
+  想照着写自己的世界？{' '}
+  <a href="./official-worldbook.json" download
+    className="text-text-secondary hover:text-accent-lantern underline decoration-dotted">
+    下载官方世界书
+  </a>
+  （含三个内置世界，也可直接导入回来）
+</div>
 
-      {includeSave && (
+{includeSave && (
         <div className="flex items-start gap-1.5 text-[10px] text-amber-300 leading-relaxed">
           <AlertTriangle size={11} className="mt-0.5 shrink-0" />
           <span>已选择附带存档 —— 分享前请确认这是你要的。</span>

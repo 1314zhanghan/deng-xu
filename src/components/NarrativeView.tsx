@@ -32,7 +32,19 @@ export function NarrativeView({ messages, isTyping, isAnalyzingData, streamingCo
         里面 absolute inset-0 的图片 bounding box 变成 656×0 —— 等于完全没画出来。
         正确做法：背景交给外层不滚动的容器（见 App.tsx），这里只负责正文。
       */}
-      <div className="relative p-4 md:p-12 space-y-6 md:space-y-8 font-serif leading-loose text-base md:text-lg">
+      {/*
+        aria-live="polite" 让读屏软件在叙事更新时朗读新内容。
+        之前叙事流对读屏完全不可见 —— 这是个纯文字游戏，内容就是唯一的产出，
+        对读屏用户来说等于什么都收不到。
+        用 polite 而不是 assertive：叙事段落很长，打断当前朗读会很烦。
+      */}
+      <div
+        className="relative p-4 md:p-12 space-y-6 md:space-y-8 font-serif leading-loose text-base md:text-lg"
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-label="叙事内容"
+      >
       {messages.map((msg, index) => (
         <motion.div
           key={index}

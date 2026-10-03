@@ -92,6 +92,39 @@ describe('历史归档', () => {
   })
 })
 
+describe('体积吃紧时的裁剪力度', () => {
+  it('平时按条数阈值触发', () => {
+    expect(needsArchive(mkHistory(HOT_HISTORY_LIMIT))).toBe(false)
+    expect(needsArchive(mkHistory(HOT_HISTORY_LIMIT * 2))).toBe(false)
+    expect(needsArchive(mkHistory(HOT_HISTORY_LIMIT * 2 + 1))).toBe(true)
+  })
+
+  it('force=true 时门槛降到一半（体积吃紧就不再等条数）', () => {
+    expect(needsArchive(mkHistory(HOT_HISTORY_LIMIT / 2), true)).toBe(false)
+    expect(needsArchive(mkHistory(HOT_HISTORY_LIMIT / 2 + 1), true)).toBe(true)
+  })
+
+  it('pressure 时把热数据压到一半 —— 否则按体积触发却只裁几条，下一轮马上又触发', async () => {
+    const h = mkHistory(HOT_HISTORY_LIMIT * 3)
+    const normal = await archiveOldMessages(h, false)
+    expect(normal.hot).toHaveLength(HOT_HISTORY_LIMIT)
+
+    mem.clear()
+    const urgent = await archiveOldMessages(h, true)
+    expect(urgent.hot.length).toBeLessThan(normal.hot.length)
+    expect(urgent.hot).toHaveLength(Math.floor(HOT_HISTORY_LIMIT / 2))
+    // 而且不能丢内容
+    expect(urgent.hot.length + urgent.archived).toBe(h.length)
+  })
+
+  it('pressure 但条数很少时不动（没东西可裁）', async () => {
+    const h = mkHistory(10, 1000)
+    const r = await archiveOldMessages(h, true)
+    expect(r.archived).toBe(0)
+    expect(r.hot).toBe(h)
+  })
+})
+
 describe('归档失败时的安全性（最重要的一条）', () => {
   it('IndexedDB 写失败 → 不裁剪，历史原样保留', async () => {
     // 让 set 抛错
