@@ -185,38 +185,45 @@ export function StartScreen() {
     flash(`已导出 ${worlds.length} 张世界卡。`)
   }
 
+  /**
+   * 点「开始」进入选角界面时，**先把上一局的残留清掉**。
+   *
+   * 这里才是 resetGame() 该待的地方。原先它被放在 handleLaunch（也就是
+   * SessionSetup 填完所有数据、点了「开始故事」之后）—— 而 resetGame 是
+   * `set({ ...INITIAL_STATE })`，会把整个 gameStore 清空。于是 SessionSetup
+   * 辛苦写入的一切**全部作废**：
+   *
+   *   initFromWorld()      → 属性/资源定义        ✗ 被清
+   *   setAspects()         → 分配好的属性点        ✗ 被清
+   *   setResources()       → 资源初始值            ✗ 被清
+   *   addItem() × N        → 开局物品（背景自带）  ✗ 被清
+   *   addCharacter() × N   → 在场角色              ✗ 被清  ← NPC 立绘"没实现"的真相
+   *   setPlayerProfile()   → 玩家档案              ✗ 被清  ← 状态栏「未命名」的真相
+   *   setTime/setLocation()→ 起始时空              ✗ 被清
+   *
+   * 我上次只补救了 playerName，没看出其他数据同样被清 —— 所以「预设数值与物品
+   * 没带进游戏」和「状态栏未命名」其实是同一个 bug 的不同表现。
+   *
+   * 正确的时序：**清空 → 进入选角 → 填数据 → 开始**。
+   * 清空必须在选角之前，而不是之后。
+   */
+  const beginSetup = (worldId: string) => {
+    resetGame()
+    setPendingSetup(null)
+    setSetupWorldId(worldId)
+  }
+
   const handleLaunch = () => {
     if (!setupWorld) return
     /*
-      顺序很重要，这里是「主角叫未命名」这个 bug 的真正根源：
+      这里**不要**再调 resetGame()：SessionSetup 已经把本局数据都写好了，
+      再重置一次就会把它们清掉（见 beginSetup 的说明）。
+      上一局的残留已在进入选角时清掉。
 
-      SessionSetup.handleLaunch 先写好玩家档案（setPlayerProfile），
-      然后调 onLaunch()，也就是这个函数 —— 而它接着执行 resetGame()。
-      但 resetGame 是 `set({ ...INITIAL_STATE })`，会把整个 gameStore 清空，
-      **包括刚刚写好的 playerName**。于是：
-        session.player.name = 正确名字
-        game.playerName     = 空
-      状态栏读的是 game.playerName，就显示成「未命名」。
-
-      所以：重置之后必须**重新写入玩家档案**。
-      重置的语义是"清掉上一局的历史与数值"，不是"清掉玩家是谁"。
+      也**不能**调 clearSession()：SessionSetup 已用 setSession() 写好本局会话，
+      再清一次会把 world 抹成 null，于是 isGameStarted 为真而 session.world 为空，
+      游戏界面卡在「尚未选择世界卡」且没有任何办法回到正常流程。
     */
-    // 注意：这里**不能**调用 clearSession()。
-    // SessionSetup 已经用 setSession() 写好了本局会话，再清一次会把 world 抹成 null，
-    // 结果 isGameStarted 为真而 session.world 为空，游戏界面会卡在
-    // 「尚未选择世界卡」并且没有任何办法回到正常流程。
-    resetGame()
-
-    const p = useSessionStore.getState().player
-    if (p) {
-      useGameStore.getState().setPlayerProfile(
-        p.name?.trim() || '无名者',
-        p.gender || '',
-        p.appearance || '',
-        p.avatar
-      )
-    }
-
     setPendingSetup(null)
     startGame()
   }
@@ -402,7 +409,7 @@ export function StartScreen() {
               >
                 {/* 封面 */}
                 <button
-                  onClick={() => setSetupWorldId(world.id)}
+                  onClick={() => beginSetup(world.id)}
                   className="relative block w-full h-36 overflow-hidden bg-black/40 text-left"
                 >
                   {world.cover
@@ -447,7 +454,7 @@ export function StartScreen() {
 
                   <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-text-muted/10">
                     <button
-                      onClick={() => setSetupWorldId(world.id)}
+                      onClick={() => beginSetup(world.id)}
                       className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
                     >
                       <Play size={12} /> 开始

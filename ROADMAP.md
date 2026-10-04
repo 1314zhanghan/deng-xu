@@ -21,36 +21,50 @@
 | **9** | 无障碍 | 叙事区加 `role="log"` + `aria-live="polite"`，读屏终于能收到内容 |
 | **10** | 端到端审计脚本 | `npm run audit:live` —— 对线上或本地走查标题页/资源/开局/立绘/移动端，25 项断言 |
 | **11** | 世界色调正名 | 世界卡编辑器原「人物头像风格」预览的是几何头像，但那条路径早已退化为极小兜底、对头像已无作用。正名为「世界色调」，每套提供完整 16 色板真正驱动像素场景配色，预览换成真实像素场景 |
+| **12** | **开局数据保全（关键 bug）** | `StartScreen.handleLaunch` 里的 `resetGame()` 在 SessionSetup 写入之后执行，把玩家档案、属性、资源、**开局物品、在场角色**全部清空。改为「进入选角时先清空」。这一个 bug 造成了三个看似无关的现象：主角叫未命名 / 预设数值与物品丢失 / 关系栏没有 NPC 所以点不出全身立绘 |
+| **13** | 主角不设立绘、不传头像 | 主角立绘是从名字随机生成的，与玩家填的外貌描述无关；自定义头像与像素风格冲突。主角是玩家自己，用文字描述表达 |
+| **14** | NPC 立绘按描述匹配 | 新增 `appearance.ts`：从描述推断发色/发型/肤色/衣色/瞳色/年龄/体型/身份/头饰/胡须。原先 `recipeFor` 只看 `gender`，其余全靠随机 |
+| **15** | 部件库 60 → 170 | 补胡须 12、头盔帽子 29、皮围裙、长袍、五种正装外套、披风、护臂、裙裤袜靴。CREDITS.md 改为从 runtime.json 自动生成（作者 34 位 / 152 件需署名） |
 
 ### 这一轮踩过的坑（都值得记住）
 
 1. **CI 三次挂在"本地正常、CI 挂掉"**
    - `pnpm-workspace.yaml` 的 `allowBuilds` 是 pnpm 10+ 字段，而 CI 装 pnpm 9
-   - `package.json` 被 PowerShell `Set-Content -Encoding UTF8` 写入 **BOM** → `pnpm/action-setup` 解析失败（Node 容错，本地看不出）
-   - **`esbuild` 是 vite 的传递依赖**，pnpm 严格布局下根 `node_modules/.bin` 里没有它 → `sh: esbuild: not found`
+   - `package.json` 被 PowerShell `Set-Content -Encoding UTF8` 写入 **BOM**
+   - **`esbuild` 是 vite 的传递依赖**，pnpm 严格布局下根 `node_modules/.bin` 里没有它
+   - `gen-credits.mjs` 写死了本机绝对路径 `D:/工作区/...`
 
 2. **场景 9 个原型看起来一模一样，查了三层**
    - 明度基调全压在调色板最暗 4 档 → 山/树/楼/柱糊成一块灰
    - 缓存键只按 `id|style` → 不传 asset 的调用把 `interior` 缓存住
-   - 我的画廊脚本按标签过滤 + `slice(0,6)`，只拿到室内和街道
+   - 画廊脚本按标签过滤 + `slice(0,6)`，只拿到室内和街道
 
-3. **审计脚本连续误报四次，全是脚本自己的问题**
+3. **「外观关键词必须指向真实部件」——静默失效最危险**
+   - 我凭想象写了 `chainmail` / `plate` / `formal` / `leather.?apron`，库里根本没有
+   - 匹配是"命中才用"，写错的代价是**不报错、悄悄退化成随机**：铁匠穿工装裤、管家戴野蛮人头盔
+   - 只有拿真实 `runtime.json` 做断言才能发现 → `spritePool.test.ts`
+
+4. **探针（测试脚本）比被测代码更容易出错** —— 本项目里探针误报过 **9 次**
    - API Key 弹窗遮住标题页 → `innerText` 对不可见元素返回空串
-   - 复用浏览器 profile → 残留的 `isGameStarted: true` 让 `StartScreen` 直接 `return null`（为这一个 ✗ 查了四轮）
-   - 用 `innerText.length > 50` 当"渲染正常"的判据 → 手机端内容在折叠面板里，真实长度只有 46
-   - 对生产构建用 `__gameStore` → 调试钩子被有意 tree-shake 掉了
+   - 复用浏览器 profile → 残留 `isGameStarted: true` 让 `StartScreen` 直接 `return null`
+   - 用 `innerText.length` 当"渲染正常"判据
+   - 对生产构建用 `__gameStore`（调试钩子被有意 tree-shake）
+   - 读 `option.items` 而真实字段是 `startingItems`
+   - 读 `g.items` 而真实字段是 `inventory`
+   - 狂点「+」导致属性点超分配 → 启动按钮被禁用，却报成"代码坏了"
+   - 点完「+」没等 React 重渲染就断言
+   - 直接改 store 后不等重渲染 / 忘了 `isGameStarted` 不持久化
 
    **共同教训：断言失败时，先怀疑断言，再怀疑被测代码。**
 
-4. **不要用 PowerShell 的字符串替换改代码文件**
-   - 反引号在 PowerShell 里是转义符，`` `t `` 会变成制表符，把 `` `typeof ...` `` 毁成 `	ypeof ...`
-   - 本轮因此弄坏了**三个**文件。改代码一律用编辑工具。
+5. **不要用 PowerShell 的字符串替换改代码文件**
+   - 反引号在 PowerShell 里是转义符，`` `t `` 会变成制表符
+   - 本轮因此弄坏了**四个**文件。改代码一律用编辑工具。
 
-5. **`WorldTone` 的两处缺陷，都是"声明了却没接上"**
-   - `cool?: boolean` 只声明、从未赋值 → `accentWarm` 恒为 `true`，冷色调场景错误地用了暖橙灯火
-     （正是我自己在注释里写"会显得脏"的那种组合）
-   - 四套色板的 14/15 档点缀色大面积重复（霓虹与全息完全相同）→ 两套色调的灯火/水面看不出差别
-   - **教训：字段声明不等于逻辑接上；写完立刻用断言验证，别靠肉眼评审。**
+6. **字段声明不等于逻辑接上**
+   - `WorldTone.cool` 只声明从未赋值 → 冷色调场景用错暖色
+   - 四套色板的点缀色大面积重复 → 两套色调看不出差别
+   - **写完立刻用断言验证，别靠肉眼评审。**
 
 ---
 
