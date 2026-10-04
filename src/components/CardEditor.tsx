@@ -9,7 +9,8 @@ import { useLibraryStore } from '@/stores/library'
 import { useUIStore } from '@/stores/ui'
 import { createEmptyCharacter, parseCharacterFile, toSillyTavern } from '@/utils/cardIO'
 import { downloadFile, makeId, readFileAsDataURL, safeFilename, timestampSuffix } from '@/utils/files'
-import { AVATAR_STYLES, AVATAR_STYLE_IDS, generateAvatar } from '@/utils/avatarArt'
+import { WORLD_TONES, WORLD_TONE_IDS, toneAccent } from '@/utils/worldTone'
+import { generateScene } from '@/utils/sceneArt'
 
 /**
  * 世界卡编辑器
@@ -415,37 +416,49 @@ export function CardEditor() {
               </Field>
 
               <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-4">
-                <SectionTitle>人物头像风格</SectionTitle>
+                <SectionTitle>世界色调</SectionTitle>
                 <p className="text-[10px] text-text-muted -mt-1">
-                  游戏里的头像由程序按角色生成（不依赖任何外部图片素材）。
-                  选一种贴合本世界调性的风格，同一套造型换配色后观感差别很大。
+                  决定本世界**像素场景背景**的配色（同一张山岭，冷色调与暖色调观感差别很大）。
+                  <br />
+                  人物立绘不受此项影响 —— 立绘是 LPC 像素素材，始终保留发色 / 肤色 / 衣色的完整变化范围。
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {AVATAR_STYLE_IDS.map(id => {
-                    const def = AVATAR_STYLES[id]
+                  {WORLD_TONE_IDS.map(id => {
+                    const def = WORLD_TONES[id]
                     const on = (draft.avatarStyle || 'ink') === id
-                    // 用当前世界的一张示例头像做预览，所见即所得
-                    const preview = generateAvatar('preview', '预览', id, draft.avatarTone).dataUrl
+                    /*
+                      预览用**真实像素场景**，不再用旧的几何头像。
+                      以前这里渲染 generateAvatar()，但那条渲染路径早已退化为
+                      "角色卡没自带图片时的极小兜底"，主路径是 LPC 像素立绘 ——
+                      于是这个选择器在展示一种玩家基本看不到的东西。
+                    */
+                    const scene = generateScene('s10', id, draft.avatarTone)
                     return (
                       <button
                         key={id}
                         type="button"
                         onClick={() => patch({ avatarStyle: id })}
-                        className={`p-2 rounded border transition-colors text-center
+                        className={`p-2 rounded border transition-colors text-left
                           ${on ? 'bg-accent-lantern/10 border-accent-lantern/50' : 'bg-black/20 border-text-muted/20 hover:border-text-muted/40'}`}
                       >
-                        <img src={preview} alt={def.label} className="w-full aspect-square rounded object-cover" />
+                        <img
+                          src={scene.dataUrl}
+                          alt={def.label}
+                          className="w-full aspect-video rounded border border-black/40"
+                          style={{ imageRendering: 'pixelated' }}
+                        />
                         <div className={`mt-1.5 text-[11px] ${on ? 'text-accent-lantern' : 'text-text-secondary'}`}>
                           {def.label}
                         </div>
+                        <div className="mt-0.5 text-[9px] text-text-muted leading-snug">{def.hint}</div>
                       </button>
                     )
                   })}
                 </div>
 
-                <Field label="头像点缀色（可选）" hint="用于配饰与描边，留空则用所选风格自带的颜色">
+                <Field label="色调点缀色（可选）" hint="覆盖场景里的灯火、水面等点缀色；留空则用所选色调自带的颜色">
                   <div className="flex items-center gap-2">
-                    <input type="color" value={draft.avatarTone || AVATAR_STYLES[(draft.avatarStyle || 'ink')].accent}
+                    <input type="color" value={draft.avatarTone || toneAccent(draft.avatarStyle)}
                       onChange={e => patch({ avatarTone: e.target.value })}
                       className="w-8 h-8 bg-transparent border border-text-muted/30 rounded cursor-pointer" />
                     <input className={`${inputCls} w-32 font-mono text-xs min-w-0`} value={draft.avatarTone || ''}

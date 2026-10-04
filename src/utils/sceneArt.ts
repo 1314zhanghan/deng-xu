@@ -14,7 +14,7 @@
  * 输出格式仍是 data URL，所以 SceneBackdrop 不需要改。
  */
 
-import { getAvatarStyle, type AvatarStyle } from '@/utils/avatarArt'
+import { getWorldTone, type WorldTone } from '@/utils/worldTone'
 
 /** 逻辑分辨率：16:9，且 160×90 的整数倍正好是 640×360（放大 4 倍） */
 const W = 160
@@ -76,11 +76,16 @@ export function sceneCatalogPrompt(): string {
 // ============================================================================
 
 /**
- * 共享的 16 色板，按「从最暗到最亮」排列。
- * 所有场景、所有世界风格都从这里取色 —— 这是像素画统一感的关键。
- * 刻意压低饱和度并偏冷，贴合本作的暗色调。
+ * 共享色板的**默认值**。
+ *
+ * 注意：这里不再是唯一色板 —— 真正用的是「世界色调」提供的那一套
+ * （`worldTone.ts` 的 `ramp`）。每个世界可以有自己的色调，
+ * 同一张场景在不同色调下观感差别很大，这是刻意的。
+ * 这个常量只作为兜底（色调数据缺失时）。
  */
-const PALETTE: [number, number, number][] = [
+export type RGB = readonly [number, number, number]
+
+const DEFAULT_RAMP: readonly RGB[] = [
   [10, 10, 14],    // 0  最暗（暗角/剪影）
   [20, 20, 28],    // 1
   [30, 30, 42],    // 2
@@ -114,12 +119,26 @@ const BAYER = [
 class PxCanvas {
   readonly w: number
   readonly h: number
+  /** 当前使用的限色板（由世界色调决定） */
+  private ramp: readonly RGB[]
   private buf: Int16Array   // 存调色板索引，-1 = 透明
 
-  constructor(w: number, h: number, fill = 0) {
+  constructor(w: number, h: number, fill = 0, ramp: readonly RGB[] = DEFAULT_RAMP) {
     this.w = w
     this.h = h
+    this.ramp = ramp
     this.buf = new Int16Array(w * h).fill(fill)
+  }
+
+  /** 色板长度，用于绘制时做边界裁剪 */
+  get size(): number {
+    return this.ramp.length
+  }
+
+  /** 取色（索引越界时夹到边界，避免读到 undefined） */
+  color(ci: number): RGB {
+    const i = Math.max(0, Math.min(this.ramp.length - 1, ci))
+    return this.ramp[i]
   }
 
   set(x: number, y: number, ci: number) {
@@ -162,14 +181,14 @@ class PxCanvas {
     }
   }
 
-  /** 转成 ImageData（查调色板） */
+  /** 转成 ImageData（查当前色板） */
   toImageData(): ImageData {
     const data = new Uint8ClampedArray(this.w * this.h * 4)
     for (let i = 0; i < this.buf.length; i++) {
       const ci = this.buf[i]
       const o = i * 4
       if (ci < 0) { data[o + 3] = 0; continue }
-      const c = PALETTE[Math.max(0, Math.min(PALETTE.length - 1, ci))]
+      const c = this.color(ci)
       data[o] = c[0]; data[o + 1] = c[1]; data[o + 2] = c[2]; data[o + 3] = 255
     }
     return new ImageData(data, this.w, this.h)
@@ -222,9 +241,14 @@ const TONE: Record<SceneArchetype, { sky: [number, number]; far: number; mid: nu
   night: { sky: [0, 1], far: 3, mid: 5, near: 1 },
 }
 
-function drawScene(archetype: SceneArchetype, seed: number, accentWarm: boolean): PxCanvas {
+function drawScene(
+  archetype: SceneArchetype,
+  seed: number,
+  accentWarm: boolean,
+  ramp: readonly RGB[]
+): PxCanvas {
   const rng = makeRng(seed)
-  const px = new PxCanvas(W, H, 0)
+  const px = new PxCanvas(W, H, 0, ramp)
   const t = TONE[archetype]
   const horizon = Math.round(H * (0.55 + rng() * 0.1))
 
@@ -301,7 +325,7 @@ function drawScene(archetype: SceneArchetype, seed: number, accentWarm: boolean)
       // 后墙 + 地板（两段实色，靠交界线区分）
       px.rect(0, 0, W, horizon, t.mid)
       px.rect(0, horizon, W, H - horizon, t.near)
-      px.rect(0, horizon, W, 1, Math.min(PALETTE.length - 1, t.mid + 2))  // 墙脚线
+      px.rect(0, horizon, W, 1, Math.min(px.size - 1, t.mid + 2))  // 墙脚线
       // 窗（带光）
       const wx = 14 + Math.floor(rng() * 18), wy = 16 + Math.floor(rng() * 8)
       const ww = 26 + Math.floor(rng() * 12), wh = 22 + Math.floor(rng() * 8)
@@ -442,7 +466,7 @@ const cache = new Map<string, GeneratedScene>()
 
 export function generateScene(
   id: string,
-  style: AvatarStyle | string = 'ink',
+  style: WorldTone | string = 'ink',
   tone?: string,
   asset?: SceneAsset
 ): GeneratedScene {
@@ -464,12 +488,12 @@ export function generateScene(
   const hit = cache.get(key)
   if (hit) return hit
 
-  const def = getAvatarStyle(style)
+  const def = getWorldTone(style)
   const seed = hashSeed(`${def.id}::${id}`)
-  // 冷色风格（霓虹/全息）用暖色点缀会显得脏，改用冷色
+  // 冷色调（霓虹/全息）用暖橙点缀会显得脏，改用该色调自带的冷色
   const accentWarm = !def.cool
 
-  const px = drawScene(archetype, seed, accentWarm)
+  const px = drawScene(archetype, seed, accentWarm, def.ramp)
 
   // 放大到 640×360（整数 4 倍），关掉插值保证硬边
   const SCALE = 4

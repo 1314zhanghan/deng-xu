@@ -7,7 +7,7 @@
  */
 
 import type { StoryEvent } from './story';
-import type { AvatarStyle } from '@/utils/avatarArt';
+import type { WorldTone } from '@/utils/worldTone';
 
 /** 数值属性（原 AspectState：灯/铸/刃/冬/心/杯/蛾/启） */
 export interface AttributeDef {
@@ -185,11 +185,15 @@ export interface WorldCard {
   enableMechanics: boolean;
 
   /**
-   * 头像风格。决定程序化生成的人物头像用哪套配色与描边。
-   * 同一套几何造型在不同风格下观感差别很大，所以跨题材复用也不会违和。
+   * **世界色调**。决定本世界的像素场景背景用哪套 16 色限色板。
+   *
+   * 注意：它**不影响人物立绘** —— 立绘是 LPC 像素素材，配色由 LPC 自己的
+   * 调色板决定（见 lpcSprite.ts）。这个字段原本叫 avatarStyle 并用于几何头像，
+   * 但那条渲染路径已退化为"角色卡没自带图片时的极小兜底"，
+   * 因此这里保留旧字段名以免破坏已保存的卡片，语义已改为场景色调。
    */
-  avatarStyle?: AvatarStyle;
-  /** 头像点缀色；留空则用风格自带色。通常填世界卡主色 */
+  avatarStyle?: WorldTone;
+  /** 场景点缀色；留空则用色调自带色 */
   avatarTone?: string;
 
   createdAt: number;
