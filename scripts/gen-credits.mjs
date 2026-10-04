@@ -6,11 +6,15 @@
  *  手工维护的作者清单在部件库从 60 扩到 170 之后必然漏 ——
  *  这次新增了 30 多位作者，靠手写不可能不漏。
  *  所以署名从部件数据里推导，部件变则署名自动跟着变。
+ *
+ * 注意用 process.cwd() 定位，**不要写死绝对路径**：
+ * 第一版我写了本机的 D:/工作区/... ，本地能跑、CI 直接 ENOENT 挂掉。
  */
 import fs from 'node:fs'
+import path from 'node:path'
 
-const ROOT = 'D:/工作区/pale-notes-web'
-const rt = JSON.parse(fs.readFileSync(ROOT + '/src/assets/lpc/runtime.json', 'utf8'))
+const ROOT = process.cwd()
+const rt = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/assets/lpc/runtime.json'), 'utf8'))
 
 /** 采集作者 → 部件，以及授权 → 部件数 */
 const byAuthor = new Map()
@@ -92,8 +96,8 @@ ${authorRows.map(([name, ids]) => `- **${name}** —— ${ids.join('、')}`).joi
 - 若某位作者认为署名有误或遗漏，请提 Issue，会立即更正。
 ${noMeta.length ? `\n## 未标注来源的部件\n\n以下 ${noMeta.length} 个部件在 LPC 定义里没有 credits 字段，视为 CC0：\n\n${noMeta.map(i => '- ' + i).join('\n')}\n` : ''}`
 
-fs.writeFileSync(ROOT + '/public/CREDITS.md', out, 'utf8')
-fs.writeFileSync(ROOT + '/src/assets/lpc/CREDITS.md', out, 'utf8')
+fs.writeFileSync(path.join(ROOT, 'public/CREDITS.md'), out, 'utf8')
+fs.writeFileSync(path.join(ROOT, 'src/assets/lpc/CREDITS.md'), out, 'utf8')
 console.log(`✓ CREDITS.md 已生成`)
 console.log(`  部件 ${rt.parts.length} 个，作者 ${authorRows.length} 位，需署名部件 ${attributionRequired} 个`)
 console.log(`  无来源标注（视为 CC0）：${noMeta.length} 个`)

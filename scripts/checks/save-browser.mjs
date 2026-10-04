@@ -4,7 +4,7 @@ import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const root = 'D:/工作区/pale-notes-web'
+const root = process.cwd().replace(/\\\\/g, '/')
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
 const PORT = 9500
 const SITE = process.env.SITE || 'http://localhost:5199/'
