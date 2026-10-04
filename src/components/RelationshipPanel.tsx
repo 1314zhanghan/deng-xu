@@ -67,6 +67,18 @@ export function RelationshipPanel({ className = '' }: RelationshipPanelProps) {
                           name={char.name}
                           id={char.id}
                           scale={3}
+                          /*
+                            把角色资料传进去，立绘才会**照着描述**画
+                            （黑发马尾就画黑发马尾，守卫队长就穿甲）。
+                            不传的话 recipeFor 只能随机挑部件 ——
+                            那正是"立绘和角色描述毫无关联"的原因。
+                          */
+                          profile={{
+                            name: char.name,
+                            description: char.description,
+                            relationship: char.relationship,
+                            scenario: char.prompt,
+                          }}
                           /* 48px 显示，3 倍合成源（192px）在 2x/3x 屏上都够锐 */
                           className="w-12 h-12 bg-black/30"
                           headOnly

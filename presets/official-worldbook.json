@@ -422,8 +422,8 @@
         }
       ],
       "enableMechanics": true,
-      "createdAt": 1791087715352,
-      "updatedAt": 1791087715352,
+      "createdAt": 1791109876669,
+      "updatedAt": 1791109876669,
       "builtin": true,
       "avatarStyle": "ink",
       "avatarTone": "#f59e0b"
@@ -1004,8 +1004,8 @@
         }
       ],
       "enableMechanics": true,
-      "createdAt": 1791087715352,
-      "updatedAt": 1791087715352,
+      "createdAt": 1791109876669,
+      "updatedAt": 1791109876669,
       "builtin": true,
       "avatarStyle": "neon",
       "avatarTone": "#22d3ee"
@@ -1096,8 +1096,8 @@
         }
       ],
       "enableMechanics": false,
-      "createdAt": 1791087715352,
-      "updatedAt": 1791087715352,
+      "createdAt": 1791109876669,
+      "updatedAt": 1791109876669,
       "builtin": true,
       "avatarStyle": "holo",
       "avatarTone": "#5eead4"

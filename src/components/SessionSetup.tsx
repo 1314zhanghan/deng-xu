@@ -1,13 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Play, Users, Upload, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Play, Users, Check, Compass } from 'lucide-react'
 import type { PlayerCard, WorldCard } from '@/types/cards'
 import { useSessionStore } from '@/stores/session'
 import { useGameStore } from '@/stores/game'
 import { useUIStore } from '@/stores/ui'
-import { readFileAsDataURL } from '@/utils/files'
-import { playerSpriteSeed } from '@/utils/lpcSprite'
-import { CharacterSprite } from '@/components/CharacterSprite'
 
 /**
  * 开局配置
@@ -46,10 +43,15 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
    * 玩家档案初值**必须来自 pendingSetup**。
    *
    * 之前这里是硬编码空值，于是从「卡片编辑器 → 保存并开始」进入时，
-   * player.name 是空串 → 存档里主角叫「未命名」，且所有档案字段被空值覆盖，
-   * 上传的头像也一起丢了。这是 ui.pendingSetup 这个字段一直没被消费的后果。
+   * player.name 是空串 → 存档里主角叫「未命名」，且所有档案字段被空值覆盖。
+   *
+   * 另外这里必须用 **ref 镜像**（见下面的 playerRef）：
+   * 点「开始故事」时 handleLaunch 会先调 initFromWorld()，那会触发 App 重渲染，
+   * 而 isGameStarted 尚未置位、SessionSetup 仍是当前视图 ——
+   * 组件重挂载后 useState 初值被重新求值，用户刚填的名字就丢了。
+   * 症状正是"主角叫未命名"。ref 不随重挂载重置，所以读它才可靠。
    */
-  const [player, setPlayer] = useState<PlayerCard>(() => {
+  const [player, setPlayerState] = useState<PlayerCard>(() => {
     const seed = useUIStore.getState().pendingSetup?.player
     return {
       name: seed?.name || '',
@@ -59,10 +61,22 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
       personality: seed?.personality || '',
       background: seed?.background || '',
       extra: seed?.extra || '',
-      // 头像必须一起带过来，否则开局选的脸进不了 gameStore
       ...(seed?.avatar ? { avatar: seed.avatar } : {}),
     }
   })
+
+  /**
+   * player 的 ref 镜像 + 一个不会丢的 setter。
+   * handleLaunch 读 playerRef.current 而不是闭包里的 player ——
+   * 原因见上方 useState 的注释（重挂载会重置 state）。
+   */
+  const playerRef = useRef(player)
+  const patchPlayer = (patch: Partial<PlayerCard>) => {
+    playerRef.current = { ...playerRef.current, ...patch }
+    setPlayerState(playerRef.current)
+  }
+  /** 供 handleLaunch 读取当前档案（永远是最新的，且不随重挂载丢失） */
+  const currentPlayer = () => playerRef.current
 
   // 默认把所有标记为「在场」的角色卡都选上
   const [activeIds, setActiveIds] = useState<string[]>(
@@ -84,7 +98,7 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
     return init
   })
 
-  const patchPlayer = (p: Partial<PlayerCard>) => setPlayer(prev => ({ ...prev, ...p }))
+  // patchPlayer 已在上面定义（同时写 ref 与 state，见那里的注释）
 
   const totalAllocated = useMemo(
     () => Object.values(allocation).reduce((a, b) => a + b, 0),
@@ -135,15 +149,25 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
   const canLaunch = world.enableMechanics ? remaining >= 0 : true
 
   const handleLaunch = () => {
+    /*
+      从 ref 取玩家档案，不要用闭包里的 `player`。
+
+      initFromWorld() 会触发重渲染 → SessionSetup 重挂载 → useState 初值被重新求值，
+      闭包里的 player 于是退回空值。症状就是主角在状态栏显示「未命名」，
+      而 session 里却存着正确的名字（两条路径读了不同的东西）。
+      ref 不随重挂载重置，所以这里必须读它。
+    */
+    const p = currentPlayer()
+
     // 1. 装载数值体系（定义属性与资源）
     initFromWorld(world)
 
-    // 2. 写入玩家档案（头像也要一起带进 gameStore，否则游戏界面读不到）
+    // 2. 写入玩家档案
     useGameStore.getState().setPlayerProfile(
-      player.name.trim() || '无名者',
-      player.gender,
-      player.appearance,
-      player.avatar
+      p.name.trim() || '无名者',
+      p.gender,
+      p.appearance,
+      p.avatar
     )
 
     // 3. 应用属性、资源与背景
@@ -189,7 +213,7 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
     // 8. 建立会话
     setSession({
       world,
-      player: player.name.trim() ? player : { ...player, name: '无名者' },
+      player: p.name.trim() ? p : { ...p, name: '无名者' },
       activeCharacterIds: activeIds,
       backgroundChoices,
       attributeAllocation: allocation
@@ -198,10 +222,6 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
     onLaunch()
   }
 
-  const handleAvatarUpload = async (file: File | undefined) => {
-    if (!file) return
-    patchPlayer({ avatar: await readFileAsDataURL(file) })
-  }
 
   return (
     <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col">
@@ -263,38 +283,22 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                   </div>
 
                   <div className="grid md:grid-cols-[10rem_1fr] gap-6">
-                    <div className="space-y-2">
-                      {player.avatar
-                        ? <img src={player.avatar} alt="" className="w-40 h-40 rounded object-cover border border-text-muted/30" />
-                        : (
-                          /*
-                            没有自带头像时，直接用**像素立绘**当预览 ——
-                            而不是留一个「无头像」的空框。
-                            种子取自姓名与性别，和进游戏后状态栏用的是同一个
-                            （playerSpriteSeed），所以这里看到的就是开局后的样子。
-                          */
-                          <div className="w-40 h-40 rounded border border-text-muted/30 bg-black/30 flex items-center justify-center overflow-hidden">
-                            <CharacterSprite
-                              name={player.name || '主角'}
-                              seed={playerSpriteSeed(player.name, player.gender)}
-                              gender={player.gender}
-                              headOnly
-                              scale={5}
-                              className="w-40 h-40"
-                            />
-                          </div>
-                        )}
-                      <label className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors cursor-pointer">
-                        <Upload size={13} /> 上传头像
-                        <input type="file" accept="image/*" className="hidden"
-                          onChange={e => handleAvatarUpload(e.target.files?.[0])} />
-                      </label>
-                      {player.avatar && (
-                        <button onClick={() => patchPlayer({ avatar: undefined })}
-                          className="w-full text-[10px] text-text-muted hover:text-red-400 transition-colors">
-                          移除头像
-                        </button>
-                      )}
+                    {/*
+                      主角**不生成立绘、也不上传头像**。
+                      原因见 PortraitPanel 的说明：从名字随机出来的那张脸
+                      与玩家填的「外貌」描述无关，等于展示一个陌生人；
+                      自定义头像又与像素风格冲突。
+                      主角是玩家自己 —— 用右边的文字描述表达就够了。
+                    */}
+                    <div className="hidden md:flex flex-col items-center justify-center gap-3 rounded border border-dashed border-text-muted/25 bg-black/15 p-4">
+                      <Compass size={36} className="text-accent-lantern/50" />
+                      <p className="text-[10px] text-text-muted text-center leading-relaxed">
+                        主角不设立绘
+                        <br />
+                        右侧的外貌与性格描述
+                        <br />
+                        会直接注入叙事提示词
+                      </p>
                     </div>
 
                     <div className="space-y-4">

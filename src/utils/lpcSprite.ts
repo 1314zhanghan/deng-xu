@@ -13,6 +13,7 @@
  */
 
 import runtime from '@/assets/lpc/runtime.json'
+import { inferTraits, resolvePaletteName, type AppearanceTraits } from '@/utils/appearance'
 import paletteData from '@/assets/lpc/palettes.json'
 
 // ============================================================================
@@ -205,21 +206,122 @@ export interface RecipeOptions {
   build?: string
   /** 显式指定颜色（不传则按 key 确定性挑选） */
   colors?: RecolorSpec
+  /**
+   * 角色资料。传了就用它推断外貌（发色、发型、年龄、身份…），
+   * 不传则退回纯随机 —— 见 `appearance.ts` 的说明：
+   * 只看 gender 一个字段会让立绘和角色描述毫无关系。
+   */
+  profile?: AppearanceProfile
+}
+
+/** 可参与推断的角色资料（字段都取自角色卡） */
+export interface AppearanceProfile {
+  name?: string
+  description?: string
+  personality?: string
+  scenario?: string
+  relationship?: string
+  gender?: string
+  age?: string
 }
 
 // —— 配方池 ——
+/*
+  部件库从 60 扩到 158（补了胡须、头盔/帽子、长袍/裙装、正装、披风、护腕、
+  裙裤、袜靴等）。下面的池子按 `kind` 过滤，而 kind 在导入时已把上游
+  五花八门的 type_name 归一化过（见 .lpc/merge-runtime.mjs 的 KIND_MAP）——
+  不归一化就会出现"抓到了却永远选不中"。
+*/
 const HAIRS = PARTS.filter(p => p.kind === 'hair').map(p => p.id)
-const TORSOS = PARTS.filter(p => p.kind === 'clothes' || p.kind === 'armour').map(p => p.id)
+const TORSOS = PARTS.filter(p => p.kind === 'clothes' || p.kind === 'armour' || p.kind === 'apron').map(p => p.id)
 const LEGS = PARTS.filter(p => p.kind === 'legs').map(p => p.id)
 const FEET = PARTS.filter(p => p.kind === 'shoes' || p.kind === 'feet').map(p => p.id)
 const NOSES = PARTS.filter(p => p.kind === 'nose').map(p => p.id)
 const BROWS = PARTS.filter(p => p.kind === 'eyebrows').map(p => p.id)
 const HEADS = PARTS.filter(p => p.kind === 'head').map(p => p.id)
+/** 帽子/头盔/头巾 —— zPos 120~132，压在头发之上 */
+const HEADWEAR = PARTS.filter(p => p.kind === 'hat').map(p => p.id)
+/** 胡须 —— zPos 110~111，在头部之上、头发之下 */
+const BEARDS = PARTS.filter(p => p.kind === 'beard').map(p => p.id)
+/** 披风 —— zPos 85~90，在盔甲之上、头之下 */
+const CAPES = PARTS.filter(p => p.kind === 'cape').map(p => p.id)
+/** 手臂护甲/护腕 —— zPos 60~75 */
+const ARMS = PARTS.filter(p => p.kind === 'arms').map(p => p.id)
 
 /** 只用成年人头（小号/儿童头与身体比例不搭） */
 const HEADS_ADULT = HEADS.filter(h => !/_small$|_child$/.test(h))
-const HEADS_MALEISH = HEADS_ADULT.filter(h => /male|elderly/.test(h) && !/female/.test(h))
-const HEADS_FEMALEISH = HEADS_ADULT.filter(h => /female/.test(h))
+
+/**
+ * 在候选部件里按关键词优先匹配。
+ *
+ * 返回 undefined 表示"给了关键词但一个都没命中" —— 调用方**必须区别对待**：
+ *  - 必需部件（头发、上衣）：回退随机，否则角色会没头发；
+ *  - 可选部件（头饰、披风）：**什么都不加**。
+ *
+ * 这个区分很重要。之前可选部件也走随机回退，于是"戴单片眼镜的管家"
+ * 因为素材库里没有眼镜类部件，被随机配了一顶**野蛮人头盔** ——
+ * 比不戴帽子糟糕得多。宁可少一个配饰，也不能给错。
+ */
+function pickByKeywords(
+  rng: () => number,
+  pool: string[],
+  keywords: string[] | undefined
+): string | undefined {
+  if (!keywords?.length) return undefined
+  // 关键词按顺序试探：靠前的更精确
+  for (const kw of keywords) {
+    const hits = pool.filter(id => id.toLowerCase().includes(kw.toLowerCase()))
+    if (hits.length) return hits[Math.floor(rng() * hits.length) % hits.length]
+  }
+  return undefined
+}
+
+/** 必需部件用：命中就用命中的，没命中就随机 */
+function pickRequired(
+  rng: () => number,
+  pool: string[],
+  keywords: string[] | undefined,
+  fallback: string
+): string {
+  if (!pool.length) return fallback
+  return pickByKeywords(rng, pool, keywords) ?? pool[Math.floor(rng() * pool.length) % pool.length]
+}
+
+/**
+ * 头部：按性别气质与年龄挑。
+ *
+ * 注意各分支的候选池里**不能混入 elderly**（除非真的推断出老者）——
+ * 之前无性别线索时回退到 HEADS_ADULT 全池，结果管家被抽到一张老人脸。
+ */
+function pickHead(rng: () => number, t: AppearanceTraits, isBroad: boolean): string {
+  const take = (pool: string[], fb: string) =>
+    pool.length ? pool[Math.floor(rng() * pool.length) % pool.length] : fb
+
+  if (t.age === 'child') {
+    const kids = HEADS.filter(h => /_small$|_child$/.test(h))
+    if (kids.length) return take(kids, 'head_male')
+  }
+  if (t.age === 'elder') {
+    const elders = HEADS_ADULT.filter(h => /elderly/.test(h))
+    if (elders.length) return take(elders, 'head_male')
+  }
+
+  // 非老者：先从候选里剔除 elderly，避免"年轻人长老年脸"
+  const adultNonElder = HEADS_ADULT.filter(h => !/elderly/.test(h))
+  const maleish = adultNonElder.filter(h => /male/.test(h) && !/female/.test(h))
+  const femaleish = adultNonElder.filter(h => /female/.test(h))
+
+  if (t.gender === 'female') return take(femaleish.length ? femaleish : adultNonElder, 'head_male')
+  if (t.gender === 'male') {
+    if (isBroad) {
+      const plump = maleish.filter(h => /plump|gaunt/.test(h))
+      if (plump.length) return take(plump, 'head_male')
+    }
+    return take(maleish.length ? maleish : adultNonElder, 'head_male')
+  }
+  // 没线索就在男女之间随机，但始终避开老者
+  return take(adultNonElder.length ? adultNonElder : HEADS_ADULT, 'head_male')
+}
 
 /**
  * 由稳定标识确定性地生成一套「配方」。
@@ -244,46 +346,104 @@ export function playerSpriteSeed(name?: string, gender?: string): string {
 
 export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   const rng = makeRng(hashSeed(key))
-  const g = (opts?.gender || '').toLowerCase()
-  const isFemale = /女|female|woman|girl|f\b/.test(g)
-  const isElder = /老|elder|old|年长/.test(g)
-  const build = (opts?.build || '').toLowerCase()
-  const isBroad = /壮|broad|muscular|魁/.test(build)
 
-  // 头部：按性别气质挑，老者优先用老年头
-  let head: string
-  if (isElder) {
-    head = pick(rng, HEADS_ADULT.filter(h => /elderly/.test(h)).concat(HEADS_ADULT))
-  } else if (isFemale) {
-    head = pick(rng, HEADS_FEMALEISH.length ? HEADS_FEMALEISH : HEADS_ADULT)
-  } else if (isBroad) {
-    head = pick(rng, HEADS_MALEISH.filter(h => /plump|gaunt/.test(h)).concat(HEADS_MALEISH))
-  } else {
-    head = pick(rng, HEADS_MALEISH.length && rng() < 0.5 ? HEADS_MALEISH : HEADS_FEMALEISH)
+  // —— 先推断外貌：描述里写了什么，就尽量照着画 ——
+  const traits: AppearanceTraits = opts?.profile
+    ? inferTraits(opts.profile)
+    : { evidence: [] }
+
+  // 没有资料时退回旧的 gender/build 关键词判断
+  if (!traits.gender) {
+    const g = (opts?.gender || '').toLowerCase()
+    if (/女|female|woman|girl|f\b/.test(g)) traits.gender = 'female'
+    else if (/男|male|man|boy/.test(g)) traits.gender = 'male'
+  }
+  if (!traits.age) {
+    const g = (opts?.gender || '').toLowerCase()
+    if (/老|elder|old|年长/.test(g)) traits.age = 'elder'
+  }
+  if (!traits.build) {
+    const b = (opts?.build || '').toLowerCase()
+    if (/壮|broad|muscular|魁/.test(b)) traits.build = 'muscular'
   }
 
-  const hair = pick(rng, HAIRS.length ? HAIRS : ['hair_bob'])
-  const torso = pick(rng, TORSOS.length ? TORSOS : ['torso_clothes_longsleeve'])
+  const isBroad = traits.build === 'broad' || traits.build === 'muscular'
+
+  const head = pickHead(rng, traits, isBroad)
+
+  /*
+    发型：优先按推断出的关键词选。
+    以前这里是 `pick(rng, HAIRS)` 纯随机，所以"黑发束成马尾"的管家可能抽到爆炸头。
+
+    **光头/秃顶是特例**：描述里明说光头时不能再给头发 ——
+    给一个光头角色配 `hair_balding`（后脑一圈头发）再叠个发色，
+    看起来仍然像有头发，与设定矛盾。这种情况**整个不加头发层**。
+  */
+  const bald = traits.hairStyle?.some(k => /bald|shaved/i.test(k))
+  const hair = bald ? '' : pickRequired(rng, HAIRS, traits.hairStyle, 'hair_bob')
+
+  /*
+    衣着：先用身份选类型（守卫→盔甲、法师→长袍），选不出再随机。
+    身份是最能拉开辨识度的一维 —— 一排守卫穿一样的甲、法师穿一样的袍，
+    玩家一眼就能从立绘看出谁是谁。
+  */
+  const torso = pickRequired(rng, TORSOS, traits.role, 'torso_clothes_longsleeve')
+
   const legs = pick(rng, LEGS.length ? LEGS : ['legs_pants'])
   const shoes = pick(rng, FEET.length ? FEET : ['feet_shoes_basic'])
   const nose = pick(rng, NOSES.length ? NOSES : ['head_nose_straight'])
   const brows = pick(rng, BROWS.length ? BROWS : ['eyebrows_thick'])
 
-  // —— 配色：这是差异化的主要来源 ——
+  // —— 可选部件：只在描述明确提到、且**素材库里真的有对应件**时才加 ——
+  const optional: string[] = []
+
+  /*
+    头饰：**未命中就什么都不加**。
+    这一点很关键 —— 库里没有"眼镜/单片眼镜"类部件，而"戴单片眼镜的管家"
+    会推断出 headwear=['glasses','monocle']，一个都匹配不到。
+    此时若回退随机，就会给他配一顶野蛮人头盔 —— 比不戴帽子糟糕得多。
+    宁可少一个配饰，也不能给错。
+  */
+  if (traits.headwear?.length && HEADWEAR.length) {
+    const hw = pickByKeywords(rng, HEADWEAR, traits.headwear)
+    if (hw) optional.push(hw)
+  }
+
+  // 胡须：描述里明确写了才加（zPos 110，会被头发压住一部分，符合真实观感）
+  if (traits.beard && BEARDS.length) {
+    optional.push(pick(rng, BEARDS))
+  }
+
+  // 披风：只在身份明确指向领主/法师/游侠时加
+  if (CAPES.length && /lord|noble|robe|ranger|mage/.test((traits.role || []).join(' ')) && rng() < 0.5) {
+    optional.push(pick(rng, CAPES))
+  }
+
+  /*
+    可选部件：护腕/臂甲。
+    守卫、骑士、刺客这类身份戴护腕很自然，加一点能让轮廓更"有装备感"。
+    只在身份命中时加，避免人人都戴。
+  */
+  if (ARMS.length && /armour|leather|bracer|warrior|knight|guard|rogue|assassin/.test((traits.role || []).join(' ')) && rng() < 0.55) {
+    optional.push(pick(rng, ARMS))
+  }
+
+  // —— 配色：先按描述取，取不到再随机（这是差异化的主要来源）——
   const hairNames = paletteNames('hair')
   const bodyNames = paletteNames('body').filter(n => !/^fur_|zombie|green|blue|lavender/.test(n))
   const clothNames = paletteNames('cloth')
   const eyeNames = paletteNames('eye')
 
   const colors: RecolorSpec = opts?.colors || {
-    hair: pick(rng, hairNames),
-    body: pick(rng, bodyNames.length ? bodyNames : paletteNames('body')),
-    cloth: pick(rng, clothNames),
-    eye: pick(rng, eyeNames),
+    hair: resolvePaletteName(traits.hairColor, hairNames) || pick(rng, hairNames),
+    body: resolvePaletteName(traits.skin, bodyNames.length ? bodyNames : paletteNames('body'))
+      || pick(rng, bodyNames.length ? bodyNames : paletteNames('body')),
+    cloth: resolvePaletteName(traits.cloth, clothNames) || pick(rng, clothNames),
+    eye: resolvePaletteName(traits.eye, eyeNames) || pick(rng, eyeNames),
   }
 
   return {
-    parts: ['body', head, nose, brows, hair, legs, shoes, torso],
+    parts: ['body', head, nose, brows, hair, legs, shoes, torso, ...optional].filter(Boolean),
     hair,
     clothing: torso,
     colors,

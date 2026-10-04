@@ -1,10 +1,6 @@
 import { useGameStore } from '@/stores/game';
 import { useUIStore } from '@/stores/ui';
 import { useSessionStore } from '@/stores/session';
-import { CharacterAvatar } from '@/components/CharacterAvatar';
-import { CharacterSprite } from '@/components/CharacterSprite';
-import { playerSpriteSeed } from '@/utils/lpcSprite';
-import { PortraitTrigger } from '@/components/PortraitPanel';
 import {
   Sparkles,
   Zap,
@@ -16,6 +12,7 @@ import {
   Gauge,
   LogOut,
   Settings,
+  Compass,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -28,52 +25,27 @@ interface StatusPanelProps {
 }
 
 export function StatusPanel({ className = '' }: StatusPanelProps) {
-  const { resources, resourceDefs, aspects, attributeDefs, returnToTitle, playerName, playerGender, playerAppearance, playerAvatar } = useGameStore();
+  const { resources, resourceDefs, aspects, attributeDefs, returnToTitle, playerName, playerGender, playerAppearance } = useGameStore();
   const { setApiKeyModalOpen } = useUIStore();
   const world = useSessionStore(s => s.world);
-
-  // 生成头像的种子必须派生自「开局时定下的身份」，不能用 playerAvatar 之类的可变字段，
-  // 否则换装备/改状态也会换一张脸。名字与性别在整局里是稳定的。
-  const playerAvatarSeed = playerSpriteSeed(playerName, playerGender);
-
   return (
     <div className={`h-full p-4 space-y-6 overflow-y-auto bg-surface/30 border-r border-text-muted/20 backdrop-blur-sm flex flex-col ${className}`}>
       {/*
-        玩家档案。之前这里只有资源/属性，玩家上传的头像在游戏内完全没有出口
-        （session 里存着，但没有任何组件读它），所以「上传了却看不到」。
+        玩家档案 —— **不放立绘**。
+        主角就是玩家自己，不需要引擎替他生成一张脸：那张脸是从名字随机来的，
+        与玩家填的「外貌」描述无关，等于展示一个陌生人。
+        上传自定义头像也已移除（与像素风格冲突，且只影响一个小方块）。
+        这里改为一个中性的印记，保持版式不塌。
       */}
       <section className="space-y-3">
         <h3 className="text-xs font-serif text-text-muted uppercase tracking-[0.2em] border-b border-text-muted/20 pb-2">角色</h3>
         <div className="flex items-center gap-3 p-3 bg-black/20 rounded-sm border border-text-muted/10">
-          {/*
-            头像优先级与人物关系栏保持一致：
-            角色卡自带图片 > LPC 像素立绘。
-            以前这里固定用几何 SVG 头像，导致同一角色在关系栏是像素立绘、
-            在状态栏是几何头 —— 两套视觉语言并存，是本项目最刺眼的观感问题。
-          */}
-          {playerAvatar ? (
-            <PortraitTrigger characterId="__player__">
-              <CharacterAvatar
-                name={playerName || '主角'}
-                id={playerAvatarSeed}
-                avatar={playerAvatar}
-                style={world?.avatarStyle}
-                tone={world?.avatarTone}
-                size={48}
-              />
-            </PortraitTrigger>
-          ) : (
-            <PortraitTrigger characterId="__player__">
-              <CharacterSprite
-                name={playerName || '主角'}
-                seed={playerAvatarSeed}
-                gender={playerGender}
-                headOnly
-                scale={4}
-                className="w-12 h-12 bg-black/30"
-              />
-            </PortraitTrigger>
-          )}
+          <div
+            className="w-12 h-12 shrink-0 rounded-sm border border-accent-lantern/25 bg-gradient-to-br from-accent-lantern/10 to-transparent flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <Compass size={20} className="text-accent-lantern/70" />
+          </div>
           <div className="min-w-0 flex-1">
             <div className="text-sm font-serif text-text-primary truncate" title={playerName}>
               {playerName || '未命名'}

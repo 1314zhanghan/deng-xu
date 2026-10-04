@@ -187,12 +187,36 @@ export function StartScreen() {
 
   const handleLaunch = () => {
     if (!setupWorld) return
+    /*
+      顺序很重要，这里是「主角叫未命名」这个 bug 的真正根源：
+
+      SessionSetup.handleLaunch 先写好玩家档案（setPlayerProfile），
+      然后调 onLaunch()，也就是这个函数 —— 而它接着执行 resetGame()。
+      但 resetGame 是 `set({ ...INITIAL_STATE })`，会把整个 gameStore 清空，
+      **包括刚刚写好的 playerName**。于是：
+        session.player.name = 正确名字
+        game.playerName     = 空
+      状态栏读的是 game.playerName，就显示成「未命名」。
+
+      所以：重置之后必须**重新写入玩家档案**。
+      重置的语义是"清掉上一局的历史与数值"，不是"清掉玩家是谁"。
+    */
     // 注意：这里**不能**调用 clearSession()。
     // SessionSetup 已经用 setSession() 写好了本局会话，再清一次会把 world 抹成 null，
     // 结果 isGameStarted 为真而 session.world 为空，游戏界面会卡在
     // 「尚未选择世界卡」并且没有任何办法回到正常流程。
-    // 清空旧存档由 resetGame() 负责，它和 session 是两套独立的存储。
     resetGame()
+
+    const p = useSessionStore.getState().player
+    if (p) {
+      useGameStore.getState().setPlayerProfile(
+        p.name?.trim() || '无名者',
+        p.gender || '',
+        p.appearance || '',
+        p.avatar
+      )
+    }
+
     setPendingSetup(null)
     startGame()
   }

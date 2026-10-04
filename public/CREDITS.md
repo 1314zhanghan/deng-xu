@@ -4,171 +4,136 @@
 https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator
 
 该项目素材分别以 **CC0 / OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0** 发布。
-其中 OGA-BY 与 CC-BY-SA **强制要求署名**，因此本文件必须随作品一同提供。
+其中 **OGA-BY 与 CC-BY-SA 强制要求署名**，因此本文件必须随作品一同提供。
+
+本文件由 `runtime.json` 自动生成（共 **170** 个部件），
+请勿手工编辑 —— 手工维护的清单在部件库扩充后必然漏人。
+
+## 授权分布
+
+| 授权 | 部件数 |
+|---|---|
+| OGA-BY 3.0 | 68 |
+| GPL 3.0 | 67 |
+| CC-BY-SA 3.0 | 48 |
+| GPL 2.0 | 13 |
+| OGA-BY 3.0+ | 10 |
+| CC-BY 3.0+ | 10 |
+| CC-BY 3.0 | 9 |
+| CC0 | 7 |
+| CC-BY 4.0 | 6 |
+| GPL 3.0+ | 1 |
+| CC-BY-SA 4.0 | 1 |
+
+其中 **152** 个部件要求署名（CC0 除外）。
 
 ## 作者
 
-- **??** —— heads_human_male_plump
-- **Benjamin K. Smith (BenCreating)** —— body、heads_human_female、heads_human_female_elderly、heads_human_male、heads_human_male_elderly
-- **Bluecarrot16** —— feet_boots_revised、feet_shoes_revised、legs_cuffed
-- **Durrani** —— body
-- **Eliza Wyatt (ElizaWy)** —— body、heads_human_female_elderly、heads_human_male_elderly
-- **ElizaWy** —— body、eyebrows_thick、eyebrows_thin、feet_boots_revised、feet_shoes_revised、hair_balding、hair_bob、hair_buzzcut、hair_cornrows、hair_dreadlocks_short、hair_flat_top_fade、hair_flat_top_straight、hair_natural、head_nose_elderly、head_nose_large、heads_human_elderly_small、heads_human_female_small、heads_human_male_small、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
-- **Evert** —— body
-- **JaidynReiman** —— body、feet_boots_basic、feet_boots_revised、feet_boots_rim、feet_shoes_basic、feet_shoes_ghillies、feet_shoes_revised、hair_bedhead、hair_long、hair_relm_short、hair_shorthawk、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_armour_leather、torso_armour_legion、torso_armour_plate、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
-- **Joe White** —— feet_shoes_basic、legs_pants
-- **Johannes Sjölund (wulax)** —— body、feet_boots_revised、feet_shoes_basic、feet_shoes_revised、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_armour_leather、torso_armour_plate、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
-- **Lanea Zimmerman (Sharm)** —— legs_skirt_belle、legs_skirt_overskirt
-- **Mandi Paugh** —— legs_leggings
-- **Manuel Riecke (MrBeast)** —— hair_bedhead、hair_long、hair_shorthawk
-- **Matthew Krohn (makrohn)** —— body、feet_shoes_ghillies、head_nose_big、head_nose_button、head_nose_straight、legs_pants、legs_skirt_belle、legs_skirt_overskirt、torso_armour_leather、torso_armour_plate
-- **Michael Whitlock (bigbeargames)** —— torso_armour_leather、torso_armour_plate
-- **MuffinElZangano** —— body
-- **Napsio (Vitruvian Studio)** —— torso_armour_legion、torso_armour_plate
-- **Nila122** —— body、feet_boots_basic、torso_armour_legion
-- **Nyom** —— torso_clothes_shortsleeve
-- **Pierre Vigier (pvigier)** —— body
-- **Sander Frenken (castelonia)** —— body
-- **Skorpio** —— hair_high_and_tight
-- **Stephen Challener (Redshrike)** —— body、feet_boots_revised、feet_shoes_revised、heads_human_elderly_small、heads_human_female、heads_human_female_elderly、heads_human_female_small、heads_human_male、heads_human_male_elderly、heads_human_male_gaunt、heads_human_male_plump、heads_human_male_small、legs_cuffed、legs_formal、legs_leggings、legs_pants、torso_clothes_longsleeve、torso_clothes_longsleeve2、torso_clothes_longsleeve2_buttoned、torso_clothes_longsleeve2_cardigan、torso_clothes_longsleeve2_polo、torso_clothes_longsleeve2_scoop、torso_clothes_shortsleeve、torso_clothes_shortsleeve_cardigan、torso_clothes_shortsleeve_polo、torso_clothes_tshirt
-- **Thane Brimhall (pennomi)** —— feet_shoes_ghillies、head_nose_big、head_nose_button、head_nose_straight
-- **TheraHedwig** —— body
-- **William.Thompsonj** —— legs_leggings
-- **bluecarrot16** —— body、feet_boots_basic、feet_shoes_basic、feet_shoes_ghillies、hair_afro、hair_bob、hair_cornrows、hair_dreadlocks_long、hair_dreadlocks_short、hair_flat_top_fade、hair_flat_top_straight、hair_high_and_tight、hair_lob、hair_natural、hair_twists_fade、hair_twists_straight、heads_human_female、heads_human_male、heads_human_male_gaunt、legs_formal、legs_leggings、legs_pants、legs_skirt_belle、legs_skirt_overskirt、torso_armour_leather、torso_armour_legion、torso_armour_plate、torso_clothes_longsleeve、torso_clothes_shortsleeve
-- **dalonedrau** —— body
-- **kheftel** —— body
-- **laetissima** —— feet_shoes_ghillies、head_nose_big、head_nose_button、head_nose_straight
+- **JaidynReiman** —— arms_armour、arms_bracers、arms_hands_ring_stud、beards_5oclock_shadow、beards_beard、beards_bigstache、beards_french、beards_mustache、cape_solid、cape_tattered、cape_trim、feet_plate_toe、feet_plate_toe_thick、feet_socks_ankle、feet_socks_high、hair_bangslong2、hair_bangsshort、hair_curls_large、hair_long_straight、hair_long_tied、hair_messy2、hair_page2、hair_parted_side_bangs、hair_pixie、hair_ponytail2、hair_relm_xlong、hair_shoulderr、hair_single、hair_swoop_side、hair_topknot_long2、hair_topknot_short2、hair_wavy、hat_bandana、hat_bicorne_athwart_admiral、hat_bicorne_athwart_basic_skull、hat_bicorne_athwart_commodore_trim、hat_bicorne_foreaft_commodore、hat_cap_bonnie、hat_cap_bonnie_tilt、hat_cap_leather、hat_headband_hairtie_rune、hat_headband_thick、hat_helmet_barbarian、hat_helmet_legion、hat_holiday_christmas、hat_hood_cloth、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirts_legion、legs_skirts_plain、shoulders_epaulets、shoulders_mantal、torso_aprons_overalls、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck、torso_jacket_tabard、wrists_cuffs
+- **Bluecarrot16** —— arms_armour、arms_hands_ring_stud、beards_winter、cape_solid、cape_trim、feet_socks_ankle、feet_socks_high、hair_cowlick、hair_curtains、hair_long_messy、hair_long_straight、hair_long_tied、hair_mop、hair_parted2、hair_pigtails、hair_spiked_beehive、hair_spiked_liberty2、hat_accessory_crest、hat_accessory_horns_upward、hat_accessory_wings、hat_bandana_pirate、hat_bicorne_athwart_admiral、hat_bicorne_athwart_basic_skull、hat_bicorne_athwart_commodore_trim、hat_bicorne_foreaft_commodore、hat_cap_bonnie、hat_cap_bonnie_tilt、hat_helmet_barbarian、hat_helmet_barbuta_simple、hat_helmet_flattop、hat_helmet_legion、hat_helmet_nasal、hat_helmet_spangenhelm_viking、hat_holiday_christmas、hat_tricorne_captain_skull、hat_visor_horned、hat_visor_round_raised、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirt_straight、legs_skirts_legion、legs_skirts_plain、shoulders_epaulets、shoulders_mantal、torso_aprons_apron_full、torso_aprons_apron_half、torso_aprons_overalls、torso_clothes_sleeveless1、torso_jacket_collared、torso_jacket_frock、torso_jacket_iverness、torso_jacket_pockets、torso_jacket_tabard、wrists_cuffs
+- **ElizaWy** —— beards_chevron、beards_handlebar、beards_horseshoe、beards_lampshade、beards_medium、beards_trimmed、feet_socks_ankle、feet_socks_high、hair_braid、hair_cowlick、hair_curly_long、hair_curly_short2、hair_half_up、hair_page2、hat_visor_round_raised、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirt_straight、torso_aprons_apron_full、torso_aprons_apron_half、torso_aprons_overalls、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck
+- **Johannes Sjölund (wulax)** —— arms_armour、arms_bracers、feet_socks_ankle、feet_socks_high、hair_page2、hat_cap_leather、hat_helmet_legion、hat_hood_cloth、hat_visor_horned、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirts_plain、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck、torso_jacket_tabard
+- **Stephen Challener (Redshrike)** —— feet_socks_ankle、feet_socks_high、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck
+- **Nila122** —— cape_solid、cape_tattered、hair_braid、hair_single、hair_wavy、hat_headband_tied、hat_helmet_legion、legs_skirts_legion、torso_aprons_apron
+- **Matthew Krohn (makrohn)** —— arms_armour、arms_bracers、hat_bandana、hat_cap_leather、hat_helmet_legion、hat_visor_horned、torso_jacket_tabard
+- **Manuel Riecke (MrBeast)** —— hair_bangslong2、hair_bangsshort、hair_messy2、hair_pixie、hair_ponytail2、hair_shoulderr
+- **laetissima** —— beards_5oclock_shadow、beards_bigstache、beards_french
+- **Thane Brimhall (pennomi)** —— beards_5oclock_shadow、beards_bigstache、beards_french
+- **thecilekli** —— hair_long_straight、hair_long_tied、hat_hood_hijab
+- **Carlo Enrico Victoria (Nemisys)** —— beards_beard、beards_mustache
+- **Fabzy** —— hair_spiked_beehive、hat_bandana_pirate
+- **Mandi Paugh** —— hair_curtains、hair_long_messy
+- **Michael Whitlock (bigbeargames)** —— arms_armour、hat_magic_celestial
+- **Napsio (Vitruvian Studio)** —— hat_helmet_barbarian、hat_magic_celestial
+- **Radomir Dopieralski** —— hair_mop、hair_pigtails
+- **Sander Frenken (castelonia)** —— hat_visor_horned、hat_visor_round_raised
+- **Ahmad3366** —— legs_skirts_plain
+- **Barbara Riviera** —— hair_bangslong2
+- **Charles Sanchez (CharlesGabriel)** —— hat_formal_crown
+- **Cobra Hubbard (BlueVortexGames)** —— hair_spiked_liberty2
+- **DarkwallLKE** —— hat_formal_crown
+- **DCSS authors** —— hat_accessory_wings
+- **Joe White** —— hair_ponytail2
+- **kcilds/Rocetti/Eredah** —— hair_spiked
+- **Lanea Zimmerman (Sharm)** —— hair_shoulderr
+- **Luke Mehl** —— torso_clothes_robe
+- **Marcel van de Steeg (MadMarcel)** —— hat_bandana
+- **Nyom** —— torso_clothes_sleeveless1
+- **Pierre Vigier (pvigier)** —— legs_skirts_plain
+- **Shaun Williams** —— hat_visor_horned
+- **Skorpio** —— hair_parted2
+- **Tracy** —— hat_magic_celestial
 
-## 各部件授权
+共 **34** 位作者。
 
-- `body` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `heads_human_male` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `heads_human_female` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `heads_human_male_elderly` —— OGA-BY 3.0 / CC-BY 3.0
-- `face_neutral` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `face_happy` —— OGA-BY 3.0
-- `face_angry` —— OGA-BY 3.0
-- `eyebrows_thick` —— OGA-BY 3.0
-- `eyebrows_thin` —— OGA-BY 3.0
-- `head_nose_straight` —— GPL 3.0 / CC-BY-SA 3.0
-- `head_nose_button` —— GPL 3.0 / CC-BY-SA 3.0
-- `hair_bob` —— CC0
-- `hair_long` —— CC-BY-SA 3.0 / GPL 3.0
-- `hair_buzzcut` —— OGA-BY 3.0
-- `hair_bedhead` —— CC-BY-SA 3.0 / GPL 3.0
-- `torso_clothes_tunic` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `torso_clothes_longsleeve` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `torso_armour_leather` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `legs_pants` —— OGA-BY 3.0 / GPL 3.0 / CC-BY-SA 3.0
-- `legs_leggings` —— OGA-BY 3.0 / GPL 3.0
-- `feet_boots_basic` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 2.0 / GPL 3.0
-- `feet_shoes_basic` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `weapon_sword_arming` —— OGA-BY 3.0
-- `weapon_sword_longsword` —— OGA-BY 3.0 / CC-BY-SA 3.0
-- `weapon_magic_wand` —— CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0
-- `hair_afro` —— CC0
-- `hair_cornrows` —— CC0
-- `hair_dreadlocks_long` —— CC0
-- `hair_dreadlocks_short` —— CC0
-- `hair_flat_top_fade` —— CC0
-- `hair_flat_top_straight` —— CC0
-- `hair_natural` —— CC0
-- `hair_twists_fade` —— CC0
-- `hair_twists_straight` —— CC0
-- `hair_balding` —— OGA-BY 3.0
-- `hair_high_and_tight` —— CC-BY-SA 3.0 / GPL 3.0
-- `hair_shorthawk` —— CC-BY-SA 3.0 / GPL 3.0
-- `hair_lob` —— CC0
-- `hair_relm_short` —— OGA-BY 3.0+ / CC-BY 3.0+ / GPL 3.0
-- `torso_clothes_longsleeve2` —— OGA-BY 3.0
-- `torso_clothes_longsleeve2_buttoned` —— OGA-BY 3.0
-- `torso_clothes_longsleeve2_cardigan` —— OGA-BY 3.0
-- `torso_clothes_longsleeve2_polo` —— OGA-BY 3.0
-- `torso_clothes_longsleeve2_scoop` —— OGA-BY 3.0
-- `torso_clothes_shortsleeve` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `torso_clothes_shortsleeve_cardigan` —— OGA-BY 3.0
-- `torso_clothes_shortsleeve_polo` —— OGA-BY 3.0
-- `torso_clothes_tshirt` —— OGA-BY 3.0
-- `torso_clothes_tunic_sara` —— OGA-BY 3.0
-- `torso_armour_legion` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 2.0 / GPL 3.0
-- `torso_armour_plate` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `legs_childpants` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `legs_cuffed` —— OGA-BY 3.0 / GPL 3.0
-- `legs_formal` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `legs_childskirts` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `legs_skirt_belle` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `legs_skirt_overskirt` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `feet_boots_revised` —— OGA-BY 3.0 / GPL 3.0
-- `feet_boots_rim` —— OGA-BY 3.0+ / CC-BY 3.0+ / GPL 3.0
-- `feet_shoes_ghillies` —— CC-BY-SA 3.0 / GPL 3.0
-- `feet_shoes_revised` —— OGA-BY 3.0 / GPL 3.0
-- `head_nose_big` —— GPL 3.0 / CC-BY-SA 3.0
-- `head_nose_elderly` —— OGA-BY 3.0
-- `head_nose_large` —— OGA-BY 3.0
-- `heads_human_child` —— OGA-BY 3.0 / CC-BY 3.0 / GPL 3.0
-- `heads_human_elderly_small` —— OGA-BY 3.0 / CC-BY
-- `heads_human_female_elderly` —— OGA-BY 3.0 / CC-BY 3.0
-- `heads_human_female_small` —— OGA-BY 3.0 / CC-BY
-- `heads_human_male_gaunt` —— OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
-- `heads_human_male_plump` —— CC-BY-SA 3.0 / GPL 3.0
-- `heads_human_male_small` —— OGA-BY 3.0 / CC-BY
+## 说明
 
-## 原始出处
+- 场景背景、世界色调色板、以及主角与 NPC 的**部件组合逻辑**均为本项目原创，
+  不涉及第三方素材。
+- 主角不设像素立绘（见 `PortraitPanel.tsx` 的说明），因此不涉及额外素材。
+- 若某位作者认为署名有误或遗漏，请提 Issue，会立即更正。
 
-- http://opengameart.org/content/lpc-clothing-updates
-- http://opengameart.org/content/lpc-revised-character-basics
-- http://opengameart.org/content/sara-wizard
-- https://github.com/ElizaWy/LPC/blob/main/Characters/Hair
-- https://github.com/ElizaWy/LPC/tree/main/Characters/Clothing
-- https://github.com/ElizaWy/LPC/tree/main/Characters/Hair
-- https://github.com/ElizaWy/LPC/tree/main/Characters/Head
-- https://github.com/ElizaWy/LPC/tree/main/Characters/Head/Head%20Overlay%2001%20-%20Large%20Nose
-- https://github.com/ElizaWy/LPC/tree/main/Characters/Props/Sword%2001%20-%20Arming%20Sword
-- https://gitlab.com/vagabondgame/lpc-characters
-- https://opengameart.org/content/
-- https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
-- https://opengameart.org/content/lpc-2-characters
-- https://opengameart.org/content/lpc-7-womens-shirts
-- https://opengameart.org/content/lpc-barbarian-sprite-base
-- https://opengameart.org/content/lpc-base-character-expressions
-- https://opengameart.org/content/lpc-be-seated
-- https://opengameart.org/content/lpc-character-bases
-- https://opengameart.org/content/lpc-child-standing-template
-- https://opengameart.org/content/lpc-children-walk-animation
-- https://opengameart.org/content/lpc-clothes-and-hair
-- https://opengameart.org/content/lpc-clothes-for-children
-- https://opengameart.org/content/lpc-clothing-updates
-- https://opengameart.org/content/lpc-combat-armor-for-women
-- https://opengameart.org/content/lpc-curly-hair-elven-ears-white-cape-with-blue-trim-and-more
-- https://opengameart.org/content/lpc-dress-in-combat-poses
-- https://opengameart.org/content/lpc-expanded-armor
-- https://opengameart.org/content/lpc-expanded-hair
-- https://opengameart.org/content/lpc-expanded-pants
-- https://opengameart.org/content/lpc-expanded-simple-shirts
-- https://opengameart.org/content/lpc-expanded-sit-run-jump-more
-- https://opengameart.org/content/lpc-expanded-socks-shoes
-- https://opengameart.org/content/lpc-extended-weapon-animations
-- https://opengameart.org/content/lpc-female-orcogregoblintroll-base-walkcycle
-- https://opengameart.org/content/lpc-folk
-- https://opengameart.org/content/lpc-gentleman
-- https://opengameart.org/content/lpc-hair
-- https://opengameart.org/content/lpc-jump-expanded
-- https://opengameart.org/content/lpc-kimono-relm
-- https://opengameart.org/content/lpc-ladies
-- https://opengameart.org/content/lpc-male-jumping-animation-by-durrani
-- https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
-- https://opengameart.org/content/lpc-muscular-hurt-animation
-- https://opengameart.org/content/lpc-muscular-swing-animation
-- https://opengameart.org/content/lpc-pregnancy-bases-maternity-wear
-- https://opengameart.org/content/lpc-relm-hair-xlong-ponytail
-- https://opengameart.org/content/lpc-revised-character-basics
-- https://opengameart.org/content/lpc-revised-elders
-- https://opengameart.org/content/lpc-roman-armor
-- https://opengameart.org/content/lpc-runcycle-and-diagonal-walkcycle
-- https://opengameart.org/content/lpc-runcycle-for-male-muscular-and-pregnant-character-bases-with-modular-heads
-- https://opengameart.org/content/lpc-sara
-- https://opengameart.org/content/lpc-skorpios-scifi-sprite-pack
-- https://opengameart.org/content/lpc-teen-androgynous-short-sleeve-shirt
-- https://opengameart.org/content/lpc-teen-unisex-base-clothes
-- https://opengameart.org/content/lpc-wands
-- https://opengameart.org/content/ulpc-expanded-expressions
+## 未标注来源的部件
+
+以下 60 个部件在 LPC 定义里没有 credits 字段，视为 CC0：
+
+- body
+- feet_shoes_basic
+- feet_shoes_ghillies
+- feet_shoes_revised
+- legs_cuffed
+- legs_formal
+- legs_leggings
+- legs_pants
+- legs_skirt_belle
+- feet_boots_basic
+- feet_boots_revised
+- feet_boots_rim
+- legs_skirt_overskirt
+- torso_clothes_longsleeve
+- torso_clothes_longsleeve2
+- torso_clothes_longsleeve2_buttoned
+- torso_clothes_longsleeve2_cardigan
+- torso_clothes_longsleeve2_polo
+- torso_clothes_longsleeve2_scoop
+- torso_clothes_shortsleeve
+- torso_clothes_shortsleeve_cardigan
+- torso_clothes_shortsleeve_polo
+- torso_clothes_tshirt
+- torso_armour_leather
+- torso_armour_legion
+- torso_armour_plate
+- heads_human_elderly_small
+- heads_human_female
+- heads_human_female_elderly
+- heads_human_female_small
+- heads_human_male
+- heads_human_male_elderly
+- heads_human_male_gaunt
+- heads_human_male_plump
+- heads_human_male_small
+- head_nose_big
+- head_nose_button
+- head_nose_elderly
+- head_nose_large
+- head_nose_straight
+- eyebrows_thick
+- eyebrows_thin
+- hair_afro
+- hair_balding
+- hair_bedhead
+- hair_bob
+- hair_buzzcut
+- hair_cornrows
+- hair_dreadlocks_long
+- hair_dreadlocks_short
+- hair_flat_top_fade
+- hair_flat_top_straight
+- hair_high_and_tight
+- hair_lob
+- hair_long
+- hair_natural
+- hair_relm_short
+- hair_shorthawk
+- hair_twists_fade
+- hair_twists_straight

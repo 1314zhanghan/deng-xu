@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { X, RotateCw, Upload, Sparkles } from 'lucide-react'
+import { X, RotateCw, Sparkles } from 'lucide-react'
 import { useUIStore } from '@/stores/ui'
 import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { CharacterSprite } from '@/components/CharacterSprite'
-import { recipeFor, playerSpriteSeed, type SpriteRecipe } from '@/utils/lpcSprite'
-import { readFileAsDataURL } from '@/utils/files'
+import { recipeFor, type SpriteRecipe } from '@/utils/lpcSprite'
 
 const DIRECTIONS = [
   { id: 'down', label: '正面' },
@@ -15,54 +14,46 @@ const DIRECTIONS = [
 ]
 
 /**
- * 立绘面板 —— 点开角色看他的**全身**像素立绘。
+ * 立绘面板 —— 点开 **NPC** 看他的全身像素立绘。
  *
- * 为什么要有这个：素材是 64×64 的全身行走图，而关系栏只能放一个 48px 的方框，
- * 服装、姿态、体型这些信息全被裁掉了。这里用 4 倍整数放大（256px）展示全身，
- * 并且可以转方向 —— 那种「同一张图转一圈」正是像素素材的价值所在。
+ * 为什么只有 NPC：
+ *  主角曾经也有立绘、还能上传自定义头像。但那两条路都不成立 ——
+ *   1. 主角的像素立绘是从名字随机生成的，与玩家填的「外貌」描述无关，
+ *      玩家看到的是一个跟他设定毫无关系的陌生人；
+ *   2. 上传自定义头像与这里的像素风格完全冲突（一张真人照片放进像素界面），
+ *      而且它只影响状态栏一个小方块，投入与收益不成比例。
+ *  所以主角不再有立绘 —— 主角是玩家自己，用文字描述即可。
+ *
+ * NPC 立绘则相反：它是 AI 生成的角色，玩家没有别的渠道"看见"他们，
+ * 立绘是这些人唯一的形象。
  */
 export function PortraitPanel() {
   const characterId = useUIStore(s => s.portraitCharacterId)
   const setPortraitCharacterId = useUIStore(s => s.setPortraitCharacterId)
   const characters = useGameStore(s => s.characters)
-  const playerName = useGameStore(s => s.playerName)
-  const playerGender = useGameStore(s => s.playerGender)
-  const playerAppearance = useGameStore(s => s.playerAppearance)
-  const playerAvatar = useGameStore(s => s.playerAvatar)
   const world = useSessionStore(s => s.world)
   const [dir, setDir] = useState('down')
   const [recipe, setRecipe] = useState<SpriteRecipe | null>(null)
 
-  const isPlayer = characterId === '__player__'
-  const char = isPlayer ? null : characters.find(c => c.id === characterId)
+  const char = characters.find(c => c.id === characterId)
 
   // 换角色时回到正面，避免"上次转到背面，这次一打开也是背面"
   useEffect(() => { setDir('down') }, [characterId])
 
-  // 取配方（用于展示部件构成，也便于自查）
+  // 取配方（用于展示部件构成，也便于自查是否照描述画了）
   useEffect(() => {
-    if (!characterId) { setRecipe(null); return }
-    if (isPlayer) setRecipe(recipeFor(playerSpriteSeed(playerName, playerGender), { gender: playerGender }))
-    else if (char) setRecipe(recipeFor(char.id))
-  }, [characterId, isPlayer, char, playerName, playerGender])
+    if (!char) { setRecipe(null); return }
+    setRecipe(recipeFor(char.id, {
+      profile: {
+        name: char.name,
+        description: char.description,
+        relationship: char.relationship,
+        scenario: char.prompt,
+      },
+    }))
+  }, [char])
 
-  const handleAvatarUpload = async (file: File | undefined) => {
-    if (!file || !isPlayer) return
-    try {
-      const url = await readFileAsDataURL(file)
-      useGameStore.getState().setPlayerProfile(
-        playerName || '主角', playerGender, playerAppearance, url
-      )
-    } catch { /* 读取失败就保持原样 */ }
-  }
-
-  if (!characterId) return null
-  const open = isPlayer || !!char
-  if (!open) return null
-
-  const name = isPlayer ? (playerName || '主角') : char!.name
-  const desc = isPlayer ? playerAppearance : char!.description
-  const rel = isPlayer ? null : char!.relationship
+  if (!characterId || !char) return null
 
   return (
     <div
@@ -76,9 +67,9 @@ export function PortraitPanel() {
         {/* 头部 */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-text-muted/20">
           <div className="min-w-0">
-            <div className="text-sm font-serif text-text-primary truncate">{name}</div>
+            <div className="text-sm font-serif text-text-primary truncate">{char.name}</div>
             <div className="text-[10px] text-text-muted truncate">
-              {[rel, world?.title].filter(Boolean).join(' · ') || world?.title || ''}
+              {[char.relationship, world?.title].filter(Boolean).join(' · ')}
             </div>
           </div>
           <button
@@ -94,19 +85,19 @@ export function PortraitPanel() {
           {/* 立绘 */}
           <div className="space-y-3">
             <div className="w-64 h-64 mx-auto rounded border border-text-muted/20 bg-gradient-to-b from-black/40 to-black/10 flex items-center justify-center overflow-hidden">
-              {isPlayer && playerAvatar ? (
-                <img src={playerAvatar} alt={name} className="w-64 h-64 object-cover" />
-              ) : (
-                <CharacterSprite
-                  name={name}
-                  id={isPlayer ? undefined : char!.id}
-                  seed={isPlayer ? playerSpriteSeed(playerName, playerGender) : undefined}
-                  gender={isPlayer ? playerGender : undefined}
-                  direction={dir}
-                  scale={4}
-                  className="w-64 h-64"
-                />
-              )}
+              <CharacterSprite
+                name={char.name}
+                id={char.id}
+                profile={{
+                  name: char.name,
+                  description: char.description,
+                  relationship: char.relationship,
+                  scenario: char.prompt,
+                }}
+                direction={dir}
+                scale={4}
+                className="w-64 h-64"
+              />
             </div>
 
             {/* 方向切换 */}
@@ -125,43 +116,26 @@ export function PortraitPanel() {
                 </button>
               ))}
             </div>
-
-            {isPlayer && (
-              <label className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors cursor-pointer">
-                <Upload size={12} /> {playerAvatar ? '更换自定义头像' : '上传自定义头像'}
-                <input type="file" accept="image/*" className="hidden"
-                  onChange={e => handleAvatarUpload(e.target.files?.[0])} />
-              </label>
-            )}
-            {isPlayer && playerAvatar && (
-              <button
-                onClick={() => useGameStore.getState().setPlayerProfile(playerName || '主角', playerGender, playerAppearance, undefined)}
-                className="w-full text-[10px] text-text-muted hover:text-red-400 transition-colors"
-              >
-                移除自定义头像，用像素立绘
-              </button>
-            )}
           </div>
 
           {/* 描述 */}
           <div className="space-y-3 min-w-0">
-            {desc && (
+            {char.description && (
               <p className="text-xs text-text-secondary leading-relaxed font-serif whitespace-pre-wrap">
-                {desc}
+                {char.description}
               </p>
             )}
 
-            {!isPlayer && char && (
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-text-muted">
-                {char.status && <span>状态：{char.status}</span>}
-                {char.location && <span>位置：{char.location}</span>}
-              </div>
-            )}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-text-muted">
+              {char.status && <span>状态：{char.status}</span>}
+              {char.location && <span>位置：{char.location}</span>}
+              {char.relationship && <span>关系：{char.relationship}</span>}
+            </div>
 
             {recipe && (
               <details className="text-[10px]">
                 <summary className="cursor-pointer text-text-muted hover:text-text-secondary flex items-center gap-1">
-                  <Sparkles size={10} /> 这套立绘由哪些部件组成
+                  <Sparkles size={10} /> 这套立绘是怎么定的
                 </summary>
                 <div className="mt-2 space-y-1 text-text-muted font-mono leading-relaxed">
                   <div>部件：{recipe.parts.join(' · ')}</div>
@@ -169,7 +143,9 @@ export function PortraitPanel() {
                   <div>衣色：{recipe.colors.cloth || '默认'}　瞳色：{recipe.colors.eye || '默认'}</div>
                 </div>
                 <p className="mt-2 text-text-muted/70 leading-relaxed">
-                  同一个角色 id 永远得到同一套外观与配色（确定性生成）。
+                  部件与配色由角色的**描述、身份、年龄**推断而来 ——
+                  描述里写了「黑发束成马尾的管家」，立绘就会照着画。
+                  同一个角色 id 永远得到同一张脸。
                 </p>
               </details>
             )}
@@ -180,7 +156,7 @@ export function PortraitPanel() {
   )
 }
 
-/** 供关系栏/状态栏调用的小工具组件：一个可点的头像入口 */
+/** 供关系栏调用的小工具组件：一个可点的立绘入口（仅 NPC） */
 export function PortraitTrigger({
   characterId,
   children,
