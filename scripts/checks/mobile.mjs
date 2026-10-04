@@ -1,3 +1,4 @@
+import './_ws-shim.mjs'
 /**
  * 手机端专项走查。
  *
