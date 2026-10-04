@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, Suspense } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { ApiKeyModal } from '@/components/ApiKeyModal'
 import { ChoicePanel } from '@/components/ChoicePanel'
 import { StatusPanel } from '@/components/StatusPanel'
 import { GameMenuActions } from '@/components/GameMenuActions'
 import { MobileTabBar, type MobileTab } from '@/components/MobileTabBar'
+import { MobileSheet } from '@/components/MobileSheet'
 import { recordPlay } from '@/utils/recentPlays'
 import { PortraitPanel } from '@/components/PortraitPanel'
 import { InventoryPanel } from '@/components/InventoryPanel'
@@ -16,7 +17,7 @@ import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { useUIStore } from '@/stores/ui'
 import { useGameEngine } from '@/hooks/useGameEngine'
-import { Menu, X, AlertTriangle } from 'lucide-react'
+import { X, AlertTriangle } from 'lucide-react'
 import { lazyWithRetry, appLoadedCleanly } from '@/utils/lazyWithRetry'
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SceneBackdrop } from '@/components/SceneBackdrop'
@@ -53,9 +54,75 @@ function App() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [rightPanelTab, setRightPanelTab] = useState<'inventory' | 'relationships'>('inventory')
-  const [mobileTab, setMobileTab] = useState<MobileTab>('status')
+  /**
+   * 手机端当前打开的面板抽屉；null = 都关着。
+   *
+   * 原先这个状态只有"全屏菜单"在消费，底栏改了它却没人渲染内容，
+   * 于是点底栏什么都不出现（玩家反馈「底栏无效」）。
+   * 现在它直接驱动 MobileSheet。
+   */
+  const [mobileTab, setMobileTab] = useState<MobileTab | null>(null)
 
   const hasInitialized = useRef(false)
+
+  /**
+   * 手机返回键 / 浏览器后退键 → **退回上一级界面**，而不是退出网站。
+   *
+   * 为什么需要：手机上从浏览器打开时按系统返回键会直接离开页面回到主页，
+   * 玩家以为"退出到上一级"，结果整个游戏没了。
+   *
+   * 做法：打开浮层时压入一条**哨兵历史记录**，返回键先消费它。
+   *
+   * 这个功能我改了四版才对，把踩过的坑留在这里：
+   *  1. 用 `history.state?.__dxOverlay` 判断"栈顶是不是我的哨兵" ——
+   *     React effect 与 popstate 的时序交错时这个判断不可靠。
+   *  2. 让"切换页签"先关旧抽屉再开新的，而关旧抽屉里调了 `history.back()`
+   *     —— popstate 异步到达，把刚打开的新抽屉也关了。
+   *  3. 用一个"忽略自己发起的回退"的计数器，结果把**用户真正按的返回**
+   *     也当成自己的（我先加计数再调 back，用户的 popstate 永远被吞）。
+   *  4. **打开的动作必须是同步的**：如果压哨兵放在 effect 里，
+   *     用户（或测试）在 effect 执行前按返回，就会直接离开页面。
+   *
+   * 最终形态：**打开与关闭都在事件处理里同步改历史**，
+   * effect 只保留一个兜底（浮层通过其它路径被关掉时把哨兵收回来）。
+   */
+  /** 当前栈里是否有我们压的哨兵 */
+  const sentinelRef = useRef(false)
+  /** 当前浮层是靠弹栈关掉的（用于避免关闭时再弹一次） */
+  const closedByPopRef = useRef(false)
+
+  const openOverlay = useCallback((next: { tab?: MobileTab | null; menu?: boolean }) => {
+    if (!sentinelRef.current) {
+      sentinelRef.current = true
+      window.history.pushState({ __dxOverlay: true }, '')
+    }
+    closedByPopRef.current = false
+    if (next.tab !== undefined) setMobileTab(next.tab)
+    if (next.menu !== undefined) setIsMobileMenuOpen(next.menu)
+  }, [])
+
+  const closeOverlay = useCallback(() => {
+    const wasOpen = sentinelRef.current
+    sentinelRef.current = false
+    closedByPopRef.current = false
+    setMobileTab(null)
+    setIsMobileMenuOpen(false)
+    // 浮层是我们自己关的 → 把哨兵收回来，保持历史栈干净
+    if (wasOpen) window.history.back()
+  }, [])
+
+  useEffect(() => {
+    const onPop = () => {
+      if (!sentinelRef.current) return
+      // 浏览器已经帮我们弹掉了哨兵 → 只需关掉浮层，不要再 back 一次
+      sentinelRef.current = false
+      closedByPopRef.current = true
+      setMobileTab(null)
+      setIsMobileMenuOpen(false)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   // 应用成功跑起来 8 秒后，把「模块加载失败自动重载」的计数归零，
   // 这样下次真的遇到网络故障时还能享受自动重载。
@@ -151,76 +218,44 @@ function App() {
         <ChapterOverlay />
         <StatusBar />
 
-        {/* Mobile Header */}
+        {/*
+          Mobile Header。
+          去掉了右上角的汉堡按钮：它和底栏的「更多」是同一个入口，
+          两个入口摆在屏幕上显得杂乱；资源速览保留，因为它要常驻可见。
+        */}
         <header className="md:hidden h-14 border-b border-text-muted/30 flex items-center px-4 justify-between bg-surface/80 backdrop-blur z-20">
-          <span className="font-serif text-accent-lantern font-bold truncate max-w-[8rem]">
+          <span className="font-serif text-accent-lantern font-bold truncate max-w-[9rem]">
             {world?.title || '冒险'}
           </span>
-          <div className="flex items-center gap-4">
-            <div className="flex gap-3 text-xs font-mono text-text-secondary">
-              {quickResources.map(def => (
-                <span key={def.id} title={def.name} style={{ color: def.color }}>
-                  {resources[def.id] ?? 0}
-                </span>
-              ))}
-            </div>
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-1 hover:bg-text-muted/20 rounded"
-              title="更多"
-            >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+          <div className="flex gap-3 text-xs font-mono text-text-secondary">
+            {quickResources.map(def => (
+              <span key={def.id} title={def.name} style={{ color: def.color }}>
+                {resources[def.id] ?? 0}
+              </span>
+            ))}
           </div>
         </header>
 
-        {/* Mobile Menu Overlay */}
+        {/*
+          「更多」菜单。
+          只放**设置类**操作 —— 状态/物品/人物三个面板已经由底栏的
+          MobileSheet 抽屉承担，这里再放一套页签就是重复入口，
+          玩家会不知道该点哪个。
+        */}
         {isMobileMenuOpen && (
           <div className="md:hidden fixed inset-0 bg-background/95 z-50 flex flex-col animate-fade-in">
             <div className="h-14 border-b border-text-muted/30 flex items-center px-4 justify-between bg-surface/80 backdrop-blur">
               <span className="font-serif text-accent-lantern font-bold">菜单</span>
               <button
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={closeOverlay}
                 className="p-2 hover:bg-text-muted/20 rounded text-text-muted hover:text-text-primary"
+                aria-label="关闭菜单"
               >
                 <X size={24} />
               </button>
             </div>
 
-            <div className="flex border-b border-text-muted/20 bg-surface/50">
-              {([
-                { id: 'status', label: '状态' },
-                { id: 'inventory', label: '物品' },
-                { id: 'relationships', label: '关系' }
-              ] as const).map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => setMobileTab(t.id)}
-                  className={`flex-1 py-3 text-xs font-medium uppercase tracking-wider transition-colors ${mobileTab === t.id ? 'text-accent-lantern border-b-2 border-accent-lantern bg-white/5' : 'text-text-muted'}`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
             <div className="flex-1 overflow-y-auto p-4">
-              {mobileTab === 'status' && (
-                <StatusPanel className="h-auto overflow-visible border-none p-0 bg-transparent" />
-              )}
-              {mobileTab === 'inventory' && (
-                <InventoryPanel className="h-auto overflow-visible border-none p-0 bg-transparent" />
-              )}
-              {mobileTab === 'relationships' && (
-                <RelationshipPanel className="h-auto overflow-visible border-none p-0 bg-transparent" />
-              )}
-            </div>
-
-            {/*
-              全局操作固定在菜单底部，**不随内容滚动**。
-              之前它们躺在 StatusPanel 的最底部，手机端要滚过所有属性才看得到，
-              于是"没有返回主菜单"成了真实反馈。
-            */}
-            <div className="border-t border-text-muted/25 bg-surface/60 backdrop-blur px-4 py-3">
               <GameMenuActions />
             </div>
           </div>
@@ -335,11 +370,31 @@ function App() {
         */}
         <MobileTabBar
           tab={mobileTab}
-          setTab={setMobileTab}
-          onOpenMore={() => setIsMobileMenuOpen(true)}
+          onTab={t => {
+            // 再点一次已打开的页签 → 收起（符合移动端惯例）
+            if (mobileTab === t) closeOverlay()
+            else openOverlay({ tab: t, menu: false })
+          }}
+          onOpenMore={() => {
+            if (isMobileMenuOpen) closeOverlay()
+            else openOverlay({ menu: true, tab: null })
+          }}
           moreActive={isMobileMenuOpen}
         />
       </main>
+
+      {/*
+        手机端面板抽屉：底栏点哪个就弹哪个。
+        `bottom` 是底栏自己上报的高度（CSS 变量 --dx-tabbar-h），
+        所以抽屉与遮罩都**不会盖住底栏** —— 底栏始终可点，
+        玩家可以在三个面板之间直接切换，不用先关再开。
+      */}
+      {mobileTab && (
+        <MobileSheet
+          tab={mobileTab}
+          onClose={closeOverlay}
+        />
+      )}
 
       {/* Desktop Right Panel */}
       <aside className="hidden md:flex flex-col w-72 flex-shrink-0 z-10 border-l border-text-muted/30 bg-surface/30">

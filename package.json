@@ -23,7 +23,9 @@
     "check:retry": "esbuild scripts/checks/retry.ts --bundle --platform=node --format=esm --outfile=.check/retry.mjs --alias:@=./src && node .check/retry.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "check:menu": "node scripts/checks/main-menu.mjs",
-    "check:sprites": "node scripts/checks/sprite-gallery.mjs"
+    "check:sprites": "node scripts/checks/sprite-gallery.mjs",
+    "check:mobile": "node scripts/checks/mobile.mjs",
+    "check:all": "node scripts/checks/all.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.0",

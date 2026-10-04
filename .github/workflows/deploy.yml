@@ -21,7 +21,11 @@ concurrency:
 jobs:
   # 构建任务
   build:
-    runs-on: ubuntu-latest
+    # 用 windows-latest 而不是 ubuntu-latest：
+    # 浏览器走查需要真实浏览器（Edge / Chrome），而 ubuntu runner 上
+    # 只有 chromium 的 snap 骨架，跑 headless 布局与真机不一致。
+    # Windows runner 预装 Edge，走查脚本的路径探测能直接命中。
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,6 +59,55 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # ── 浏览器走查 ──
+      # 放在 build 之后、上传产物之前：走查挂了就不部署，
+      # 免得把"能构建但交互坏了"的版本发到线上。
+      #
+      # 分两步跑，各自验证不同的东西：
+      #   1. preview（真实 dist 产物）→ 确认构建产物本身能跑、门面正常
+      #   2. dev server → 跑全套走查
+      #
+      # 为什么全套必须在 dev 上跑：走查需要 `__gameStore` 之类的调试钩子
+      # 来准备游戏状态（直接塞角色、物品、时间），而这些钩子在生产构建里
+      # 被 `import.meta.env.DEV` 守卫剔除了 —— 这是有意的（不该把内部状态
+      # 暴露给线上玩家）。第一版我把走查直接指向 preview，结果 3/4 套全挂，
+      # 报 `__gameStore is not defined`。
+      - name: Walkthroughs on production build (smoke)
+        run: |
+          # 记下我们启动的 PID，只杀它 ——
+          # 用 `Get-Process node | Kill` 会连带把 runner 自己的 node 杀掉。
+          $preview = Start-Process -FilePath "node" `
+            -ArgumentList "node_modules/vite/bin/vite.js","preview","--port","5199","--strictPort" `
+            -NoNewWindow -PassThru
+          Start-Sleep -Seconds 6
+          node scripts/checks/all.mjs main-menu
+          $code = $LASTEXITCODE
+          try { Stop-Process -Id $preview.Id -Force } catch {}
+          Start-Sleep -Seconds 2
+          exit $code
+        env:
+          SITE: http://localhost:5199/
+        shell: pwsh
+
+      - name: Walkthroughs on dev server (full)
+        run: |
+          Start-Process -FilePath "node" -ArgumentList "node_modules/vite/bin/vite.js","--port","5199","--strictPort" -NoNewWindow
+          Start-Sleep -Seconds 12
+          node scripts/checks/all.mjs
+        env:
+          SITE: http://localhost:5199/
+        shell: pwsh
+
+      - name: Upload walkthrough screenshots
+        # 只在失败时上传，方便排查（成功时不占存储）
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: walkthrough-screenshots
+          path: playtest-shots/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -66,6 +119,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # 部署用回 ubuntu：跑得快，且这一步不需要浏览器
     runs-on: ubuntu-latest
     needs: build
     steps:

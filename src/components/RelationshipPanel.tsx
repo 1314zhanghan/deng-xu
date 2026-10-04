@@ -79,9 +79,15 @@ export function RelationshipPanel({ className = '' }: RelationshipPanelProps) {
                             relationship: char.relationship,
                             scenario: char.prompt,
                           }}
-                          /* 48px 显示，3 倍合成源（192px）在 2x/3x 屏上都够锐 */
-                          className="w-12 h-12 bg-black/30"
-                          headOnly
+                          /*
+                            **全身立绘**（不是头像）。
+                            这里原先写着 `headOnly` —— 于是列表里只有一颗脑袋，
+                            玩家反馈的"NPC 全身像素立绘没有实现"就是这个：
+                            不是没画，是被裁成了头。
+                            列表里用 48×72 的竖长比例，能看出服装与体型；
+                            点开右边面板看更大的一张。
+                          */
+                          className="w-12 h-[4.5rem] bg-black/30 rounded"
                         />
                       </PortraitTrigger>
                     )}

@@ -22,7 +22,23 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const OUT = process.env.AUDIT_OUT || 'D:/工作区/probe'
-const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+/**
+ * Edge / Chrome 路径。**必须自动探测**：
+ * 本地 Edge 在 Program Files (x86)，CI（windows-latest）在 Program Files，
+ * 写死路径会让走查在 CI 上直接跑不起来。
+ */
+const EDGE = (() => {
+  const cands = [
+    process.env.EDGE_PATH,
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    '/usr/bin/microsoft-edge',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium',
+  ].filter(Boolean)
+  for (const c of cands) { try { if (fs.existsSync(c)) return c } catch {} }
+  throw new Error('找不到 Edge / Chrome，可用 EDGE_PATH 指定')
+})()
 const PORT = Number(process.env.CDP_PORT || 9715)
 const FAKE_PORT = Number(process.env.FAKE_PORT || 9725)
 const SITE = process.env.SITE || 'http://localhost:5199/'

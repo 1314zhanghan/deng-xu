@@ -84,7 +84,13 @@ export function PortraitPanel() {
         <div className="grid md:grid-cols-[16rem_1fr] gap-4 p-4">
           {/* 立绘 */}
           <div className="space-y-3">
-            <div className="w-64 h-64 mx-auto rounded border border-text-muted/20 bg-gradient-to-b from-black/40 to-black/10 flex items-center justify-center overflow-hidden">
+            {/*
+              容器用**竖长**比例（4:5）。
+              之前是正方形 256×256 —— 而角色画在 64×64 帧里、
+              上下本来就留白，放进正方形后人物显得又小又空。
+              竖长容器能把人物撑满，也更像一张"立绘"。
+            */}
+            <div className="w-64 h-80 mx-auto rounded border border-text-muted/20 bg-gradient-to-b from-black/40 to-black/10 flex items-center justify-center overflow-hidden">
               <CharacterSprite
                 name={char.name}
                 id={char.id}
@@ -95,8 +101,8 @@ export function PortraitPanel() {
                   scenario: char.prompt,
                 }}
                 direction={dir}
-                scale={4}
-                className="w-64 h-64"
+                scale={5}
+                className="w-64 h-80"
               />
             </div>
 
