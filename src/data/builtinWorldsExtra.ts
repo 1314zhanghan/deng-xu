@@ -455,7 +455,7 @@ const neonRain: WorldCard = {
 const starDrifter: WorldCard = {
   id: 'builtin_star_drifter',
   title: '星海拾遗',
-  tagline: '一艘退役的勘探船，一个来历不明的导航 AI，去追一艘失踪了七十年的殖民舰',
+  tagline: '一艘退役的勘探船，一个来历不明的导航 AI，去追一艘失踪了七十年的殖民舰（纯叙事模式范例：数值层全部关闭，故事只靠对话与叙述推进）',
   worldLore: `**世界背景**
 
 人类没有发明超光速引擎。我们发明的是**慢船**。

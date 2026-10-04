@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Play, BookOpen, Library, Settings, ChevronRight, ScrollText, Sparkles,
+  Play, BookOpen, Library, Settings, ChevronRight, ScrollText, Sparkles, Clock, X,
 } from 'lucide-react'
 import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { useLibraryStore } from '@/stores/library'
 import { useUIStore } from '@/stores/ui'
+import { listRecent, forgetPlay, relativeTime, type RecentPlay } from '@/utils/recentPlays'
 
 /**
  * 主菜单 —— 打开网站后的第一屏。
@@ -25,10 +26,12 @@ export interface MainMenuProps {
   onWorldbook: () => void
   onLibrary: () => void
   onOpenSettings: () => void
+  /** 点「最近玩过」里的某一条 → 直接用它开局 */
+  onPickWorld: (worldId: string) => void
 }
 
 export function MainMenu({
-  onContinue, onNewGame, onWorldbook, onLibrary, onOpenSettings,
+  onContinue, onNewGame, onWorldbook, onLibrary, onOpenSettings, onPickWorld,
 }: MainMenuProps) {
   const world = useSessionStore(s => s.world)
   const history = useGameStore(s => s.history)
@@ -42,7 +45,22 @@ export function MainMenu({
   const hasProgress = history.length > 0
   const canContinue = !!world && (hasProgress || characters.length > 0)
 
-  /** 上次玩到的最后一句话，用作"继续游戏"卡片的预览 */
+  /**
+   * 「最近玩过」。
+   *
+   * 与上面那张「继续游戏」卡的区别必须让玩家看出来，否则会以为点了能读档：
+   *   - 继续游戏 = 回到**当前存档**（唯一一局，能接着玩）
+   *   - 最近玩过 = **曾玩过的世界**（多条，点了是拿这个世界的设定开新一局）
+   *
+   * 所以这里的措辞用「再来一局」而不是「继续」。
+   */
+  const [recent, setRecent] = useState<RecentPlay[]>([])
+  const refreshRecent = useCallback(() => setRecent(listRecent()), [])
+  useEffect(() => { refreshRecent() }, [refreshRecent])
+  const worldIds = useMemo(() => new Set(worlds.map(w => w.id)), [worlds])
+  // 当前存档所在的世界不重复显示（上面那张卡已经代表了它）
+  const recentToShow = recent.filter(r => r.worldId !== world?.id).slice(0, 4)
+
   const [lastLine, setLastLine] = useState('')
   useEffect(() => {
     for (let i = history.length - 1; i >= 0; i--) {
@@ -164,6 +182,54 @@ export function MainMenu({
           delay={0.25}
         />
       </div>
+
+      {/*
+        「最近玩过」。
+        存档只保留当前这一局，开新局就覆盖 —— 所以单局存档回答不了
+        "我玩过哪些世界"。这条历史跨局存在，回头玩家不用去卡片库里翻。
+      */}
+      {recentToShow.length > 0 && (
+        <div className="mt-8">
+          <div className="flex items-baseline gap-2 mb-3">
+            <Clock size={13} className="text-text-muted" />
+            <h2 className="text-xs font-serif font-bold text-text-secondary">最近玩过</h2>
+            <span className="text-[10px] text-text-muted/70">点一条即用该世界开新一局</span>
+          </div>
+          <div className="space-y-1.5">
+            {recentToShow.map(r => {
+              const gone = !worldIds.has(r.worldId)
+              return (
+                <div key={r.worldId} className="group relative">
+                  <button
+                    onClick={() => !gone && onPickWorld(r.worldId)}
+                    disabled={gone}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded border text-left transition-colors
+                      ${gone
+                        ? 'border-text-muted/15 bg-black/10 cursor-not-allowed opacity-50'
+                        : 'border-text-muted/25 bg-black/20 hover:border-accent-lantern/40 hover:bg-accent-lantern/[0.06]'}`}
+                  >
+                    <span className="font-serif text-sm text-text-primary truncate flex-1">{r.title}</span>
+                    <span className="text-[10px] text-text-muted font-mono shrink-0">
+                      {r.turns > 0 ? `${r.turns} 条` : '未开场'}
+                      <span className="mx-1.5 text-text-muted/40">·</span>
+                      {relativeTime(r.at)}
+                      {gone && <span className="ml-1.5 text-red-400/70">世界卡已删除</span>}
+                    </span>
+                    {!gone && <ChevronRight size={13} className="text-text-muted/50 shrink-0 group-hover:translate-x-0.5 transition-transform" />}
+                  </button>
+                  <button
+                    onClick={() => { forgetPlay(r.worldId); refreshRecent() }}
+                    title="从最近玩过中移除"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded text-text-muted/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* 底部说明 */}
       <div className="mt-10 pt-6 border-t border-text-muted/15 text-[10px] text-text-muted/70 leading-relaxed text-center space-y-1">

@@ -3652,6 +3652,283 @@
     "Stephen Challener (Redshrike)",
     "Johannes Sjölund (wulax)"
    ]
+  },
+  {
+   "id": "belt_double",
+   "kind": "accessory",
+   "zPos": 70,
+   "file": "belt_double.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Johannes Sjölund (wulax)",
+    "Matthew Krohn (makrohn)"
+   ]
+  },
+  {
+   "id": "belt_formal",
+   "kind": "accessory",
+   "zPos": 80,
+   "file": "belt_formal.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "Thane Brimhall (pennomi)",
+    "laetissima",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "belt_leather",
+   "kind": "accessory",
+   "zPos": 70,
+   "file": "belt_leather.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Johannes Sjölund (wulax)",
+    "Matthew Krohn (makrohn)"
+   ],
+   "variantOf": "belt",
+   "color": "leather"
+  },
+  {
+   "id": "belt_leather2",
+   "kind": "accessory",
+   "zPos": 70,
+   "file": "belt_leather2.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "Johannes Sjölund (wulax)",
+    "Matthew Krohn (makrohn)"
+   ]
+  },
+  {
+   "id": "belt_obi",
+   "kind": "accessory",
+   "zPos": 65,
+   "file": "belt_obi.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "belt_obi_knot_left",
+   "kind": "accessory",
+   "zPos": 66,
+   "file": "belt_obi_knot_left.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "belt_obi_knot_right",
+   "kind": "accessory",
+   "zPos": 66,
+   "file": "belt_obi_knot_right.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "belt_sash",
+   "kind": "accessory",
+   "zPos": 65,
+   "file": "belt_sash.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "GPL 2.0",
+    "GPL 3.0",
+    "CC-BY-SA 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Nila122"
+   ]
+  },
+  {
+   "id": "belt_sash_narrow",
+   "kind": "accessory",
+   "zPos": 65,
+   "file": "belt_sash_narrow.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "GPL 2.0",
+    "GPL 3.0",
+    "CC-BY-SA 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Nila122"
+   ]
+  },
+  {
+   "id": "legs_skirts_slit",
+   "kind": "legs",
+   "zPos": 20,
+   "file": "legs_skirts_slit.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "cloth",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 2.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "Nila122",
+    "ElizaWy",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "legs_widepants",
+   "kind": "legs",
+   "zPos": 20,
+   "file": "legs_widepants.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "ElizaWy",
+    "JaidynReiman",
+    "dalonedrau",
+    "Johannes Sjölund (wulax)",
+    "Stephen Challener (Redshrike)"
+   ]
+  },
+  {
+   "id": "torso_clothes_longsleeve2_vneck",
+   "kind": "clothes",
+   "zPos": 35,
+   "file": "torso_clothes_longsleeve2_vneck.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "cloth",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0"
+   ],
+   "authors": [
+    "ElizaWy",
+    "JaidynReiman",
+    "Stephen Challener (Redshrike)",
+    "Johannes Sjölund (wulax)"
+   ]
+  },
+  {
+   "id": "torso_clothes_longsleeve_formal",
+   "kind": "clothes",
+   "zPos": 35,
+   "file": "torso_clothes_longsleeve_formal.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Thane Brimhall (pennomi)",
+    "laetissima",
+    "Stephen Challener (Redshrike)",
+    "Johannes Sjölund (wulax)"
+   ]
+  },
+  {
+   "id": "torso_clothes_longsleeve_formal_striped",
+   "kind": "clothes",
+   "zPos": 35,
+   "file": "torso_clothes_longsleeve_formal_striped.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Thane Brimhall (pennomi)",
+    "laetissima",
+    "Stephen Challener (Redshrike)",
+    "Johannes Sjölund (wulax)"
+   ]
   }
  ]
 }

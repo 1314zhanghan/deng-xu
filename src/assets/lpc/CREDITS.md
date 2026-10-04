@@ -6,43 +6,43 @@ https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generat
 该项目素材分别以 **CC0 / OGA-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0** 发布。
 其中 **OGA-BY 与 CC-BY-SA 强制要求署名**，因此本文件必须随作品一同提供。
 
-本文件由 `runtime.json` 自动生成（共 **232** 个部件），
+本文件由 `runtime.json` 自动生成（共 **246** 个部件），
 请勿手工编辑 —— 手工维护的清单在部件库扩充后必然漏人。
 
 ## 授权分布
 
 | 授权 | 部件数 |
 |---|---|
-| GPL 3.0 | 91 |
-| OGA-BY 3.0 | 80 |
-| CC-BY-SA 3.0 | 65 |
-| OGA-BY 3.0+ | 18 |
-| CC-BY 3.0+ | 18 |
-| GPL 2.0 | 18 |
+| GPL 3.0 | 104 |
+| OGA-BY 3.0 | 87 |
+| CC-BY-SA 3.0 | 75 |
+| OGA-BY 3.0+ | 21 |
+| CC-BY 3.0+ | 21 |
+| GPL 2.0 | 21 |
 | CC-BY 3.0 | 13 |
 | CC0 | 9 |
 | CC-BY 4.0 | 9 |
 | GPL 3.0+ | 2 |
 | CC-BY-SA 4.0 | 2 |
 
-其中 **205** 个部件要求署名（CC0 除外）。
+其中 **228** 个部件要求署名（CC0 除外）。
 
 ## 作者
 
-- **JaidynReiman** —— arms_armour、arms_bracers、arms_hands_ring_stud、beards_5oclock_shadow、beards_beard、beards_bigstache、beards_french、beards_mustache、cape_solid、cape_tattered、cape_trim、dress_kimono、dress_kimono_longsleeve、dress_kimono_oversize、dress_kimono_split、feet_plate_toe、feet_plate_toe_thick、feet_socks_ankle、feet_socks_high、hair_bangs、hair_bangslong、hair_bangslong2、hair_bangsshort、hair_curls_large、hair_curls_large_xlong、hair_high_ponytail、hair_long_straight、hair_long_tied、hair_loose、hair_messy1、hair_messy2、hair_page2、hair_parted、hair_parted_side_bangs、hair_parted_side_bangs2、hair_pixie、hair_ponytail2、hair_relm_xlong、hair_shoulderl、hair_shoulderr、hair_single、hair_swoop、hair_swoop_side、hair_topknot_long、hair_topknot_long2、hair_topknot_short、hair_topknot_short2、hair_wavy、hat_bandana、hat_bicorne_athwart_admiral、hat_bicorne_athwart_basic_skull、hat_bicorne_athwart_commodore_trim、hat_bicorne_foreaft_commodore、hat_cap_bonnie、hat_cap_bonnie_tilt、hat_cap_leather、hat_cap_leather_feather、hat_headband_hairtie_rune、hat_headband_thick、hat_helmet_barbarian、hat_helmet_legion、hat_holiday_christmas、hat_hood_cloth、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirts_legion、legs_skirts_plain、shoulders_epaulets、shoulders_mantal、torso_aprons_overalls、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck、torso_jacket_tabard、wrists_cuffs
-- **Bluecarrot16** —— arms_armour、arms_hands_ring_stud、beards_winter、cape_solid、cape_trim、feet_socks_ankle、feet_socks_high、hair_cowlick、hair_curtains、hair_curtains_long、hair_halfmessy、hair_high_ponytail、hair_idol、hair_long_center_part、hair_long_messy、hair_long_messy2、hair_long_straight、hair_long_tied、hair_mop、hair_parted2、hair_pigtails、hair_spiked_beehive、hair_spiked_liberty、hair_spiked_liberty2、hat_accessory_crest、hat_accessory_horns_upward、hat_accessory_wings、hat_bandana_pirate、hat_bandana_pirate_skull、hat_bicorne_athwart_admiral、hat_bicorne_athwart_basic、hat_bicorne_athwart_basic_skull、hat_bicorne_athwart_commodore_trim、hat_bicorne_foreaft_commodore、hat_cap_bonnie、hat_cap_bonnie_tilt、hat_helmet_barbarian、hat_helmet_barbuta、hat_helmet_barbuta_simple、hat_helmet_flattop、hat_helmet_greathelm、hat_helmet_legion、hat_helmet_nasal、hat_helmet_spangenhelm_viking、hat_helmet_sugarloaf、hat_holiday_christmas、hat_tricorne_captain_skull、hat_visor_horned、hat_visor_round_raised、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirt_straight、legs_skirts_legion、legs_skirts_plain、shoulders_epaulets、shoulders_mantal、torso_aprons_apron_full、torso_aprons_apron_half、torso_aprons_overalls、torso_clothes_longsleeve_scoop、torso_clothes_sleeveless1、torso_jacket_collared、torso_jacket_frock、torso_jacket_iverness、torso_jacket_pockets、torso_jacket_tabard、wrists_cuffs
-- **ElizaWy** —— beards_chevron、beards_handlebar、beards_horseshoe、beards_lampshade、beards_medium、beards_trimmed、feet_socks_ankle、feet_socks_high、hair_braid、hair_cowlick、hair_curly_long、hair_curly_short2、hair_half_up、hair_high_ponytail、hair_page2、hat_helmet_morion、hat_visor_round_raised、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirt_straight、torso_aprons_apron_full、torso_aprons_apron_half、torso_aprons_overalls、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck
-- **Johannes Sjölund (wulax)** —— arms_armour、arms_bracers、dress_kimono、dress_kimono_longsleeve、dress_kimono_oversize、dress_kimono_split、feet_socks_ankle、feet_socks_high、hair_page、hair_page2、hat_cap_leather、hat_cap_leather_feather、hat_helmet_legion、hat_hood_cloth、hat_visor_horned、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirts_plain、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck、torso_jacket_tabard
-- **Stephen Challener (Redshrike)** —— dress_kimono、dress_kimono_longsleeve、dress_kimono_oversize、dress_kimono_split、feet_socks_ankle、feet_socks_high、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck
+- **JaidynReiman** —— arms_armour、arms_bracers、arms_hands_ring_stud、beards_5oclock_shadow、beards_beard、beards_bigstache、beards_french、beards_mustache、belt_obi、belt_obi_knot_left、belt_obi_knot_right、cape_solid、cape_tattered、cape_trim、dress_kimono、dress_kimono_longsleeve、dress_kimono_oversize、dress_kimono_split、feet_plate_toe、feet_plate_toe_thick、feet_socks_ankle、feet_socks_high、hair_bangs、hair_bangslong、hair_bangslong2、hair_bangsshort、hair_curls_large、hair_curls_large_xlong、hair_high_ponytail、hair_long_straight、hair_long_tied、hair_loose、hair_messy1、hair_messy2、hair_page2、hair_parted、hair_parted_side_bangs、hair_parted_side_bangs2、hair_pixie、hair_ponytail2、hair_relm_xlong、hair_shoulderl、hair_shoulderr、hair_single、hair_swoop、hair_swoop_side、hair_topknot_long、hair_topknot_long2、hair_topknot_short、hair_topknot_short2、hair_wavy、hat_bandana、hat_bicorne_athwart_admiral、hat_bicorne_athwart_basic_skull、hat_bicorne_athwart_commodore_trim、hat_bicorne_foreaft_commodore、hat_cap_bonnie、hat_cap_bonnie_tilt、hat_cap_leather、hat_cap_leather_feather、hat_headband_hairtie_rune、hat_headband_thick、hat_helmet_barbarian、hat_helmet_legion、hat_holiday_christmas、hat_hood_cloth、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirts_legion、legs_skirts_plain、legs_widepants、shoulders_epaulets、shoulders_mantal、torso_aprons_overalls、torso_clothes_longsleeve2_vneck、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck、torso_jacket_tabard、wrists_cuffs
+- **Bluecarrot16** —— arms_armour、arms_hands_ring_stud、beards_winter、belt_double、belt_formal、belt_leather、belt_sash、belt_sash_narrow、cape_solid、cape_trim、feet_socks_ankle、feet_socks_high、hair_cowlick、hair_curtains、hair_curtains_long、hair_halfmessy、hair_high_ponytail、hair_idol、hair_long_center_part、hair_long_messy、hair_long_messy2、hair_long_straight、hair_long_tied、hair_mop、hair_parted2、hair_pigtails、hair_spiked_beehive、hair_spiked_liberty、hair_spiked_liberty2、hat_accessory_crest、hat_accessory_horns_upward、hat_accessory_wings、hat_bandana_pirate、hat_bandana_pirate_skull、hat_bicorne_athwart_admiral、hat_bicorne_athwart_basic、hat_bicorne_athwart_basic_skull、hat_bicorne_athwart_commodore_trim、hat_bicorne_foreaft_commodore、hat_cap_bonnie、hat_cap_bonnie_tilt、hat_helmet_barbarian、hat_helmet_barbuta、hat_helmet_barbuta_simple、hat_helmet_flattop、hat_helmet_greathelm、hat_helmet_legion、hat_helmet_nasal、hat_helmet_spangenhelm_viking、hat_helmet_sugarloaf、hat_holiday_christmas、hat_tricorne_captain_skull、hat_visor_horned、hat_visor_round_raised、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirt_straight、legs_skirts_legion、legs_skirts_plain、legs_skirts_slit、shoulders_epaulets、shoulders_mantal、torso_aprons_apron_full、torso_aprons_apron_half、torso_aprons_overalls、torso_clothes_longsleeve_formal、torso_clothes_longsleeve_formal_striped、torso_clothes_longsleeve_scoop、torso_clothes_sleeveless1、torso_jacket_collared、torso_jacket_frock、torso_jacket_iverness、torso_jacket_pockets、torso_jacket_tabard、wrists_cuffs
+- **ElizaWy** —— beards_chevron、beards_handlebar、beards_horseshoe、beards_lampshade、beards_medium、beards_trimmed、feet_socks_ankle、feet_socks_high、hair_braid、hair_cowlick、hair_curly_long、hair_curly_short2、hair_half_up、hair_high_ponytail、hair_page2、hat_helmet_morion、hat_visor_round_raised、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirt_straight、legs_skirts_slit、legs_widepants、torso_aprons_apron_full、torso_aprons_apron_half、torso_aprons_overalls、torso_clothes_longsleeve2_vneck、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck
+- **Johannes Sjölund (wulax)** —— arms_armour、arms_bracers、belt_double、belt_leather、belt_leather2、dress_kimono、dress_kimono_longsleeve、dress_kimono_oversize、dress_kimono_split、feet_socks_ankle、feet_socks_high、hair_page、hair_page2、hat_cap_leather、hat_cap_leather_feather、hat_helmet_legion、hat_hood_cloth、hat_visor_horned、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_skirts_plain、legs_widepants、torso_clothes_longsleeve2_vneck、torso_clothes_longsleeve_formal、torso_clothes_longsleeve_formal_striped、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck、torso_jacket_tabard
+- **Stephen Challener (Redshrike)** —— dress_kimono、dress_kimono_longsleeve、dress_kimono_oversize、dress_kimono_split、feet_socks_ankle、feet_socks_high、legs_formal_striped、legs_hose、legs_pants2、legs_shorts、legs_shorts_short、legs_widepants、torso_clothes_longsleeve2_vneck、torso_clothes_longsleeve_formal、torso_clothes_longsleeve_formal_striped、torso_clothes_longsleeve_scoop、torso_clothes_longsleeves2、torso_clothes_longsleeves_cuffed、torso_clothes_sleeveless1、torso_clothes_sleeveless2_cardigan、torso_clothes_sleeveless2_polo、torso_clothes_sleeveless2_vneck、torso_clothes_tshirt_buttoned、torso_clothes_tshirt_scoop、torso_clothes_tshirt_vneck
 - **Manuel Riecke (MrBeast)** —— hair_bangs、hair_bangslong、hair_bangslong2、hair_bangsshort、hair_loose、hair_messy1、hair_messy2、hair_parted、hair_pixie、hair_ponytail2、hair_shoulderl、hair_shoulderr、hair_swoop
-- **Nila122** —— cape_solid、cape_tattered、hair_braid、hair_halfmessy、hair_single、hair_wavy、hat_headband_tied、hat_helmet_legion、legs_skirts_legion、torso_aprons_apron
-- **Matthew Krohn (makrohn)** —— arms_armour、arms_bracers、hat_bandana、hat_cap_leather、hat_cap_leather_feather、hat_helmet_legion、hat_visor_horned、torso_jacket_tabard
+- **Nila122** —— belt_sash、belt_sash_narrow、cape_solid、cape_tattered、hair_braid、hair_halfmessy、hair_single、hair_wavy、hat_headband_tied、hat_helmet_legion、legs_skirts_legion、legs_skirts_slit、torso_aprons_apron
+- **Matthew Krohn (makrohn)** —— arms_armour、arms_bracers、belt_double、belt_leather、belt_leather2、hat_bandana、hat_cap_leather、hat_cap_leather_feather、hat_helmet_legion、hat_visor_horned、torso_jacket_tabard
+- **laetissima** —— beards_5oclock_shadow、beards_bigstache、beards_french、belt_formal、torso_clothes_longsleeve_formal、torso_clothes_longsleeve_formal_striped
+- **Thane Brimhall (pennomi)** —— beards_5oclock_shadow、beards_bigstache、beards_french、belt_formal、torso_clothes_longsleeve_formal、torso_clothes_longsleeve_formal_striped
 - **thecilekli** —— hair_idol、hair_long_center_part、hair_long_straight、hair_long_tied、hat_hood_hijab
 - **Fabzy** —— hair_spiked_beehive、hair_spiked_liberty、hat_bandana_pirate、hat_bandana_pirate_skull
-- **laetissima** —— beards_5oclock_shadow、beards_bigstache、beards_french
 - **Mandi Paugh** —— hair_curtains、hair_curtains_long、hair_long_messy
 - **Sander Frenken (castelonia)** —— hat_helmet_morion、hat_visor_horned、hat_visor_round_raised
-- **Thane Brimhall (pennomi)** —— beards_5oclock_shadow、beards_bigstache、beards_french
 - **Carlo Enrico Victoria (Nemisys)** —— beards_beard、beards_mustache
 - **Joe White** —— hair_parted、hair_ponytail2
 - **Lanea Zimmerman (Sharm)** —— hair_shoulderl、hair_shoulderr
@@ -53,6 +53,7 @@ https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generat
 - **Barbara Riviera** —— hair_bangslong2
 - **Charles Sanchez (CharlesGabriel)** —— hat_formal_crown
 - **Cobra Hubbard (BlueVortexGames)** —— hair_spiked_liberty2
+- **dalonedrau** —— legs_widepants
 - **DarkwallLKE** —— hat_formal_crown
 - **DCSS authors** —— hat_accessory_wings
 - **kcilds/Rocetti/Eredah** —— hair_spiked
@@ -66,7 +67,7 @@ https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generat
 - **Tracy** —— hat_magic_celestial
 - **Yamilian** —— hair_long_messy2
 
-共 **36** 位作者。
+共 **37** 位作者。
 
 ## 说明
 

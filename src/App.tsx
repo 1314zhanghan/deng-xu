@@ -3,6 +3,8 @@ import { ApiKeyModal } from '@/components/ApiKeyModal'
 import { ChoicePanel } from '@/components/ChoicePanel'
 import { StatusPanel } from '@/components/StatusPanel'
 import { GameMenuActions } from '@/components/GameMenuActions'
+import { MobileTabBar, type MobileTab } from '@/components/MobileTabBar'
+import { recordPlay } from '@/utils/recentPlays'
 import { PortraitPanel } from '@/components/PortraitPanel'
 import { InventoryPanel } from '@/components/InventoryPanel'
 import { RelationshipPanel } from '@/components/RelationshipPanel'
@@ -30,7 +32,7 @@ const NarrativeView = lazyWithRetry(() =>
 )
 
 function App() {
-  const { history, resources, resourceDefs, isGameStarted } = useGameStore()
+  const { history, resources, resourceDefs, isGameStarted, playerName, location } = useGameStore()
   const { llm } = useUIStore()
   const world = useSessionStore(s => s.world)
   const {
@@ -51,7 +53,7 @@ function App() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [rightPanelTab, setRightPanelTab] = useState<'inventory' | 'relationships'>('inventory')
-  const [mobileTab, setMobileTab] = useState<'status' | 'inventory' | 'relationships'>('status')
+  const [mobileTab, setMobileTab] = useState<MobileTab>('status')
 
   const hasInitialized = useRef(false)
 
@@ -68,6 +70,25 @@ function App() {
   useEffect(() => {
     hasInitialized.current = false
   }, [world?.id])
+
+  /**
+   * 记录「最近玩过」。
+   *
+   * 只在**游戏真正开始时**与**每轮叙事结束后**写一次 —— 不是每次渲染都写，
+   * 否则会疯狂访问 localStorage。
+   * 放在 App 里而不是引擎里：引擎不关心"历史列表"这种事，
+   * 而且这样世界卡被删掉后记录仍在（条目会标灰）。
+   */
+  useEffect(() => {
+    if (!isGameStarted || !world) return
+    recordPlay({
+      worldId: world.id,
+      title: world.title,
+      playerName,
+      turns: history.length,
+      location: location || '',
+    })
+  }, [isGameStarted, world, playerName, history.length, location])
 
   // Reset initialization flag when API key changes, allowing retry
   useEffect(() => {
@@ -146,6 +167,7 @@ function App() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-1 hover:bg-text-muted/20 rounded"
+              title="更多"
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -304,6 +326,19 @@ function App() {
             }}
           />
         </div>
+
+        {/*
+          手机端底部标签栏。
+          之前要切"物品/人物"必须先点右上角打开全屏菜单 —— 每看一次背包
+          就损失一次与叙事区的视线连接，来回两步。改成常驻底栏一键直达。
+          「更多」里放频率低的操作（模型设置 / 返回标题 / 素材署名）。
+        */}
+        <MobileTabBar
+          tab={mobileTab}
+          setTab={setMobileTab}
+          onOpenMore={() => setIsMobileMenuOpen(true)}
+          moreActive={isMobileMenuOpen}
+        />
       </main>
 
       {/* Desktop Right Panel */}

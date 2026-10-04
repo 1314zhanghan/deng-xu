@@ -177,4 +177,82 @@ describe('zPos 层级必须符合 LPC 约定（叠错层会画出穿模）', () 
       expect(d.recolors, `${d.id} 不应声明 recolors`).toBeFalsy()
     }
   })
+
+  it('**裙子不会出现在裤装池里** —— 否则男 NPC 会随机穿裙子', async () => {
+    /*
+      上游把 legs_skirt_* / legs_skirts_* 的 kind 也标成了 `legs`。
+      如果按 `kind === 'legs'` 取池子，裙子就混进了裤装，
+      "一个走路的年轻男子"能随机分到一条裙子 —— 这类错误玩家一眼就看得出来。
+      这条断言守住"裤装池里没有裙子"。
+    */
+    const { recipeFor } = await import('@/utils/lpcSprite')
+    for (let i = 0; i < 40; i++) {
+      const r = recipeFor('male-' + i, {
+        profile: { description: '一个走路的年轻男子', gender: '男' },
+        gender: '男',
+      })
+      for (const l of r.parts.filter(p => /^legs_/.test(p))) {
+        expect(/skirt/i.test(l), `男性角色不该拿到裙子：${l} (seed ${i})`).toBe(false)
+      }
+    }
+  })
+
+  it('**无裙装线索的角色不会拿到连衣裙或罩裙**', async () => {
+    /*
+      dress_* 与 legs_skirt_overskirt 都被上游归成了上衣类
+      （后者 kind 甚至是 apron）。它们若留在上衣池里就会被随机分配，
+      结果是"走路的年轻男子"随机穿上一件连衣裙。
+    */
+    const { recipeFor } = await import('@/utils/lpcSprite')
+    for (let i = 0; i < 60; i++) {
+      const r = recipeFor('plain-' + i, {
+        profile: { description: '一个走路的年轻人', gender: '男' },
+        gender: '男',
+      })
+      const dressy = r.parts.filter(p => /^dress_|skirt/i.test(p))
+      expect(dressy.length, `无裙装线索却拿到了裙装：${dressy.join(',')} (seed ${i})`).toBe(0)
+    }
+  })
+
+  it('明确穿裙时不会同时给裤子', async () => {
+    const { recipeFor } = await import('@/utils/lpcSprite')
+    const r = recipeFor('skirt-only', {
+      profile: { description: '穿着裙子的女子', gender: '女' },
+      gender: '女',
+    })
+    const legParts = r.parts.filter(p => /^legs_/.test(p))
+    const hasPants = legParts.some(l => !/skirt/i.test(l))
+    // 要么是一条裙子，要么什么都没有（连衣裙覆盖），但绝不能是裤子
+    expect(hasPants, `不应同时给裤子：${legParts.join(',')}`).toBe(false)
+  })
+
+  it('**外层件一定配了打底衬衣** —— 否则角色裸露上身', async () => {
+    /*
+      围裙/罩衣/工装裤/战袍/罩裙这些"外层件"自己只画外层那一片，
+      LPC 的用法是先穿衬衣再套外层。配方原先只选一件就收工，
+      选到它们时角色底下什么都没穿 —— 渲染出来是一个裸露上身的人。
+      我把 37 件上衣各画一遍对照才发现有 7 件如此
+      （先用像素覆盖率统计试过，结论完全对不上，白折腾一轮）。
+    */
+    const OUTER = [
+      'torso_aprons_apron', 'torso_aprons_apron_full', 'torso_aprons_apron_half',
+      'torso_aprons_overalls', 'torso_aprons_suspenders', 'torso_jacket_tabard',
+      'torso_jacket_pockets', 'legs_skirt_overskirt',
+    ]
+    const BASE = /^torso_clothes_(longsleeve2?|shortsleeve|tshirt|longsleeves2)$/
+    const { recipeFor } = await import('@/utils/lpcSprite')
+
+    for (const outer of OUTER) {
+      // 用足够多的种子找到一个真的选中该外层件的配方
+      let found = false
+      for (let i = 0; i < 400 && !found; i++) {
+        const r = recipeFor('outer-' + i, { profile: { description: '一个普通人' }, gender: '女' })
+        if (!r.parts.includes(outer)) continue
+        found = true
+        const hasBase = r.parts.some(p => BASE.test(p))
+        expect(hasBase, `${outer} 必须配打底衬衣，实际部件：${r.parts.join(',')}`).toBe(true)
+      }
+      // 找不到不报错：外层件是随机选中的，某些可能极难命中
+    }
+  })
 })

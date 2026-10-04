@@ -402,6 +402,196 @@
       "color": null
     },
     {
+      "id": "belt_double",
+      "kind": "accessory",
+      "zPos": 70,
+      "dir": "torso/waist/belt_double/male/",
+      "defPath": "sheet_definitions/torso/waist/belt_double.json",
+      "typeName": "belt",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Johannes Sjölund (wulax)",
+        "Matthew Krohn (makrohn)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_formal",
+      "kind": "accessory",
+      "zPos": 80,
+      "dir": "torso/waist/belt_formal/",
+      "defPath": "sheet_definitions/torso/waist/belt_formal.json",
+      "typeName": "belt",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "Thane Brimhall (pennomi)",
+        "laetissima",
+        "bluecarrot16"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_leather",
+      "kind": "accessory",
+      "zPos": 70,
+      "dir": "torso/waist/belt_leather/male/",
+      "defPath": "sheet_definitions/torso/waist/belt_leather.json",
+      "typeName": "belt",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Johannes Sjölund (wulax)",
+        "Matthew Krohn (makrohn)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "belt",
+      "color": "leather"
+    },
+    {
+      "id": "belt_leather2",
+      "kind": "accessory",
+      "zPos": 70,
+      "dir": "torso/waist/belt_leather2/male/",
+      "defPath": "sheet_definitions/torso/waist/belt_leather2.json",
+      "typeName": "belt",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "Johannes Sjölund (wulax)",
+        "Matthew Krohn (makrohn)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_obi",
+      "kind": "accessory",
+      "zPos": 65,
+      "dir": "torso/waist/obi/male/",
+      "defPath": "sheet_definitions/torso/waist/obi/belt_obi.json",
+      "typeName": "sash",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_obi_knot_left",
+      "kind": "accessory",
+      "zPos": 66,
+      "dir": "torso/waist/obi/knot/left/male/",
+      "defPath": "sheet_definitions/torso/waist/obi/belt_obi_knot_left.json",
+      "typeName": "sash_tie",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_obi_knot_right",
+      "kind": "accessory",
+      "zPos": 66,
+      "dir": "torso/waist/obi/knot/right/male/",
+      "defPath": "sheet_definitions/torso/waist/obi/belt_obi_knot_right.json",
+      "typeName": "sash_tie",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_sash",
+      "kind": "accessory",
+      "zPos": 65,
+      "dir": "torso/waist/sash/male/",
+      "defPath": "sheet_definitions/torso/waist/belt_sash.json",
+      "typeName": "sash",
+      "licenses": [
+        "OGA-BY 3.0",
+        "GPL 2.0",
+        "GPL 3.0",
+        "CC-BY-SA 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Nila122"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "belt_sash_narrow",
+      "kind": "accessory",
+      "zPos": 65,
+      "dir": "torso/waist/sash_narrow/male/",
+      "defPath": "sheet_definitions/torso/waist/belt_sash_narrow.json",
+      "typeName": "sash",
+      "licenses": [
+        "OGA-BY 3.0",
+        "GPL 2.0",
+        "GPL 3.0",
+        "CC-BY-SA 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Nila122"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "cape_solid",
       "kind": "cape",
       "zPos": 85,
@@ -3382,6 +3572,35 @@
       "color": null
     },
     {
+      "id": "legs_skirts_slit",
+      "kind": "legs",
+      "zPos": 20,
+      "dir": "legs/skirts/slit/thin/",
+      "defPath": "sheet_definitions/legs/skirts/legs_skirts_slit.json",
+      "typeName": "legs",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 2.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "Nila122",
+        "ElizaWy",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "cloth",
+        "palettes": [
+          "ulpc",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "legs_skirt_belle",
       "kind": "legs",
       "zPos": 20,
@@ -3459,6 +3678,29 @@
           "all.lpcr"
         ]
       },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "legs_widepants",
+      "kind": "legs",
+      "zPos": 20,
+      "dir": "legs/pants/muscular/",
+      "defPath": "sheet_definitions/legs/pants/legs_widepants.json",
+      "typeName": "legs",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "ElizaWy",
+        "JaidynReiman",
+        "dalonedrau",
+        "Johannes Sjölund (wulax)",
+        "Stephen Challener (Redshrike)"
+      ],
+      "recolors": null,
       "matchBodyColor": false,
       "variantOf": null,
       "color": null
@@ -3787,6 +4029,33 @@
       "color": null
     },
     {
+      "id": "torso_clothes_longsleeve2_vneck",
+      "kind": "clothes",
+      "zPos": 35,
+      "dir": "torso/clothes/longsleeve/longsleeve2_vneck/male/",
+      "defPath": "sheet_definitions/torso/shirts/longsleeve/torso_clothes_longsleeve2_vneck.json",
+      "typeName": "clothes",
+      "licenses": [
+        "OGA-BY 3.0"
+      ],
+      "authors": [
+        "ElizaWy",
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": {
+        "material": "cloth",
+        "palettes": [
+          "ulpc",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "torso_clothes_longsleeves2",
       "kind": "clothes",
       "zPos": 36,
@@ -3836,6 +4105,52 @@
           "all.lpcr"
         ]
       },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "torso_clothes_longsleeve_formal",
+      "kind": "clothes",
+      "zPos": 35,
+      "dir": "torso/clothes/longsleeve/formal/male/",
+      "defPath": "sheet_definitions/torso/shirts/longsleeve/torso_clothes_longsleeve_formal.json",
+      "typeName": "clothes",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Thane Brimhall (pennomi)",
+        "laetissima",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "torso_clothes_longsleeve_formal_striped",
+      "kind": "clothes",
+      "zPos": 35,
+      "dir": "torso/clothes/longsleeve/formal_striped/male/",
+      "defPath": "sheet_definitions/torso/shirts/longsleeve/torso_clothes_longsleeve_formal_striped.json",
+      "typeName": "clothes",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Thane Brimhall (pennomi)",
+        "laetissima",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": null,
       "matchBodyColor": false,
       "variantOf": null,
       "color": null

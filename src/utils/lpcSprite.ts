@@ -53,6 +53,59 @@ export function paletteNames(material: Material): string[] {
   return Object.keys(PALETTES[material] || {})
 }
 
+/** Rec.601 亮度，用来比较两种颜色的明暗 */
+function hexLuma(hex: string): number {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim())
+  if (!m) return 128
+  const v = parseInt(m[1], 16)
+  return 0.299 * ((v >> 16) & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255)
+}
+
+/**
+ * 取一种调色板的代表色（用于判断"衣色会不会撞肤色"）。
+ *
+ * 每种 LPC 调色板是 6 级明暗 ramp，这里取**中间两级**的平均 ——
+ * 只取最亮或最暗一级都不准：白衣与皮肤的亮级可能都很亮，
+ * 但整件衣服的观感由中间调决定。
+ */
+function paletteLuma(material: string, name: string): number | null {
+  const ramp = PALETTES[material]?.[name]
+  if (!ramp || !ramp.length) return null
+  const idx = [Math.floor(ramp.length / 2), Math.max(0, Math.floor(ramp.length / 2) - 1)]
+  let sum = 0
+  for (const i of idx) sum += hexLuma(ramp[i])
+  return sum / idx.length
+}
+
+/**
+ * 挑一个与肤色**明暗差距足够**的衣色。
+ *
+ * 为什么需要：`torso_clothes_sleeveless1`（无袖背心）这类部件只覆盖躯干一部分，
+ * 若衣色与肤色亮度接近，整体观感就是**一个裸着上身的人** ——
+ * 我在画廊里第一眼就把"穿无袖背心的中介"看成了没穿衣服。
+ * 换掉衣色比换掉部件更省事，而且不影响"无袖"这个款式选择。
+ *
+ * 优先在候选里找差距 ≥ 45 的；找不到就取差距最大的那一个。
+ */
+function pickContrastingCloth(rng: () => number, names: string[], bodyName: string): string {
+  if (!names.length) return 'blue'
+  const bodyLuma = paletteLuma('body', bodyName)
+  if (bodyLuma === null) return names[Math.floor(rng() * names.length) % names.length]
+  const ok = names.filter(n => {
+    const l = paletteLuma('cloth', n)
+    return l !== null && Math.abs(l - bodyLuma) >= 45
+  })
+  if (ok.length) return ok[Math.floor(rng() * ok.length) % ok.length]
+  let best = names[0], bestD = -1
+  for (const n of names) {
+    const l = paletteLuma('cloth', n)
+    if (l === null) continue
+    const d = Math.abs(l - bodyLuma)
+    if (d > bestD) { bestD = d; best = n }
+  }
+  return best
+}
+
 /** 按亮度排序，保证调色板方向一致 */
 function byLuminance(list: readonly string[]): string[] {
   const lum = (h: string) => {
@@ -233,8 +286,32 @@ export interface AppearanceProfile {
   不归一化就会出现"抓到了却永远选不中"。
 */
 const HAIRS = PARTS.filter(p => p.kind === 'hair').map(p => p.id)
-const TORSOS = PARTS.filter(p => p.kind === 'clothes' || p.kind === 'armour' || p.kind === 'apron').map(p => p.id)
-const LEGS = PARTS.filter(p => p.kind === 'legs').map(p => p.id)
+/**
+ * 上衣池（含盔甲与围裙）。
+ *
+ * **必须排除裙装与罩裙**：`dress_*` 与 `legs_skirt_overskirt` 都被上游标成了
+ * 上衣类（后者更离谱，kind 是 `apron`）。它们留在池子里就会被随机当成上衣分配，
+ * 结果是"一个走路的年轻男子"随机拿到一件连衣裙 —— 比拿到裙子更糟。
+ *
+ * 裙装只通过 `traits.skirt` 那条显式分支进入配方（见下面 `DRESSES`）。
+ */
+const TORSOS = PARTS
+  .filter(p => (p.kind === 'clothes' || p.kind === 'armour' || p.kind === 'apron'))
+  .filter(p => !/^dress_|skirt/i.test(p.id))
+  .map(p => p.id)
+
+/**
+ * 裤装与裙装必须**分开**。
+ *
+ * 上游把 `legs_skirt_straight` / `legs_skirt_belle` / `legs_skirts_plain` /
+ * `legs_skirts_legion` / `legs_skirts_slit` 的 kind 也标成了 `legs`，
+ * 于是按 `kind === 'legs'` 取池子会把裙子混进裤装里 ——
+ * 结果"一个走路的年轻男子"能随机分到一条裙子。
+ * 这类错误玩家一眼就看得出来（"这个男 NPC 为什么穿裙子"），必须按 id 排除。
+ */
+const LEGS = PARTS.filter(p => p.kind === 'legs' && !/skirt/i.test(p.id)).map(p => p.id)
+/** 裙装（作为下半身单独穿），只在明确穿裙且没有连衣裙可用时兜底 */
+const SKIRT_LEGS = PARTS.filter(p => p.kind === 'legs' && /skirt/i.test(p.id)).map(p => p.id)
 const FEET = PARTS.filter(p => p.kind === 'shoes' || p.kind === 'feet').map(p => p.id)
 const NOSES = PARTS.filter(p => p.kind === 'nose').map(p => p.id)
 const BROWS = PARTS.filter(p => p.kind === 'eyebrows').map(p => p.id)
@@ -247,6 +324,50 @@ const BEARDS = PARTS.filter(p => p.kind === 'beard').map(p => p.id)
 const CAPES = PARTS.filter(p => p.kind === 'cape').map(p => p.id)
 /** 手臂护甲/护腕 —— zPos 60~75 */
 const ARMS = PARTS.filter(p => p.kind === 'arms').map(p => p.id)
+
+/**
+ * 腰带/腰带/和服带（kind=accessory，zPos 65~80）。
+ *
+ * 它们压在上衣（35~55）之上，所以**不需要特殊层级处理** ——
+ * 合成器已经按 zPos 升序叠层，腰带自然会盖在衣服外面。
+ * 需要做的只是让配方**真的会选它**：不选的话这 9 件永远用不上。
+ */
+const BELTS = PARTS.filter(p => /^belt_/.test(p.id)).map(p => p.id)
+
+/**
+ * **自身不覆盖躯干、必须叠在衬衣外面的部件**。
+ *
+ * 这些都是"外层件"：围裙、罩衣、工装背带裤、战袍、马甲口袋、罩裙。
+ * LPC 的用法是**先穿衬衣，再套外层**，它们自己只画外层那一片。
+ *
+ * 我的配方原先只选一件上衣就收工，于是选到这些时角色**底下什么都没穿** ——
+ * 渲染出来就是一个裸露上身的人（我一开始以为是配色问题，
+ * 把 37 件上衣各画一遍对照才看清：整整 7 件是这种情况）。
+ *
+ * 判断依据是逐个渲染人工看出来的，不是像素覆盖率统计 ——
+ * 我试过用"躯干区域不透明像素比例"自动判定，结果把 jacket_pockets
+ * 量成 0%、把正式衬衫量成 58%，完全对不上，白折腾一轮。
+ * **看不清就画出来看。**
+ */
+const OUTER_LAYERS = new Set([
+  'torso_aprons_apron',
+  'torso_aprons_apron_full',
+  'torso_aprons_apron_half',
+  'torso_aprons_overalls',
+  'torso_aprons_suspenders',
+  'torso_jacket_tabard',
+  'torso_jacket_pockets',
+  'legs_skirt_overskirt',
+])
+
+/** 用于打底的衬衣 —— 必须**完整覆盖躯干**，且款式朴素（不抢外层） */
+const BASE_SHIRTS = [
+  'torso_clothes_longsleeve2',
+  'torso_clothes_longsleeve',
+  'torso_clothes_shortsleeve',
+  'torso_clothes_tshirt',
+  'torso_clothes_longsleeves2',
+].filter(id => PARTS.some(p => p.id === id))
 
 /**
  * 裙装（连衣裙/和服一类）。
@@ -427,6 +548,17 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   let torso = pickRequired(rng, TORSOS, traits.role, 'torso_clothes_longsleeve')
 
   /*
+    **外层件必须配打底衬衣**。
+    围裙/罩衣/工装裤/战袍/罩裙这些自己只画外层那一片，
+    LPC 的用法是先穿衬衣再套外层。若不补打底，选到它们时角色
+    就是一个裸露上身的人（我画了 37 件上衣对照才发现有 7 件如此）。
+    打底件放在 torso 之前，靠 zPos 自然被外层盖住。
+  */
+  const underLayer = OUTER_LAYERS.has(torso) && BASE_SHIRTS.length
+    ? [pick(rng, BASE_SHIRTS)]
+    : []
+
+  /*
     裙装优先：
     描述里写了裙子/长裙/和服时，改用 dress 部件并按颜色挑变体。
     dress 是**预渲染的颜色变体**（无 recolors），所以颜色必须在选件时就定下来，
@@ -435,6 +567,8 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     它覆盖整个下半身，所以要**去掉腿部件** —— 否则裤腿从裙摆里透出来。
   */
   let skirtReplacesLegs = false
+  /** 是否穿了和服 —— 决定腰带要用和服带（obi）而不是皮腰带 */
+  let wearsKimono = false
   if (traits.skirt && DRESSES.length) {
     /*
       裙装只有这几种颜色变体，而描述里推断出的衣色名可能来自更宽的调色板
@@ -457,9 +591,23 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     })
     torso = ranked[Math.floor(rng() * ranked.length) % ranked.length]
     skirtReplacesLegs = true
+    wearsKimono = /kimono/i.test(torso)
   }
 
-  const legs = skirtReplacesLegs ? '' : pick(rng, LEGS.length ? LEGS : ['legs_pants'])
+  /*
+    下半身。
+      - 已穿裙装（连衣裙）→ 空，因为裙摆覆盖整个下半身
+      - 明确要裙装但没有连衣裙可用 → 用独立的裙装部件兜底
+      - 其余 → 从**裤装池**取（裙子已按 id 排除，不会随机分给男 NPC）
+  */
+  let legs: string
+  if (skirtReplacesLegs) {
+    legs = ''
+  } else if (traits.skirt && SKIRT_LEGS.length) {
+    legs = pick(rng, SKIRT_LEGS)
+  } else {
+    legs = pick(rng, LEGS.length ? LEGS : ['legs_pants'])
+  }
   const shoes = pick(rng, FEET.length ? FEET : ['feet_shoes_basic'])
   const nose = pick(rng, NOSES.length ? NOSES : ['head_nose_straight'])
   const brows = pick(rng, BROWS.length ? BROWS : ['eyebrows_thick'])
@@ -484,6 +632,26 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     optional.push(pick(rng, BEARDS))
   }
 
+  /*
+    腰带。
+      - 穿和服 → 用和服带（obi），这是和服的必要组成，不加会很怪
+      - 穿普通裙装 → 不加（裙装自带腰线，再叠一条会穿模）
+      - 穿盔甲 → 不加（板甲外面系皮腰带很荒谬）
+      - 其余 → 45% 概率加一条
+  */
+  if (BELTS.length) {
+    if (wearsKimono) {
+      const obi = BELTS.filter(b => /^belt_obi/.test(b))
+      if (obi.length) optional.push(pick(rng, obi))
+    } else if (!skirtReplacesLegs) {
+      const armored = /armour|armor|plate|chain/i.test(torso)
+      if (!armored && rng() < 0.45) {
+        const pool = BELTS.filter(b => !/^belt_obi/.test(b))
+        optional.push(pick(rng, pool.length ? pool : BELTS))
+      }
+    }
+  }
+
   // 披风：只在身份明确指向领主/法师/游侠时加
   if (CAPES.length && /lord|noble|robe|ranger|mage/.test((traits.role || []).join(' ')) && rng() < 0.5) {
     optional.push(pick(rng, CAPES))
@@ -504,16 +672,28 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   const clothNames = paletteNames('cloth')
   const eyeNames = paletteNames('eye')
 
+  /*
+    肤色先定，衣色再定 —— 因为衣色要看肤色来决定（避免撞色）。
+    顺序反过来的话没法做这个约束。
+  */
+  const skinName = resolvePaletteName(traits.skin, bodyNames.length ? bodyNames : paletteNames('body'))
+    || pick(rng, bodyNames.length ? bodyNames : paletteNames('body'))
+
   const colors: RecolorSpec = opts?.colors || {
     hair: resolvePaletteName(traits.hairColor, hairNames) || pick(rng, hairNames),
-    body: resolvePaletteName(traits.skin, bodyNames.length ? bodyNames : paletteNames('body'))
-      || pick(rng, bodyNames.length ? bodyNames : paletteNames('body')),
-    cloth: resolvePaletteName(traits.cloth, clothNames) || pick(rng, clothNames),
+    body: skinName,
+    /*
+      描述里明确写了衣色就照办（玩家说了算）；
+      没写时才随机，但**排除与肤色太接近的**，否则无袖/短袖部件
+      看起来就像没穿衣服。玩家明确指定的颜色即使撞肤色也保留。
+    */
+    cloth: resolvePaletteName(traits.cloth, clothNames)
+      || pickContrastingCloth(rng, clothNames, skinName),
     eye: resolvePaletteName(traits.eye, eyeNames) || pick(rng, eyeNames),
   }
 
   return {
-    parts: ['body', head, nose, brows, hair, legs, shoes, torso, ...optional].filter(Boolean),
+    parts: ['body', head, nose, brows, hair, legs, shoes, ...underLayer, torso, ...optional].filter(Boolean),
     hair,
     clothing: torso,
     colors,

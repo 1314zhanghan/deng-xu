@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Upload, Download, Settings, Trash2, Copy, Pencil, Play,
-  Users, Sliders, BookOpen, Layers, AlertTriangle, ChevronLeft, Eye
+  Users, Sliders, BookOpen, Layers, AlertTriangle, ChevronLeft, Eye, Search, X
 } from 'lucide-react'
 import { useLibraryStore } from '@/stores/library'
 import { useUIStore } from '@/stores/ui'
@@ -61,10 +61,47 @@ export function StartScreen() {
   const [previewId, setPreviewId] = useState<string | null>(null)
   /** 从「世界书」进来时，卡片墙只展示内置世界（资料库则展示全部） */
   const [worldbookMode, setWorldbookMode] = useState(false)
+  /**
+   * 世界书搜索与筛选。
+   * 内置世界到 9 个之后列表已经变长，用户再导入几十张就会很难找 ——
+   * 搜索与筛选必须和"能看到详情"一起提供。
+   */
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState<'all' | 'builtin' | 'mine' | 'mechanics' | 'narrative'>('all')
 
   useEffect(() => {
     loadWorlds()
   }, [loadWorlds])
+
+  /**
+   * 经过搜索与筛选之后要显示的世界卡。
+   *
+   * 搜索范围刻意放宽到**世界观正文与规则**：找"有没有那种带魔法的世界"时，
+   * 关键词往往只出现在正文里，而不在标题或简介中。
+   * 但正文很长，只取前 2000 字参与匹配，避免每次输入都全文扫描。
+   */
+  const visibleWorlds = useMemo(() => {
+    let list = worlds
+    if (worldbookMode) list = list.filter(w => w.builtin)
+    if (filter === 'builtin') list = list.filter(w => w.builtin)
+    else if (filter === 'mine') list = list.filter(w => !w.builtin)
+    else if (filter === 'mechanics') list = list.filter(w => w.enableMechanics)
+    else if (filter === 'narrative') list = list.filter(w => !w.enableMechanics)
+
+    const q = query.trim().toLowerCase()
+    if (!q) return list
+    return list.filter(w => {
+      const hay = [
+        w.title, w.tagline,
+        (w.worldLore || '').slice(0, 2000),
+        w.rules || '',
+        w.story?.mainQuest || '',
+        ...(w.characters || []).map(c => c.name),
+        ...(w.attributes || []).map(a => a.name),
+      ].join('\n').toLowerCase()
+      return hay.includes(q)
+    })
+  }, [worlds, worldbookMode, filter, query])
 
   // 首次进入时的引导
   useEffect(() => {
@@ -297,6 +334,7 @@ export function StartScreen() {
             onWorldbook={() => { setWorldbookMode(true); setView('library') }}
             onLibrary={() => { setWorldbookMode(false); setView('library') }}
             onOpenSettings={() => setApiKeyModalOpen(true)}
+            onPickWorld={id => beginSetup(id)}
           />
         </main>
       </div>
@@ -499,9 +537,70 @@ export function StartScreen() {
           </div>
         )}
 
+        {/* 搜索与筛选：列表变长之后没有它就没法用 */}
+        {loaded && worlds.length > 0 && (
+          <div className="max-w-[100rem] mx-auto mb-5 space-y-3">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="搜索世界：标题、简介、世界观正文都能匹配…"
+                className="w-full bg-black/25 border border-text-muted/30 rounded pl-9 pr-9 py-2 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-accent-lantern outline-none"
+              />
+              {query && (
+                <button
+                  onClick={() => setQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-primary"
+                  title="清除"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              {([
+                { id: 'all', label: '全部' },
+                { id: 'builtin', label: '内置示例' },
+                { id: 'mine', label: '我创建的' },
+                { id: 'mechanics', label: '机制向' },
+                { id: 'narrative', label: '纯叙事' },
+              ] as const).map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setFilter(f.id)}
+                  className={`px-2.5 py-1 text-[11px] rounded border transition-colors ${
+                    filter === f.id
+                      ? 'border-accent-lantern/50 bg-accent-lantern/10 text-accent-lantern'
+                      : 'border-text-muted/25 text-text-muted hover:border-text-muted/50'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+              <span className="ml-auto text-[10px] text-text-muted font-mono">
+                显示 {visibleWorlds.length} / {worlds.length}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {loaded && worlds.length > 0 && visibleWorlds.length === 0 && (
+          <div className="max-w-[100rem] mx-auto py-16 text-center space-y-3">
+            <p className="text-sm text-text-muted">没有匹配的世界卡</p>
+            <button
+              onClick={() => { setQuery(''); setFilter('all') }}
+              className="px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors"
+            >
+              清除筛选条件
+            </button>
+          </div>
+        )}
+
         {loaded && worlds.length > 0 && (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[100rem] mx-auto">
-            {(worldbookMode ? worlds.filter(w => w.builtin) : worlds).map(world => (
+            {visibleWorlds.map(world => (
               <motion.div
                 key={world.id}
                 layout
