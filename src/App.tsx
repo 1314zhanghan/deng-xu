@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { ApiKeyModal } from '@/components/ApiKeyModal'
 import { ChoicePanel } from '@/components/ChoicePanel'
 import { StatusPanel } from '@/components/StatusPanel'
+import { GameMenuActions } from '@/components/GameMenuActions'
 import { PortraitPanel } from '@/components/PortraitPanel'
 import { InventoryPanel } from '@/components/InventoryPanel'
 import { RelationshipPanel } from '@/components/RelationshipPanel'
@@ -180,7 +181,7 @@ function App() {
               ))}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 pb-20">
+            <div className="flex-1 overflow-y-auto p-4">
               {mobileTab === 'status' && (
                 <StatusPanel className="h-auto overflow-visible border-none p-0 bg-transparent" />
               )}
@@ -190,6 +191,15 @@ function App() {
               {mobileTab === 'relationships' && (
                 <RelationshipPanel className="h-auto overflow-visible border-none p-0 bg-transparent" />
               )}
+            </div>
+
+            {/*
+              全局操作固定在菜单底部，**不随内容滚动**。
+              之前它们躺在 StatusPanel 的最底部，手机端要滚过所有属性才看得到，
+              于是"没有返回主菜单"成了真实反馈。
+            */}
+            <div className="border-t border-text-muted/25 bg-surface/60 backdrop-blur px-4 py-3">
+              <GameMenuActions />
             </div>
           </div>
         )}

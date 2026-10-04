@@ -248,6 +248,43 @@ const CAPES = PARTS.filter(p => p.kind === 'cape').map(p => p.id)
 /** 手臂护甲/护腕 —— zPos 60~75 */
 const ARMS = PARTS.filter(p => p.kind === 'arms').map(p => p.id)
 
+/**
+ * 裙装（连衣裙/和服一类）。
+ *
+ * 这些部件**没有声明 recolors**，LPC 是为每种颜色预渲染一个文件
+ * （`dress_slit_white` / `dress_slit_black` …）。所以它们不能靠调色板换色，
+ * 只能按描述里的颜色去选对应那一件。
+ *
+ * 它们覆盖整个下半身（zPos 30 > 腿 20），所以穿裙子时**必须去掉腿部件**。
+ */
+const DRESSES = PARTS.filter(p => /^dress_/.test(p.id)).map(p => p.id)
+
+/**
+ * 裙装可用的颜色变体名。
+ *
+ * 必须显式列出，不能简单取 id 的最后一段 —— 因为 dress 里还混着**款式**部件
+ * （`dress_kimono_longsleeve` / `dress_kimono_oversize` / `dress_kimono_split`），
+ * 它们的后缀不是颜色。按"最后一段"建索引会把它们当成颜色键，
+ * 于是查 'longsleeve' 也会命中一件裙子。
+ */
+const DRESS_COLORS = [
+  'white', 'black', 'red', 'blue', 'navy', 'green', 'purple', 'brown',
+  'gray', 'pink', 'yellow', 'orange', 'teal', 'sky', 'maroon', 'lavender',
+  'forest', 'charcoal', 'rose', 'tan', 'walnut', 'leather', 'slate', 'bluegray',
+] as const
+
+/** 按颜色索引裙装：color → [部件 id]（只收真正的颜色变体，无颜色的款式归入 '' 兜底组） */
+const DRESS_BY_COLOR = (() => {
+  const m = new Map<string, string[]>()
+  for (const id of DRESSES) {
+    const suffix = (id.match(/_([a-z]+)$/) || [])[1] || ''
+    const color = (DRESS_COLORS as readonly string[]).includes(suffix) ? suffix : ''
+    if (!m.has(color)) m.set(color, [])
+    m.get(color)!.push(id)
+  }
+  return m
+})()
+
 /** 只用成年人头（小号/儿童头与身体比例不搭） */
 const HEADS_ADULT = HEADS.filter(h => !/_small$|_child$/.test(h))
 
@@ -387,9 +424,42 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     身份是最能拉开辨识度的一维 —— 一排守卫穿一样的甲、法师穿一样的袍，
     玩家一眼就能从立绘看出谁是谁。
   */
-  const torso = pickRequired(rng, TORSOS, traits.role, 'torso_clothes_longsleeve')
+  let torso = pickRequired(rng, TORSOS, traits.role, 'torso_clothes_longsleeve')
 
-  const legs = pick(rng, LEGS.length ? LEGS : ['legs_pants'])
+  /*
+    裙装优先：
+    描述里写了裙子/长裙/和服时，改用 dress 部件并按颜色挑变体。
+    dress 是**预渲染的颜色变体**（无 recolors），所以颜色必须在选件时就定下来，
+    不能像其他部件那样靠调色板换色。
+
+    它覆盖整个下半身，所以要**去掉腿部件** —— 否则裤腿从裙摆里透出来。
+  */
+  let skirtReplacesLegs = false
+  if (traits.skirt && DRESSES.length) {
+    /*
+      裙装只有这几种颜色变体，而描述里推断出的衣色名可能来自更宽的调色板
+      （如 slate / teal / sky）—— 匹配不到时用 resolvePaletteName 退到最近的一件，
+      而不是直接随机。这直接决定"白色长裙"能不能拿到白裙子。
+    */
+    const wanted = traits.cloth
+      ? (resolvePaletteName(traits.cloth, [...DRESS_BY_COLOR.keys()].filter(Boolean)) || '')
+      : ''
+    const byColor = wanted ? (DRESS_BY_COLOR.get(wanted) || []) : []
+    // 颜色匹配不到就退回「所有裙装」（含无颜色的款式变体）
+    const pool = byColor.length ? byColor : DRESSES
+    const styleHint = [(traits.role || []).join(' '), (traits.hairStyle || []).join(' ')].join(' ')
+    const prefersKimono = /和服|浴衣|kimono/i.test(styleHint)
+    // 款式偏好排序：和服描述优先和服，否则优先非和服
+    const ranked = pool.slice().sort((a, b) => {
+      const wa = /kimono/.test(a) === prefersKimono ? 0 : 1
+      const wb = /kimono/.test(b) === prefersKimono ? 0 : 1
+      return wa - wb
+    })
+    torso = ranked[Math.floor(rng() * ranked.length) % ranked.length]
+    skirtReplacesLegs = true
+  }
+
+  const legs = skirtReplacesLegs ? '' : pick(rng, LEGS.length ? LEGS : ['legs_pants'])
   const shoes = pick(rng, FEET.length ? FEET : ['feet_shoes_basic'])
   const nose = pick(rng, NOSES.length ? NOSES : ['head_nose_straight'])
   const brows = pick(rng, BROWS.length ? BROWS : ['eyebrows_thick'])
@@ -518,6 +588,12 @@ export async function renderSprite(recipe: SpriteRecipe, opts: RenderOptions = {
   const scale = Math.max(1, Math.round(opts.scale || (opts.headOnly ? 4 : 3)))
   // 缓存键必须包含配色 —— 否则换了颜色还会命中旧图
   const c = recipe.colors || {}
+  /*
+    缓存键还要带 `parts`（也就是整个配方）。
+    第一版只带 colors，于是**改了配方逻辑但配色没变时会命中旧图** ——
+    我在验证裙装时被这个坑了一次：同一 id 反复取到修复前的旧配方，
+    看起来像"代码没生效"。带上 parts 之后，配方变则缓存自动失效。
+  */
   const cacheKey = `${recipe.parts.join('|')}#${c.hair || ''},${c.body || ''},${c.cloth || ''},${c.eye || ''}#${direction}#${scale}#${crop.size}@${crop.x},${crop.y}`
   const hit = dataUrlCache.get(cacheKey)
   if (hit) return hit

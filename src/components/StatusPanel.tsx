@@ -1,6 +1,6 @@
 import { useGameStore } from '@/stores/game';
-import { useUIStore } from '@/stores/ui';
 import { useSessionStore } from '@/stores/session';
+import { GameMenuActions } from '@/components/GameMenuActions';
 import {
   Sparkles,
   Zap,
@@ -10,8 +10,6 @@ import {
   Droplet,
   Star,
   Gauge,
-  LogOut,
-  Settings,
   Compass,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -25,8 +23,7 @@ interface StatusPanelProps {
 }
 
 export function StatusPanel({ className = '' }: StatusPanelProps) {
-  const { resources, resourceDefs, aspects, attributeDefs, returnToTitle, playerName, playerGender, playerAppearance } = useGameStore();
-  const { setApiKeyModalOpen } = useUIStore();
+  const { resources, resourceDefs, aspects, attributeDefs, playerName, playerGender, playerAppearance } = useGameStore();
   const world = useSessionStore(s => s.world);
   return (
     <div className={`h-full p-4 space-y-6 overflow-y-auto bg-surface/30 border-r border-text-muted/20 backdrop-blur-sm flex flex-col ${className}`}>
@@ -157,22 +154,13 @@ export function StatusPanel({ className = '' }: StatusPanelProps) {
         )}
       </section>
 
-      <div className="pt-6 mt-auto border-t border-text-muted/20 space-y-2">
-        <button
-          onClick={() => setApiKeyModalOpen(true)}
-          className="w-full flex items-center justify-center gap-2 p-2 text-sm text-text-muted hover:text-accent-lantern hover:bg-accent-lantern/10 border border-transparent hover:border-accent-lantern/30 rounded transition-all"
-        >
-          <Settings size={14} />
-          <span>模型设置</span>
-        </button>
-        <button
-          onClick={returnToTitle}
-          className="w-full flex items-center justify-center gap-2 p-2 text-sm text-text-muted hover:text-accent-lantern hover:bg-accent-lantern/10 border border-transparent hover:border-accent-lantern/30 rounded transition-all"
-        >
-          <LogOut size={14} />
-          <span>返回标题</span>
-        </button>
-      </div>
+      {/*
+        全局操作抽成了 GameMenuActions。
+        原先「返回标题 / 模型设置」写在这里的最底部（mt-auto 之后），
+        手机端因为 StatusPanel 被放进菜单的滚动容器，
+        玩家要滚过所有属性才看得到 —— 于是"没有返回主菜单"成了真实反馈。
+      */}
+      <GameMenuActions className="pt-6 mt-auto border-t border-text-muted/20" />
     </div>
   );
 }

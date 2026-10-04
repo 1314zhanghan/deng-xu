@@ -27,7 +27,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "arms_bracers",
@@ -55,7 +57,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "arms_hands_ring_stud",
@@ -80,7 +84,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_5oclock_shadow",
@@ -106,7 +112,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_beard",
@@ -131,7 +139,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_bigstache",
@@ -157,7 +167,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_chevron",
@@ -180,7 +192,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_french",
@@ -206,7 +220,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_handlebar",
@@ -229,7 +245,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_horseshoe",
@@ -252,7 +270,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_lampshade",
@@ -275,7 +295,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_medium",
@@ -298,7 +320,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_mustache",
@@ -323,7 +347,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_trimmed",
@@ -346,7 +372,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "beards_winter",
@@ -369,7 +397,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "cape_solid",
@@ -395,7 +425,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "cape_tattered",
@@ -420,7 +452,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "cape_trim",
@@ -447,7 +481,97 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "dress_kimono",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "dress/kimono/normal/universal/female/",
+      "defPath": "",
+      "typeName": "dress",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "dress_kimono_longsleeve",
+      "kind": "clothes",
+      "zPos": 31,
+      "dir": "dress/kimono/sleeves/universal/female/",
+      "defPath": "",
+      "typeName": "dress_sleeves",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "dress_kimono_oversize",
+      "kind": "clothes",
+      "zPos": 31,
+      "dir": "dress/kimono/sleeves_oversize/universal/female/",
+      "defPath": "",
+      "typeName": "dress_sleeves",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "dress_kimono_split",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "dress/kimono/split/universal/female/",
+      "defPath": "",
+      "typeName": "dress",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "feet_plate_toe",
@@ -472,7 +596,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "feet_plate_toe_thick",
@@ -497,7 +623,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "feet_socks_ankle",
@@ -524,7 +652,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "feet_socks_high",
@@ -551,7 +681,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_afro",
@@ -574,7 +706,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_bangslong2",
@@ -600,7 +734,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_bangsshort",
@@ -625,7 +761,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_bob",
@@ -649,7 +787,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_braid",
@@ -676,7 +816,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_cowlick",
@@ -700,7 +842,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_curls_large",
@@ -725,7 +869,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_curly_long",
@@ -748,7 +894,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_curly_short2",
@@ -771,7 +919,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_curtains",
@@ -797,7 +947,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_dreadlocks_long",
@@ -820,7 +972,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_flat_top_fade",
@@ -844,7 +998,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_half_up",
@@ -867,7 +1023,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_lob",
@@ -890,7 +1048,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_long",
@@ -915,7 +1075,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_long_messy",
@@ -941,7 +1103,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_long_straight",
@@ -966,7 +1130,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_long_tied",
@@ -1011,7 +1177,9 @@
           ]
         }
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_messy2",
@@ -1036,7 +1204,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_mop",
@@ -1061,7 +1231,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_natural",
@@ -1085,7 +1257,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_page2",
@@ -1112,7 +1286,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_parted2",
@@ -1137,7 +1313,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_parted_side_bangs",
@@ -1163,7 +1341,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_pigtails",
@@ -1208,7 +1388,9 @@
           ]
         }
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_pixie",
@@ -1233,7 +1415,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_ponytail2",
@@ -1260,7 +1444,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_relm_xlong",
@@ -1285,7 +1471,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_shoulderr",
@@ -1312,7 +1500,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_single",
@@ -1339,7 +1529,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_spiked",
@@ -1362,7 +1554,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_spiked_beehive",
@@ -1386,7 +1580,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_spiked_liberty2",
@@ -1410,7 +1606,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_swoop_side",
@@ -1436,7 +1634,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_topknot_long2",
@@ -1462,7 +1662,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_topknot_short2",
@@ -1488,7 +1690,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_twists_straight",
@@ -1511,7 +1715,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hair_wavy",
@@ -1538,7 +1744,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_accessory_crest",
@@ -1561,7 +1769,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_accessory_horns_upward",
@@ -1585,7 +1795,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_accessory_wings",
@@ -1610,7 +1822,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_bandana",
@@ -1635,7 +1849,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_bandana_pirate",
@@ -1659,7 +1875,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_bicorne_athwart_admiral",
@@ -1676,7 +1894,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_bicorne_athwart_basic_skull",
@@ -1693,7 +1913,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_bicorne_athwart_commodore_trim",
@@ -1710,7 +1932,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_bicorne_foreaft_commodore",
@@ -1727,7 +1951,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_cap_bonnie",
@@ -1744,7 +1970,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_cap_bonnie_tilt",
@@ -1761,7 +1989,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_cap_leather",
@@ -1781,7 +2011,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": "hat_cap",
+      "color": "leather"
     },
     {
       "id": "hat_formal_crown",
@@ -1799,7 +2031,9 @@
         "Charles Sanchez (CharlesGabriel)"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_headband_hairtie_rune",
@@ -1824,7 +2058,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_headband_thick",
@@ -1848,7 +2084,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_headband_tied",
@@ -1872,7 +2110,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_helmet_barbarian",
@@ -1913,7 +2153,9 @@
           ]
         }
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_helmet_barbuta_simple",
@@ -1940,7 +2182,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_helmet_flattop",
@@ -1967,7 +2211,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_helmet_legion",
@@ -1997,7 +2243,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_helmet_nasal",
@@ -2024,7 +2272,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_helmet_spangenhelm_viking",
@@ -2051,7 +2301,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_holiday_christmas",
@@ -2069,7 +2321,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_hood_cloth",
@@ -2094,7 +2348,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_hood_hijab",
@@ -2116,7 +2372,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_magic_celestial",
@@ -2134,7 +2392,9 @@
         "Tracy"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_tricorne_captain_skull",
@@ -2150,7 +2410,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_visor_horned",
@@ -2178,7 +2440,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_visor_round_raised",
@@ -2206,7 +2470,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_formal_striped",
@@ -2234,7 +2500,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_hose",
@@ -2261,7 +2529,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_pants2",
@@ -2288,7 +2558,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_shorts",
@@ -2315,7 +2587,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_shorts_short",
@@ -2342,7 +2616,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_skirts_legion",
@@ -2370,7 +2646,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_skirts_plain",
@@ -2398,7 +2676,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_skirt_belle",
@@ -2424,7 +2704,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_skirt_overskirt",
@@ -2450,7 +2732,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "legs_skirt_straight",
@@ -2474,7 +2758,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "shoulders_epaulets",
@@ -2499,7 +2785,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "shoulders_mantal",
@@ -2523,7 +2811,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_aprons_apron",
@@ -2542,7 +2832,9 @@
         "Nila122"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_aprons_apron_full",
@@ -2560,7 +2852,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_aprons_apron_half",
@@ -2578,7 +2872,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_aprons_overalls",
@@ -2597,7 +2893,9 @@
         "JaidynReiman"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_armour_leather",
@@ -2639,7 +2937,9 @@
           ]
         }
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": "torso_armour",
+      "color": "leather"
     },
     {
       "id": "torso_armour_legion",
@@ -2668,7 +2968,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_armour_plate",
@@ -2698,7 +3000,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_longsleeve2_buttoned",
@@ -2723,7 +3027,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_longsleeve2_cardigan",
@@ -2748,7 +3054,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_longsleeve2_scoop",
@@ -2773,7 +3081,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_longsleeves2",
@@ -2798,7 +3108,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_longsleeves_cuffed",
@@ -2823,7 +3135,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_robe",
@@ -2840,7 +3154,9 @@
         "Luke Mehl"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_shortsleeve",
@@ -2869,7 +3185,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_shortsleeve_cardigan",
@@ -2894,7 +3212,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_sleeveless1",
@@ -2922,7 +3242,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_sleeveless2_cardigan",
@@ -2947,7 +3269,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_sleeveless2_polo",
@@ -2972,7 +3296,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_sleeveless2_vneck",
@@ -2997,7 +3323,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_tshirt",
@@ -3022,7 +3350,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_tshirt_scoop",
@@ -3047,7 +3377,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_clothes_tshirt_vneck",
@@ -3072,7 +3404,9 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_jacket_collared",
@@ -3089,7 +3423,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_jacket_frock",
@@ -3105,7 +3441,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_jacket_iverness",
@@ -3122,7 +3460,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_jacket_pockets",
@@ -3138,7 +3478,9 @@
         "bluecarrot16"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "torso_jacket_tabard",
@@ -3159,7 +3501,9 @@
         "Matthew Krohn (makrohn)"
       ],
       "recolors": null,
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "wrists_cuffs",
@@ -3182,7 +3526,429 @@
           "all.lpcr"
         ]
       },
-      "matchBodyColor": false
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "dress_bodice_black",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "black"
+    },
+    {
+      "id": "dress_bodice_blue",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "blue"
+    },
+    {
+      "id": "dress_bodice_brown",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "brown"
+    },
+    {
+      "id": "dress_bodice_gray",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "gray"
+    },
+    {
+      "id": "dress_bodice_green",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "green"
+    },
+    {
+      "id": "dress_bodice_navy",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "navy"
+    },
+    {
+      "id": "dress_bodice_pink",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "pink"
+    },
+    {
+      "id": "dress_bodice_purple",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "purple"
+    },
+    {
+      "id": "dress_bodice_red",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "red"
+    },
+    {
+      "id": "dress_bodice_white",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_bodice",
+      "color": "white"
+    },
+    {
+      "id": "dress_sash_black",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "black"
+    },
+    {
+      "id": "dress_sash_blue",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "blue"
+    },
+    {
+      "id": "dress_sash_brown",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "brown"
+    },
+    {
+      "id": "dress_sash_gray",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "gray"
+    },
+    {
+      "id": "dress_sash_green",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "green"
+    },
+    {
+      "id": "dress_sash_navy",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "navy"
+    },
+    {
+      "id": "dress_sash_pink",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "pink"
+    },
+    {
+      "id": "dress_sash_purple",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "purple"
+    },
+    {
+      "id": "dress_sash_red",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "red"
+    },
+    {
+      "id": "dress_sash_white",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_sash",
+      "color": "white"
+    },
+    {
+      "id": "dress_slit_black",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "black"
+    },
+    {
+      "id": "dress_slit_blue",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "blue"
+    },
+    {
+      "id": "dress_slit_brown",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "brown"
+    },
+    {
+      "id": "dress_slit_gray",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "gray"
+    },
+    {
+      "id": "dress_slit_green",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "green"
+    },
+    {
+      "id": "dress_slit_navy",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "navy"
+    },
+    {
+      "id": "dress_slit_pink",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "pink"
+    },
+    {
+      "id": "dress_slit_purple",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "purple"
+    },
+    {
+      "id": "dress_slit_red",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "red"
+    },
+    {
+      "id": "dress_slit_white",
+      "kind": "clothes",
+      "zPos": 30,
+      "dir": "",
+      "defPath": "",
+      "typeName": "clothes",
+      "licenses": [],
+      "authors": [],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": "dress_slit",
+      "color": "white"
     }
   ]
 }

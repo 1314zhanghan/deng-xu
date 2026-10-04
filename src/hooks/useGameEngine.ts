@@ -15,6 +15,7 @@ import { storySystem } from '@/systems/StorySystem'
 import { pickAvatarId } from '@/utils/avatarArt'
 import { isKnownSceneId } from '@/utils/sceneArt'
 import { LlmError, classifyLlmError } from '@/api/llmErrors'
+import type { LLMConfig, WorldCard } from '@/types/cards'
 import { detectTruncation } from '@/utils/truncation'
 import {
   needsArchive,
@@ -53,6 +54,88 @@ async function maybeArchiveHistory(): Promise<void> {
     useGameStore.setState({ history: hot })
     console.info(`[archive] 已归档 ${archived} 条旧叙事，热数据保留 ${hot.length} 条`)
   }
+}
+
+/**
+ * 叙事被截断时，请求模型**接着写完**，再与已写的部分拼接。
+ *
+ * 为什么用"续写"而不是"重新生成"：
+ *  重新生成会把已经写好、玩家可能已经读了一半的内容全部作废 ——
+ *  对于长段落，这个代价太大。续写只补最后那一小段。
+ *
+ * 拼接时会做重叠去重：模型往往会把已经写过的最后一句再重复一遍，
+ * 直接拼接会出现"他推开门。他推开门。"这种重复。
+ *
+ * 失败（网络错、返回空、也抛错）时返回 null，让调用方退回"提示玩家"的路径。
+ */
+async function tryContinueNarrative(
+  partial: string,
+  config: LLMConfig,
+  world: WorldCard | null | undefined
+): Promise<string | null> {
+  try {
+    const tail = partial.slice(-600)   // 只把结尾交给模型，避免上下文翻倍
+    const res = await llmChat({
+      messages: [
+        {
+          role: 'system',
+          content: '你是一个续写助手。用户会给你一段被截断的小说正文，'
+            + '请**接着最后一个字继续写完**。'
+            + '要求：不要重复已写的内容；不要写任何解释、标题或标记；'
+            + '不要另起一段重讲；直接输出接下来的文字，直到这一段自然结束。',
+        },
+        {
+          role: 'user',
+          content: `以下正文在结尾处被截断了，请接着写完：\n\n---\n${tail}\n---`,
+        },
+      ],
+      config,
+      model: config.narrativeModel,
+      stream: false,
+      temperature: 0.6,
+    })
+
+    const text: string = res?.choices?.[0]?.message?.content || ''
+    const clean = String(text).trim()
+    if (!clean) return null
+
+    return mergeContinuation(partial, clean, world)
+  } catch (e) {
+    console.warn('[continue] 续写失败，退回提示路径', e)
+    return null
+  }
+}
+
+/**
+ * 把续写片段拼到原文后面，并去掉模型常见的"重复已写内容"。
+ *
+ * 两种情况都要处理：
+ *   A. 续写从整句之后接上 → 原文的结尾是续写的前缀
+ *      「他推开门。」 + 「他推开门。屋里很冷。」
+ *   B. 续写从半句之后接上 → 原文的结尾**被包含在**续写里
+ *      「他推开门，看见」 + 「看见桌上放着一封信。」
+ *
+ * 第一版只做了 A 的正向 `startsWith`，B 完全没覆盖；而且把最小重叠长度
+ * 写成 6，导致只有 5 个字符的「他推开门。」被直接滤掉 —— 去重反而失效。
+ * 现在改成**在两侧之间找最大重叠**，长度下界 4 个字（太短会误删真实内容）。
+ *
+ * 实现与 `src/utils/continuation.test.ts` 里的副本保持一致（那边有测试）。
+ */
+export function mergeContinuation(original: string, continuation: string, _world?: unknown): string {
+  const a = original.replace(/\s+$/, '')
+  const b = continuation.trim()
+  if (!b) return a
+  if (a.endsWith(b)) return a
+
+  const max = Math.min(a.length, b.length)
+  for (let len = max; len >= 4; len--) {
+    const tail = a.slice(a.length - len)
+    const head = b.slice(0, len)
+    if (tail === head) return a + b.slice(len)
+  }
+
+  const needSpace = /[A-Za-z0-9,.;:'"]$/.test(a) && /^[A-Za-z0-9]/.test(b)
+  return a + (needSpace ? ' ' : '') + b
 }
 
 /**
@@ -659,14 +742,41 @@ export function useGameEngine(): GameEngineReturn {
         它会照原样进入历史与下一轮上下文，故事里凭空多一个断句，
         而玩家完全不知道为什么。这里标出来让他决定要不要重新生成。
       */
-      const trunc = detectTruncation(fullNarrative, activeWorld?.narrative?.replyLength)
+      /*
+        截断检测与**自动续写**。
+
+        模型可能在句子中间被切断（max_tokens 用尽、流被中断），
+        返回的既不是空串也不是错误，而是一段"看起来正常但停在半句"的文本。
+
+        上一版只做提示，玩家要自己点重新生成 —— 而重生成会把已经写好的
+        那半段整体作废，代价太大。这里改成**自动请求补全**：
+        把已写的部分作为前缀交给模型，请它接着写完，再拼起来。
+
+        只续一次。续写也可能再次被截断，第二次就直接提示玩家 ——
+        否则会陷入"无限续写"，既费 token 又永远停不下来。
+      */
+      let finalNarrative = fullNarrative
+      let trunc = detectTruncation(finalNarrative, activeWorld?.narrative?.replyLength)
+      if (trunc.truncated) {
+        const continued = await tryContinueNarrative(finalNarrative, config, activeWorld)
+        if (continued) {
+          finalNarrative = continued
+          trunc = detectTruncation(finalNarrative, activeWorld?.narrative?.replyLength)
+          if (!trunc.truncated) {
+            // 续写成功：明确告诉玩家发生了什么，而不是静默拼上
+            useUIStore.getState().setStatusMessage('这段叙事曾被截断，已自动补全')
+            setTimeout(() => useUIStore.getState().setStatusMessage(null), 2500)
+          }
+        }
+      }
+
       if (trunc.truncated) {
         setTruncationWarning(trunc.reason || '这段叙事可能没有写完')
       } else {
         setTruncationWarning(null)
       }
 
-      useGameStore.getState().addHistory({ role: 'assistant', content: fullNarrative, timestamp: Date.now() })
+      useGameStore.getState().addHistory({ role: 'assistant', content: finalNarrative, timestamp: Date.now() })
       setStreamingContent(null)
       setStreamingReasoning(null)
 

@@ -1,5 +1,6 @@
 import type { WorldCard } from '@/types/cards'
 import { EXTRA_BUILTIN_WORLDS } from '@/data/builtinWorldsExtra'
+import { THEMED_WORLDS } from '@/data/builtinWorldsThemed'
 
 /**
  * 内置示例世界卡
@@ -243,9 +244,17 @@ const ashenEcho: WorldCard = {
  * 复用同一套生成算法也不会互相违和。
  */
 const AVATAR_STYLE_BY_WORLD: Record<string, { style: WorldCard['avatarStyle']; tone: string }> = {
+  // —— 原有三个 ——
   builtin_ashen_echo: { style: 'ink', tone: '#f59e0b' },      // 暗黑奇幻：水墨 + 烛火橙
   builtin_neon_rain: { style: 'neon', tone: '#22d3ee' },      // 赛博朋克：霓虹 + 青
   builtin_star_drifter: { style: 'holo', tone: '#5eead4' },   // 太空歌剧：全息 + 荧绿
+  // —— 题材包（世界色调按题材选，让新玩家一眼看出"这引擎什么都能跑"）——
+  builtin_silver_crown: { style: 'parchment', tone: '#d4a017' },   // 经典西幻：羊皮纸 + 金
+  builtin_seventh_day: { style: 'ink', tone: '#5eead4' },          // 日式异世界：水墨 + 荧青（魔法感）
+  builtin_asking_sword: { style: 'ink', tone: '#8e44ad' },         // 中式仙侠：水墨 + 紫（道韵）
+  builtin_three_am: { style: 'neon', tone: '#22d3ee' },            // 现代都市：霓虹 + 青（夜班冷光）
+  builtin_changan_twelve: { style: 'parchment', tone: '#b45309' }, // 架空历史：羊皮纸 + 赭
+  builtin_rain_never_stopped: { style: 'holo', tone: '#5eead4' },  // 后末日：全息 + 湿冷青
 }
 
 function withAvatarStyle(world: WorldCard): WorldCard {
@@ -254,6 +263,11 @@ function withAvatarStyle(world: WorldCard): WorldCard {
   return { ...world, avatarStyle: preset.style, avatarTone: preset.tone }
 }
 
-export const BUILTIN_WORLDS: WorldCard[] = [ashenEcho, ...EXTRA_BUILTIN_WORLDS].map(withAvatarStyle)
+export const BUILTIN_WORLDS: WorldCard[] = [
+  ashenEcho,
+  ...EXTRA_BUILTIN_WORLDS,
+  // 题材包：覆盖当下最主流的六种想象框架，让新玩家先看到自己熟悉的题材
+  ...THEMED_WORLDS,
+].map(withAvatarStyle)
 
 export default BUILTIN_WORLDS

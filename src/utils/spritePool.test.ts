@@ -151,4 +151,29 @@ describe('zPos 层级必须符合 LPC 约定（叠错层会画出穿模）', () 
       expect(parts.some(p => p.id === id), `缺部件 ${id}`).toBe(true)
     }
   })
+
+  it('裙装部件齐备，且覆盖常用颜色', () => {
+    const dresses = parts.filter(p => /^dress_/.test(p.id))
+    expect(dresses.length, '裙装数量').toBeGreaterThanOrEqual(20)
+    /*
+      裙装是**预渲染的颜色变体**（没有 recolors），所以"白色长裙"能不能画对，
+      完全取决于 _white 这一件在不在库里。这条断言守住它。
+    */
+    for (const color of ['white', 'black', 'red', 'blue', 'navy', 'green', 'purple', 'brown']) {
+      expect(dresses.some(d => d.id.endsWith('_' + color)), `缺 ${color} 色裙装`).toBe(true)
+    }
+  })
+
+  it('裙装的 zPos 在腿之上、上衣之下（否则叠层会穿模）', () => {
+    const dress = zOf('dress_sash_white')
+    expect(dress).toBeGreaterThan(zOf('legs_pants'))
+    expect(dress).toBeLessThan(zOf('torso_clothes_longsleeve'))
+  })
+
+  it('裙装不声明 recolors（颜色靠变体文件，不靠调色板）', () => {
+    const dresses = parts.filter(p => /^dress_/.test(p.id)) as any[]
+    for (const d of dresses) {
+      expect(d.recolors, `${d.id} 不应声明 recolors`).toBeFalsy()
+    }
+  })
 })

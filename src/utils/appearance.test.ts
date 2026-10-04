@@ -138,6 +138,45 @@ describe('外貌推断 · 性别', () => {
   })
 })
 
+describe('外貌推断 · 裙装', () => {
+  it('「长裙」「和服」等命中裙装', () => {
+    for (const desc of ['穿着白色长裙', '一身红色和服', '裙摆很长', 'a long dress', 'wearing a skirt']) {
+      expect(inferTraits({ description: desc }).skirt, desc).toBe(true)
+    }
+  })
+
+  it('**没有**裙装线索时不误判 —— 这里踩过一个正则坑', () => {
+    /*
+      第一版 SKIRT_RE 里写了 `robe-like`，而正则里 `-` 是普通字符、
+      `e` 被它修饰成"零或多个"，于是 `rob-?like` 实际匹配了
+      `torso_clothes_shortsleeve` 里的 "robe"。
+      结果"村里的年轻人"被判成穿裙装，拿到没有颜色变体的和服，
+      而且裤腿与裙子同时出现。
+    */
+    for (const desc of ['村里的年轻人', '穿短袖的人', '一个普通的旅人', 'a villager']) {
+      expect(inferTraits({ description: desc }).skirt, desc).toBeFalsy()
+    }
+  })
+
+  it('裙装会去掉腿部件（否则裤腿从裙摆里透出来）', async () => {
+    const { recipeFor } = await import('@/utils/lpcSprite')
+    const dress = recipeFor('t1', { profile: { description: '穿着白色长裙的女子', gender: '女' }, gender: '女' })
+    expect(dress.clothing).toMatch(/^dress_/)
+    expect(dress.parts.some(p => /^legs_/.test(p)), '穿裙子时不应有腿部件').toBe(false)
+
+    const pants = recipeFor('t2', { profile: { description: '穿长裤的旅人', gender: '男' }, gender: '男' })
+    expect(pants.parts.some(p => /^legs_/.test(p)), '不穿裙子时应有腿部件').toBe(true)
+  })
+
+  it('裙装按描述的颜色选对应变体', async () => {
+    const { recipeFor } = await import('@/utils/lpcSprite')
+    const white = recipeFor('t3', { profile: { description: '穿着白色长裙', gender: '女' }, gender: '女' })
+    expect(white.clothing).toMatch(/_white$/)
+    const red = recipeFor('t4', { profile: { description: '穿着红色长裙', gender: '女' }, gender: '女' })
+    expect(red.clothing).toMatch(/_red$/)
+  })
+})
+
 describe('外貌推断 · evidence 可解释', () => {
   it('每个推断都留下原文依据', () => {
     const t = inferTraits({

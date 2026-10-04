@@ -42,6 +42,12 @@ export interface AppearanceTraits {
   headwear?: string[]
   /** 是否有胡须 */
   beard?: boolean
+  /**
+   * 是否有裙装。
+   * 上游的 dress 部件**覆盖整个下半身**（zPos 30，在腿 20 之上），
+   * 所以穿裙子时必须**不再叠腿部件** —— 否则裤腿会从裙摆里穿出来。
+   */
+  skirt?: boolean
   /** 匹配到的原文片段，便于调试与向玩家解释 */
   evidence: string[]
 }
@@ -226,6 +232,20 @@ const HEADWEAR: [RegExp, string[]][] = [
 /** 胡须 */
 const BEARD_RE = /胡须|胡子|大胡|络腮|山羊胡|髭|beard|moustache|mustache|whisker/i
 
+/**
+ * 裙装。
+ * LPC 的 dress 部件覆盖整个下半身，所以命中它就要**去掉腿部件**，
+ * 否则裤腿会从裙摆里透出来（比不穿裙子更难看）。
+ *
+ * ⚠️ 这里踩过一个隐蔽的坑：第一版写了 `robe-like`，
+ * 而正则里的 `-` 是普通字符、`e` 由 `-` 修饰成了"零或多个"，
+ * 于是 `rob-?like` 实际匹配了 `torso_clothes_shortsleeve` 里的 "robe"！
+ * 结果"村里的年轻人"被判成穿裙装，拿到一件没有颜色变体的和服、
+ * 而且腿部件与裙子同时出现。
+ * 凡是写"可选的连字符"，必须转义：`robe\-like`。
+ */
+const SKIRT_RE = /长?裙|连衣裙|裙装|裙摆|裙裾|礼服|晚礼服|和服|浴衣|旗袍|\bdress\b|\bskirt\b|\bkimono\b|\bgown\b/i
+
 // ============================================================================
 // 提取
 // ============================================================================
@@ -319,6 +339,11 @@ export function inferTraits(input: {
   if (BEARD_RE.test(text)) {
     out.beard = true
     out.evidence.push('胡须')
+  }
+
+  if (SKIRT_RE.test(text)) {
+    out.skirt = true
+    out.evidence.push('裙装')
   }
 
   // 性别：显式字段优先，否则从文本里找
