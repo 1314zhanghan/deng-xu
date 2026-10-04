@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Upload, Download, Settings, Trash2, Copy, Pencil, Play,
-  Users, Sliders, BookOpen, Layers, AlertTriangle
+  Users, Sliders, BookOpen, Layers, AlertTriangle, ChevronLeft, Eye
 } from 'lucide-react'
 import { useLibraryStore } from '@/stores/library'
 import { useUIStore } from '@/stores/ui'
@@ -15,6 +15,8 @@ import { lazyWithRetry } from '@/utils/lazyWithRetry'
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SaveManager } from '@/components/SaveManager'
 import { WorldPackManager } from '@/components/WorldPackManager'
+import { MainMenu } from '@/components/MainMenu'
+import { WorldbookPreview } from '@/components/WorldbookPreview'
 
 /**
  * 世界卡编辑器懒加载。
@@ -44,6 +46,21 @@ export function StartScreen() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [confirmResume, setConfirmResume] = useState(false)
   const importRef = useRef<HTMLInputElement>(null)
+
+  /**
+   * 首页视图状态机。
+   *
+   * 之前打开网站**直接就是世界书卡片墙** —— 一种"门户大开"的感觉：
+   * 新玩家一眼看到九张卡与一堆导入导出按钮，不知道自己该从哪开始，
+   * 也看不出上次玩到哪了。卡片墙本质是"资料库"，不该当门厅。
+   *
+   * 现在：menu（主菜单）→ library（选世界开新局 / 卡片库）| worldbook（看设定）
+   */
+  const [view, setView] = useState<'menu' | 'library' | 'worldbook'>('menu')
+  /** 正在预览的世界卡 id */
+  const [previewId, setPreviewId] = useState<string | null>(null)
+  /** 从「世界书」进来时，卡片墙只展示内置世界（资料库则展示全部） */
+  const [worldbookMode, setWorldbookMode] = useState(false)
 
   useEffect(() => {
     loadWorlds()
@@ -256,6 +273,56 @@ export function StartScreen() {
     )
   }
 
+  /** 主菜单视图：不渲染卡片墙，只有五个入口 */
+  if (view === 'menu') {
+    return (
+      <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
+        <div className="absolute inset-0 bg-neutral-900 opacity-[0.04] pointer-events-none" />
+        <ApiKeyModal />
+        <AnimatePresence>{showTutorial && <TutorialModal onClose={closeTutorial} />}</AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[96] px-4 py-2 bg-black/90 border border-accent-lantern/40 text-accent-lantern text-xs rounded shadow-xl max-w-[90vw]"
+          >
+            {toast}
+          </motion.div>
+        )}
+        <main className="relative z-10 flex-1 overflow-y-auto">
+          <MainMenu
+            onContinue={handleResume}
+            onNewGame={() => { setWorldbookMode(false); setView('library') }}
+            onWorldbook={() => { setWorldbookMode(true); setView('library') }}
+            onLibrary={() => { setWorldbookMode(false); setView('library') }}
+            onOpenSettings={() => setApiKeyModalOpen(true)}
+          />
+        </main>
+      </div>
+    )
+  }
+
+  /** 世界书预览：只读地看一个世界的全部设定 */
+  const previewWorld = previewId ? worlds.find(w => w.id === previewId) : null
+  if (view === 'worldbook' && previewWorld) {
+    return (
+      <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
+        <div className="absolute inset-0 bg-neutral-900 opacity-[0.04] pointer-events-none" />
+        <ApiKeyModal />
+        <main className="relative z-10 flex-1 overflow-y-auto">
+          <WorldbookPreview
+            world={previewWorld}
+            isBuiltin={previewWorld.builtin}
+            onBack={() => { setPreviewId(null); setView('worldbook') }}
+            onEdit={() => { setEditingWorldId(previewWorld.id); setCardEditorOpen(true) }}
+            onStart={() => { setWorldbookMode(false); setView('library'); setSetupWorldId(previewWorld.id) }}
+          />
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
       <div className="absolute inset-0 bg-neutral-900 opacity-[0.04] pointer-events-none" />
@@ -270,16 +337,32 @@ export function StartScreen() {
       {/* 顶栏 */}
       <header className="relative z-10 flex items-center justify-between gap-4 px-6 py-4 border-b border-text-muted/20">
         <div className="flex items-center gap-3 min-w-0">
-          <Layers size={22} className="text-accent-lantern flex-shrink-0" />
+          {/*
+            返回主菜单。之前打开网站就是这一屏，没有"上一层"可回；
+            加上主菜单之后，这里必须给出回去的路。
+          */}
+          <button
+            onClick={() => { setPreviewId(null); setView('menu') }}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors shrink-0"
+            title="返回主菜单"
+          >
+            <ChevronLeft size={14} />
+            <span className="hidden sm:inline">主菜单</span>
+          </button>
+          <Layers size={20} className="text-accent-lantern flex-shrink-0" />
           <div className="min-w-0">
             <div className="flex items-center gap-2 min-w-0">
-              <h1 className="font-serif font-bold tracking-widest text-accent-lantern truncate">灯叙</h1>
+              <h1 className="font-serif font-bold tracking-widest text-accent-lantern truncate">
+                {worldbookMode ? '世界书' : '卡片库'}
+              </h1>
               <span className="text-[10px] px-1.5 py-0.5 rounded border border-accent-forge/50 text-accent-forge whitespace-nowrap flex-shrink-0">
                 Z测试版
               </span>
             </div>
             <p className="text-[10px] text-text-muted font-mono truncate">
-              {loaded ? `${worlds.length} 张世界卡` : '正在载入卡库…'}
+              {worldbookMode
+                ? (loaded ? `${worlds.filter(w => w.builtin).length} 个内置世界，点卡片看详情` : '正在载入世界书…')
+                : (loaded ? `${worlds.length} 张世界卡` : '正在载入卡库…')}
             </p>
           </div>
         </div>
@@ -418,7 +501,7 @@ export function StartScreen() {
 
         {loaded && worlds.length > 0 && (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-[100rem] mx-auto">
-            {worlds.map(world => (
+            {(worldbookMode ? worlds.filter(w => w.builtin) : worlds).map(world => (
               <motion.div
                 key={world.id}
                 layout
@@ -426,10 +509,16 @@ export function StartScreen() {
                 animate={{ opacity: 1, y: 0 }}
                 className="group bg-surface/40 border border-text-muted/20 rounded-lg overflow-hidden flex flex-col hover:border-accent-lantern/40 transition-colors"
               >
-                {/* 封面 */}
+                {/*
+                  点封面进**世界书预览**，而不是直接开局。
+                  之前点封面会直接跳到选角界面 —— 想先看看设定的人被迫
+                  先进入一个"要填资料"的流程才能退出，很别扭。
+                  现在：看设定 → 满意了再点「开始」。
+                */}
                 <button
-                  onClick={() => beginSetup(world.id)}
+                  onClick={() => { setPreviewId(world.id); setView('worldbook') }}
                   className="relative block w-full h-36 overflow-hidden bg-black/40 text-left"
+                  title="查看世界书详情"
                 >
                   {world.cover
                     ? <img src={world.cover} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
@@ -447,6 +536,12 @@ export function StartScreen() {
                       纯叙事
                     </span>
                   )}
+                  {/* 悬停时提示这里可以点 */}
+                  <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded border border-accent-lantern/50 text-accent-lantern bg-black/70">
+                      <Eye size={12} /> 查看详情
+                    </span>
+                  </span>
                   <div className="absolute inset-x-0 bottom-0 p-3">
                     <h3 className="font-serif font-bold text-text-primary truncate">{world.title}</h3>
                   </div>
@@ -477,6 +572,14 @@ export function StartScreen() {
                       className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
                     >
                       <Play size={12} /> 开始
+                    </button>
+
+                    <button
+                      onClick={() => { setPreviewId(world.id); setView('worldbook') }}
+                      title="查看世界书详情（只读）"
+                      className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40 transition-colors"
+                    >
+                      <Eye size={13} />
                     </button>
 
                     {world.builtin ? (

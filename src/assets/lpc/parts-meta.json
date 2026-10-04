@@ -711,6 +711,60 @@
       "color": null
     },
     {
+      "id": "hair_bangs",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/bangs/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_bangs.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Manuel Riecke (MrBeast)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_bangslong",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/bangslong/adult/",
+      "defPath": "sheet_definitions/hair/long/hair_bangslong.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Manuel Riecke (MrBeast)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_bangslong2",
       "kind": "hair",
       "zPos": 120,
@@ -874,6 +928,33 @@
       "color": null
     },
     {
+      "id": "hair_curls_large_xlong",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/curls_large_xlong/adult/fg/",
+      "defPath": "sheet_definitions/hair/curly/hair_curls_large_xlong.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "GPL 3.0+"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_curly_long",
       "kind": "hair",
       "zPos": 120,
@@ -952,6 +1033,34 @@
       "color": null
     },
     {
+      "id": "hair_curtains_long",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/curtains_long/adult/",
+      "defPath": "sheet_definitions/hair/long/hair_curtains_long.json",
+      "typeName": "hair",
+      "licenses": [
+        "GPL 2.0",
+        "GPL 3.0",
+        "CC-BY 3.0"
+      ],
+      "authors": [
+        "Mandi Paugh",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_dreadlocks_long",
       "kind": "hair",
       "zPos": 120,
@@ -1003,6 +1112,35 @@
       "color": null
     },
     {
+      "id": "hair_halfmessy",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/halfmessy/adult/",
+      "defPath": "sheet_definitions/hair/spiky/hair_halfmessy.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0",
+        "GPL 2.0"
+      ],
+      "authors": [
+        "Nila122",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_half_up",
       "kind": "hair",
       "zPos": 120,
@@ -1014,6 +1152,59 @@
       ],
       "authors": [
         "ElizaWy"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_high_ponytail",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/high_ponytail/adult/fg/",
+      "defPath": "sheet_definitions/hair/braids/hair_high_ponytail.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "ElizaWy",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_idol",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/idol/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_idol.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC0"
+      ],
+      "authors": [
+        "thecilekli",
+        "bluecarrot16"
       ],
       "recolors": {
         "material": "hair",
@@ -1080,6 +1271,32 @@
       "color": null
     },
     {
+      "id": "hair_long_center_part",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/long_center_part/adult/fg/",
+      "defPath": "sheet_definitions/hair/long/hair_long_center_part.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC0"
+      ],
+      "authors": [
+        "thecilekli",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_long_messy",
       "kind": "hair",
       "zPos": 120,
@@ -1093,6 +1310,33 @@
       ],
       "authors": [
         "Mandi Paugh",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_long_messy2",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/long_messy2/adult/",
+      "defPath": "sheet_definitions/hair/long/hair_long_messy2.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "Yamilian",
         "bluecarrot16"
       ],
       "recolors": {
@@ -1182,6 +1426,60 @@
       "color": null
     },
     {
+      "id": "hair_loose",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/loose/adult/",
+      "defPath": "sheet_definitions/hair/long/hair_loose.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Manuel Riecke (MrBeast)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_messy1",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/messy1/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_messy1.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Manuel Riecke (MrBeast)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_messy2",
       "kind": "hair",
       "zPos": 120,
@@ -1262,6 +1560,34 @@
       "color": null
     },
     {
+      "id": "hair_page",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/page/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_page.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "Page",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_page2",
       "kind": "hair",
       "zPos": 120,
@@ -1277,6 +1603,34 @@
         "JaidynReiman",
         "ElizaWy",
         "Johannes Sjölund (wulax)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_parted",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/parted/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_parted.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Joe White",
+        "Manuel Riecke (MrBeast)"
       ],
       "recolors": {
         "material": "hair",
@@ -1323,6 +1677,34 @@
       "zPos": 120,
       "dir": "hair/parted_side_bangs/adult/",
       "defPath": "",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_parted_side_bangs2",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/parted_side_bangs2/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_parted_side_bangs2.json",
       "typeName": "hair",
       "licenses": [
         "OGA-BY 3.0+",
@@ -1476,6 +1858,35 @@
       "color": null
     },
     {
+      "id": "hair_shoulderl",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/shoulderl/adult/fg/",
+      "defPath": "sheet_definitions/hair/braids/hair_shoulderl.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Lanea Zimmerman (Sharm)",
+        "Manuel Riecke (MrBeast)"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_shoulderr",
       "kind": "hair",
       "zPos": 120,
@@ -1585,6 +1996,32 @@
       "color": null
     },
     {
+      "id": "hair_spiked_liberty",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/spiked_liberty/adult/",
+      "defPath": "sheet_definitions/hair/spiky/hair_spiked_liberty.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0"
+      ],
+      "authors": [
+        "Fabzy",
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_spiked_liberty2",
       "kind": "hair",
       "zPos": 120,
@@ -1597,6 +2034,33 @@
       "authors": [
         "Cobra Hubbard (BlueVortexGames)",
         "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_swoop",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/swoop/adult/",
+      "defPath": "sheet_definitions/hair/short/hair_swoop.json",
+      "typeName": "hair",
+      "licenses": [
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman",
+        "Manuel Riecke (MrBeast)"
       ],
       "recolors": {
         "material": "hair",
@@ -1639,11 +2103,67 @@
       "color": null
     },
     {
+      "id": "hair_topknot_long",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/parted_side_bangs/adult/",
+      "defPath": "sheet_definitions/hair/braids/hair_topknot_long.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hair_topknot_long2",
       "kind": "hair",
       "zPos": 120,
       "dir": "hair/parted_side_bangs2/adult/",
       "defPath": "sheet_definitions/hair/braids/hair_topknot_long2.json",
+      "typeName": "hair",
+      "licenses": [
+        "OGA-BY 3.0+",
+        "CC-BY 3.0+",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "JaidynReiman"
+      ],
+      "recolors": {
+        "material": "hair",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hair_topknot_short",
+      "kind": "hair",
+      "zPos": 120,
+      "dir": "hair/parted_side_bangs/adult/",
+      "defPath": "sheet_definitions/hair/braids/hair_topknot_short.json",
       "typeName": "hair",
       "licenses": [
         "OGA-BY 3.0+",
@@ -1880,6 +2400,31 @@
       "color": null
     },
     {
+      "id": "hat_bandana_pirate_skull",
+      "kind": "hat",
+      "zPos": 121,
+      "dir": "hat/pirate/bandana/skull/adult/",
+      "defPath": "sheet_definitions/headwear/coverings/bandana/hat_bandana_pirate_skull.json",
+      "typeName": "bandana_overlay",
+      "licenses": [
+        "CC-BY-SA 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "Fabzy"
+      ],
+      "recolors": {
+        "material": "cloth",
+        "palettes": [
+          "ulpc",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hat_bicorne_athwart_admiral",
       "kind": "hat",
       "zPos": 130,
@@ -1892,6 +2437,24 @@
       "authors": [
         "bluecarrot16",
         "JaidynReiman"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hat_bicorne_athwart_basic",
+      "kind": "hat",
+      "zPos": 130,
+      "dir": "hat/pirate/bicorne/athwart/basic/adult/",
+      "defPath": "sheet_definitions/headwear/hats/athwart/hat_bicorne_athwart_basic.json",
+      "typeName": "hat",
+      "licenses": [
+        "OGA-BY 3.0"
+      ],
+      "authors": [
+        "bluecarrot16"
       ],
       "recolors": null,
       "matchBodyColor": false,
@@ -2014,6 +2577,28 @@
       "matchBodyColor": false,
       "variantOf": "hat_cap",
       "color": "leather"
+    },
+    {
+      "id": "hat_cap_leather_feather",
+      "kind": "hat",
+      "zPos": 131,
+      "dir": "hat/cloth/leather_cap/feather/adult/",
+      "defPath": "sheet_definitions/headwear/hats/caps/hat_cap_leather_feather.json",
+      "typeName": "hat_accessory",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "Johannes Sjölund (wulax)",
+        "Matthew Krohn (Makrohn)",
+        "JaidynReiman"
+      ],
+      "recolors": null,
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
     },
     {
       "id": "hat_formal_crown",
@@ -2158,6 +2743,35 @@
       "color": null
     },
     {
+      "id": "hat_helmet_barbuta",
+      "kind": "hat",
+      "zPos": 130,
+      "dir": "hat/helmet/barbuta/male/",
+      "defPath": "sheet_definitions/headwear/helmets/helmets/hat_helmet_barbuta.json",
+      "typeName": "hat",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY 3.0",
+        "CC-BY 4.0",
+        "GPL 2.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "metal",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hat_helmet_barbuta_simple",
       "kind": "hat",
       "zPos": 130,
@@ -2216,6 +2830,35 @@
       "color": null
     },
     {
+      "id": "hat_helmet_greathelm",
+      "kind": "hat",
+      "zPos": 130,
+      "dir": "hat/helmet/greathelm/male/",
+      "defPath": "sheet_definitions/headwear/helmets/helmets/hat_helmet_greathelm.json",
+      "typeName": "hat",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY 3.0",
+        "CC-BY 4.0",
+        "GPL 2.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "metal",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "hat_helmet_legion",
       "kind": "hat",
       "zPos": 130,
@@ -2234,6 +2877,35 @@
         "JaidynReiman",
         "Matthew Krohn (makrohn)",
         "Johannes Sjölund (wulax)"
+      ],
+      "recolors": {
+        "material": "metal",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hat_helmet_morion",
+      "kind": "hat",
+      "zPos": 135,
+      "dir": "hat/helmet/morion/adult/",
+      "defPath": "sheet_definitions/headwear/helmets/helmets/hat_helmet_morion.json",
+      "typeName": "hat",
+      "licenses": [
+        "OGA-BY 3.0",
+        "CC-BY-SA 4.0",
+        "CC-BY-SA 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "ElizaWy",
+        "Sander Frenken (castelonia)"
       ],
       "recolors": {
         "material": "metal",
@@ -2282,6 +2954,35 @@
       "zPos": 130,
       "dir": "hat/helmet/spangenhelm_viking/adult/",
       "defPath": "",
+      "typeName": "hat",
+      "licenses": [
+        "CC-BY 3.0",
+        "CC-BY 4.0",
+        "OGA-BY 3.0",
+        "GPL 2.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16"
+      ],
+      "recolors": {
+        "material": "metal",
+        "palettes": [
+          "ulpc",
+          "lpcr",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
+      "id": "hat_helmet_sugarloaf",
+      "kind": "hat",
+      "zPos": 130,
+      "dir": "hat/helmet/sugarloaf/male/",
+      "defPath": "sheet_definitions/headwear/helmets/helmets/hat_helmet_sugarloaf.json",
       "typeName": "hat",
       "licenses": [
         "CC-BY 3.0",
@@ -3140,6 +3841,35 @@
       "color": null
     },
     {
+      "id": "torso_clothes_longsleeve_scoop",
+      "kind": "clothes",
+      "zPos": 35,
+      "dir": "torso/clothes/longsleeve/scoop/male/",
+      "defPath": "sheet_definitions/torso/shirts/longsleeve/torso_clothes_longsleeve_scoop.json",
+      "typeName": "clothes",
+      "licenses": [
+        "OGA-BY 3.0",
+        "GPL 3.0"
+      ],
+      "authors": [
+        "bluecarrot16",
+        "ElizaWy",
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": {
+        "material": "cloth",
+        "palettes": [
+          "ulpc",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "torso_clothes_robe",
       "kind": "clothes",
       "zPos": 35,
@@ -3355,6 +4085,33 @@
       "color": null
     },
     {
+      "id": "torso_clothes_tshirt_buttoned",
+      "kind": "clothes",
+      "zPos": 35,
+      "dir": "torso/clothes/shortsleeve/tshirt_buttoned/male/",
+      "defPath": "sheet_definitions/torso/shirts/shortsleeve/torso_clothes_tshirt_buttoned.json",
+      "typeName": "clothes",
+      "licenses": [
+        "OGA-BY 3.0"
+      ],
+      "authors": [
+        "ElizaWy",
+        "JaidynReiman",
+        "Stephen Challener (Redshrike)",
+        "Johannes Sjölund (wulax)"
+      ],
+      "recolors": {
+        "material": "cloth",
+        "palettes": [
+          "ulpc",
+          "all.lpcr"
+        ]
+      },
+      "matchBodyColor": false,
+      "variantOf": null,
+      "color": null
+    },
+    {
       "id": "torso_clothes_tshirt_scoop",
       "kind": "clothes",
       "zPos": 35,
@@ -3529,426 +4286,6 @@
       "matchBodyColor": false,
       "variantOf": null,
       "color": null
-    },
-    {
-      "id": "dress_bodice_black",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "black"
-    },
-    {
-      "id": "dress_bodice_blue",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "blue"
-    },
-    {
-      "id": "dress_bodice_brown",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "brown"
-    },
-    {
-      "id": "dress_bodice_gray",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "gray"
-    },
-    {
-      "id": "dress_bodice_green",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "green"
-    },
-    {
-      "id": "dress_bodice_navy",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "navy"
-    },
-    {
-      "id": "dress_bodice_pink",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "pink"
-    },
-    {
-      "id": "dress_bodice_purple",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "purple"
-    },
-    {
-      "id": "dress_bodice_red",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "red"
-    },
-    {
-      "id": "dress_bodice_white",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_bodice",
-      "color": "white"
-    },
-    {
-      "id": "dress_sash_black",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "black"
-    },
-    {
-      "id": "dress_sash_blue",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "blue"
-    },
-    {
-      "id": "dress_sash_brown",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "brown"
-    },
-    {
-      "id": "dress_sash_gray",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "gray"
-    },
-    {
-      "id": "dress_sash_green",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "green"
-    },
-    {
-      "id": "dress_sash_navy",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "navy"
-    },
-    {
-      "id": "dress_sash_pink",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "pink"
-    },
-    {
-      "id": "dress_sash_purple",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "purple"
-    },
-    {
-      "id": "dress_sash_red",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "red"
-    },
-    {
-      "id": "dress_sash_white",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_sash",
-      "color": "white"
-    },
-    {
-      "id": "dress_slit_black",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "black"
-    },
-    {
-      "id": "dress_slit_blue",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "blue"
-    },
-    {
-      "id": "dress_slit_brown",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "brown"
-    },
-    {
-      "id": "dress_slit_gray",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "gray"
-    },
-    {
-      "id": "dress_slit_green",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "green"
-    },
-    {
-      "id": "dress_slit_navy",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "navy"
-    },
-    {
-      "id": "dress_slit_pink",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "pink"
-    },
-    {
-      "id": "dress_slit_purple",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "purple"
-    },
-    {
-      "id": "dress_slit_red",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "red"
-    },
-    {
-      "id": "dress_slit_white",
-      "kind": "clothes",
-      "zPos": 30,
-      "dir": "",
-      "defPath": "",
-      "typeName": "clothes",
-      "licenses": [],
-      "authors": [],
-      "recolors": null,
-      "matchBodyColor": false,
-      "variantOf": "dress_slit",
-      "color": "white"
     }
   ]
 }

@@ -3130,6 +3130,528 @@
    "authors": [],
    "variantOf": "dress_slit",
    "color": "white"
+  },
+  {
+   "id": "hair_bangs",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_bangs.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_bangslong",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_bangslong.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_curls_large_xlong",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_curls_large_xlong.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "GPL 3.0+"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "hair_curtains_long",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_curtains_long.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "GPL 2.0",
+    "GPL 3.0",
+    "CC-BY 3.0"
+   ],
+   "authors": [
+    "Mandi Paugh",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_halfmessy",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_halfmessy.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0",
+    "GPL 2.0"
+   ],
+   "authors": [
+    "Nila122",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_high_ponytail",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_high_ponytail.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "ElizaWy",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_idol",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_idol.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC0"
+   ],
+   "authors": [
+    "thecilekli",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_long_center_part",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_long_center_part.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC0"
+   ],
+   "authors": [
+    "thecilekli",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_long_messy2",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_long_messy2.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "Yamilian",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_loose",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_loose.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_messy1",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_messy1.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_page",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_page.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "Page",
+    "Johannes Sjölund (wulax)"
+   ]
+  },
+  {
+   "id": "hair_parted",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_parted.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Joe White",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_parted_side_bangs2",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_parted_side_bangs2.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "hair_shoulderl",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_shoulderl.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Lanea Zimmerman (Sharm)",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_spiked_liberty",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_spiked_liberty.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0"
+   ],
+   "authors": [
+    "Fabzy",
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hair_swoop",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_swoop.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman",
+    "Manuel Riecke (MrBeast)"
+   ]
+  },
+  {
+   "id": "hair_topknot_long",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_topknot_long.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "hair_topknot_short",
+   "kind": "hair",
+   "zPos": 120,
+   "file": "hair_topknot_short.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "hair",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0+",
+    "CC-BY 3.0+",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "hat_bandana_pirate_skull",
+   "kind": "hat",
+   "zPos": 121,
+   "file": "hat_bandana_pirate_skull.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "cloth",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY-SA 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "Fabzy"
+   ]
+  },
+  {
+   "id": "hat_bicorne_athwart_basic",
+   "kind": "hat",
+   "zPos": 130,
+   "file": "hat_bicorne_athwart_basic.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0"
+   ],
+   "authors": [
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hat_cap_leather_feather",
+   "kind": "hat",
+   "zPos": 131,
+   "file": "hat_cap_leather_feather.png",
+   "w": 128,
+   "h": 256,
+   "recolors": null,
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "Johannes Sjölund (wulax)",
+    "Matthew Krohn (Makrohn)",
+    "JaidynReiman"
+   ]
+  },
+  {
+   "id": "hat_helmet_barbuta",
+   "kind": "hat",
+   "zPos": 130,
+   "file": "hat_helmet_barbuta.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "metal",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY 3.0",
+    "CC-BY 4.0",
+    "GPL 2.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hat_helmet_greathelm",
+   "kind": "hat",
+   "zPos": 130,
+   "file": "hat_helmet_greathelm.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "metal",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY 3.0",
+    "CC-BY 4.0",
+    "GPL 2.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "hat_helmet_morion",
+   "kind": "hat",
+   "zPos": 135,
+   "file": "hat_helmet_morion.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "metal",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "CC-BY-SA 4.0",
+    "CC-BY-SA 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "ElizaWy",
+    "Sander Frenken (castelonia)"
+   ]
+  },
+  {
+   "id": "hat_helmet_sugarloaf",
+   "kind": "hat",
+   "zPos": 130,
+   "file": "hat_helmet_sugarloaf.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "metal",
+   "matchBodyColor": false,
+   "licenses": [
+    "CC-BY 3.0",
+    "CC-BY 4.0",
+    "OGA-BY 3.0",
+    "GPL 2.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16"
+   ]
+  },
+  {
+   "id": "torso_clothes_longsleeve_scoop",
+   "kind": "clothes",
+   "zPos": 35,
+   "file": "torso_clothes_longsleeve_scoop.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "cloth",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0",
+    "GPL 3.0"
+   ],
+   "authors": [
+    "bluecarrot16",
+    "ElizaWy",
+    "JaidynReiman",
+    "Stephen Challener (Redshrike)",
+    "Johannes Sjölund (wulax)"
+   ]
+  },
+  {
+   "id": "torso_clothes_tshirt_buttoned",
+   "kind": "clothes",
+   "zPos": 35,
+   "file": "torso_clothes_tshirt_buttoned.png",
+   "w": 128,
+   "h": 256,
+   "recolors": "cloth",
+   "matchBodyColor": false,
+   "licenses": [
+    "OGA-BY 3.0"
+   ],
+   "authors": [
+    "ElizaWy",
+    "JaidynReiman",
+    "Stephen Challener (Redshrike)",
+    "Johannes Sjölund (wulax)"
+   ]
   }
  ]
 }

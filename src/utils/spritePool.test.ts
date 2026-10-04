@@ -28,14 +28,15 @@ const hits = (pool: string[], keywords: string[]) =>
   keywords.filter(kw => pool.some(id => id.toLowerCase().includes(kw.toLowerCase())))
 
 describe('部件库规模（扩大后的基线）', () => {
-  it('总数不少于 160（原为 60）', () => {
-    expect(parts.length).toBeGreaterThanOrEqual(160)
+  it('总数不少于 220（四轮扩充后的基线）', () => {
+    expect(parts.length).toBeGreaterThanOrEqual(220)
   })
 
   it('关键类别都有足够选择', () => {
-    expect(HAIR_POOL.length, '发型').toBeGreaterThanOrEqual(40)
-    expect(TORSO_POOL.length, '衣着').toBeGreaterThanOrEqual(25)
-    expect(HEADWEAR_POOL.length, '头饰').toBeGreaterThanOrEqual(20)
+    // 发型是玩家区分 NPC 最快的一维（一眼分得开爆炸头与马尾），所以基线定得最高
+    expect(HAIR_POOL.length, '发型').toBeGreaterThanOrEqual(60)
+    expect(TORSO_POOL.length, '衣着').toBeGreaterThanOrEqual(55)
+    expect(HEADWEAR_POOL.length, '头饰').toBeGreaterThanOrEqual(30)
     expect(BEARD_POOL.length, '胡须').toBeGreaterThanOrEqual(10)
     expect(CAPE_POOL.length, '披风').toBeGreaterThanOrEqual(3)
     expect(ARMS_POOL.length, '护臂').toBeGreaterThanOrEqual(5)

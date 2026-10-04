@@ -17,7 +17,7 @@ import path from 'node:path'
 const SITE = process.env.SITE || 'http://localhost:5199/'
 const OUT = process.env.AUDIT_OUT || 'playtest-shots'
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-const PORT = Number(process.env.CDP_PORT || 9701)
+const PORT = 9701
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 const getJson = u => new Promise((res, rej) => {
   http.get(u, r => { let d = ''; r.on('data', c => d += c); r.on('end', () => { try { res(JSON.parse(d)) } catch (e) { rej(e) } }) }).on('error', rej)
@@ -65,20 +65,34 @@ await ev(`(()=>{const k='pale-notes-ui';let v={};try{v=JSON.parse(localStorage.g
   v.state.isApiKeyModalOpen=false;localStorage.setItem(k,JSON.stringify(v));return 1})()`)
 await send('Page.navigate', { url: SITE }); await sleep(9000)
 
-console.log('=== 1) 首次打开 ===')
+console.log('=== 1) 首次打开：主菜单 ===')
+/*
+  流程已改：打开网站先进**主菜单**，不再直接铺卡片墙。
+  （"门户大开"的问题：新玩家一眼看到九张卡与一堆导入导出按钮，
+   不知道自己该从哪开始，也看不出上次玩到哪了。）
+*/
 const first = JSON.parse(await ev(`(()=>{
   const T=document.body.innerText;
+  const bs=[...document.querySelectorAll('button')].map(b=>(b.textContent||'').trim());
   return JSON.stringify({
     hasTitle:/灯叙/.test(T),
-    hintKey:/密钥|API Key/.test(T),
-    worldButtons:(T.match(/开始/g)||[]).length,
+    hasNewGame: bs.some(x=>/开始新游戏/.test(x)),
+    hasWorldbook: bs.some(x=>/世界书/.test(x)),
+    hasLibrary: bs.some(x=>/卡片库/.test(x)),
+    hasSettings: bs.some(x=>/模型设置/.test(x)),
   });})()`))
-check('标题页认得出来是什么', first.hasTitle)
-check('提示了需要 API Key', first.hintKey)
-check('有多个内置世界可开始', first.worldButtons >= 3, String(first.worldButtons))
+check('主菜单认得出来是什么', first.hasTitle)
+check('有「开始新游戏」', first.hasNewGame)
+check('有「世界书」', first.hasWorldbook)
+check('有「卡片库」', first.hasLibrary)
+check('有「模型设置」', first.hasSettings)
 await shot('p2-01-title')
 
 console.log('\n=== 2) 选角 ===')
+// 主菜单 → 开始新游戏 → 卡片列表
+await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/开始新游戏/.test((x.textContent||'').trim()));if(b)b.click();return 1})()`)
+await sleep(2200)
+// 卡片列表 → 点第一张卡的「开始」
 await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>(x.textContent||'').trim()==='开始');if(b)b.click();return 1})()`)
 await sleep(2500)
 const setup = JSON.parse(await ev(`(()=>{
@@ -175,7 +189,7 @@ await sleep(2500)
 const back = JSON.parse(await ev(`(()=>{const G=__gameStore.getState();
   const bs=[...document.querySelectorAll('button')].map(b=>(b.textContent||'').trim());
   return JSON.stringify({ backToTitle:!G.isGameStarted, hist:(G.history||[]).length,
-    resumeButtons: bs.filter(x=>/继续游戏|回到这一局|读档|上次/.test(x)),
+    resumeButtons: bs.filter(x=>/继续游戏|回到这一局|尚未开场|进行中/.test(x)),
     stillHasWorld: !!__sessionStore.getState().world });})()`))
 console.log('  ' + JSON.stringify(back))
 check('回到标题页', back.backToTitle)
@@ -183,7 +197,7 @@ check('历史条数未变（进度没被清）', back.hist === beforeHist, `${be
 check('世界卡还在（能继续）', back.stillHasWorld)
 check('标题页有继续入口', back.resumeButtons.length > 0, JSON.stringify(back.resumeButtons))
 
-const resumed = await clickRe('/^继续游戏$|^回到这一局$|^上次/')
+const resumed = await clickRe('/继续游戏|回到这一局|尚未开场|进行中/')
 console.log('  点继续:', resumed)
 await sleep(3000)
 const after = JSON.parse(await ev(`(()=>{const G=__gameStore.getState();return JSON.stringify({
