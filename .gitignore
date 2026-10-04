@@ -11,3 +11,5 @@ __pycache__/
 .check/
 
 audit-shots/
+
+playtest-shots/

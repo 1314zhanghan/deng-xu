@@ -91,10 +91,25 @@ export function StartScreen() {
   const gameTime = useGameStore(s => s.time)
   const saveLocation = useGameStore(s => s.location)
   const savedPlayerName = useGameStore(s => s.playerName)
+  // 用于判断"这一局是否真的有内容"——开场生成失败时 history 为空，但在场角色已经写好了
+  const characters = useGameStore(s => s.characters)
   const sessionWorld = useSessionStore(s => s.world)
 
-  // 有世界卡 + 至少推进过一轮，才算可继续
-  const canResume = !!sessionWorld && history.length > 0
+  /**
+   * 是否显示「继续」入口。
+   *
+   * 原先要求 `history.length > 0`（至少推进过一轮）—— 但那会留下一个**死路**：
+   * 如果开场生成失败（API Key 无效、余额不足、网络抖动），history 就是 0，
+   * 而 session、在场角色、开局物品其实都已经写好了。
+   * 玩家此时回到标题页会发现自己**没有任何办法回到那一局**，
+   * 只能重新开一局 —— 明明点一下重试就能开始。
+   *
+   * 所以判据放宽：只要有会话（世界卡）就允许回去，
+   * 一句叙事都没有时把文案改成「重新开始本局」而不是「继续游戏」。
+   */
+  const hasSession = !!sessionWorld
+  const hasProgress = history.length > 0
+  const canResume = hasSession && (hasProgress || characters.length > 0)
 
   const lastNarrative = useMemo(() => {
     for (let i = history.length - 1; i >= 0; i--) {
@@ -338,7 +353,7 @@ export function StartScreen() {
                 <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/20 text-accent-lantern border border-accent-lantern/40">
-                      进行中
+                      {hasProgress ? '进行中' : '尚未开场'}
                     </span>
                     <h2 className="font-serif font-bold text-lg text-text-primary truncate">
                       {sessionWorld.title}
@@ -346,14 +361,18 @@ export function StartScreen() {
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-text-muted font-mono">
                     {savedPlayerName && <span>角色：{savedPlayerName}</span>}
-                    <span>已记录 {history.length} 条</span>
+                    <span>{hasProgress ? `已记录 ${history.length} 条` : '还没有生成开场'}</span>
                     {saveLocation && <span>位置：{saveLocation}</span>}
                     <span>世界时间：{fmtTime(gameTime)}</span>
                     {savedAtLabel && <span>存档于 {savedAtLabel}</span>}
                   </div>
-                  {lastNarrative && (
+                  {lastNarrative ? (
                     <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 font-serif">
                       …{lastNarrative.replace(/[#*`>]/g, '').slice(-90)}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-amber-300/90 leading-relaxed font-serif">
+                      这一局还没生成开场（上次可能是密钥或网络问题）。点右边按钮回到游戏，再点一次「重试」即可。
                     </p>
                   )}
                 </div>
@@ -362,7 +381,7 @@ export function StartScreen() {
                     onClick={handleResume}
                     className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-accent-lantern text-black rounded hover:bg-accent-lantern/90 transition-colors"
                   >
-                    <Play size={15} /> 继续游戏
+                    <Play size={15} /> {hasProgress ? '继续游戏' : '回到这一局'}
                   </button>
                   <button
                     onClick={() => setConfirmResume(true)}
