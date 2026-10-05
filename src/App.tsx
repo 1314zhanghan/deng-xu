@@ -5,6 +5,9 @@ import { StatusPanel } from '@/components/StatusPanel'
 import { GameMenuActions } from '@/components/GameMenuActions'
 import { MobileTabBar, type MobileTab } from '@/components/MobileTabBar'
 import { MobileSheet } from '@/components/MobileSheet'
+import { GlobalToast } from '@/components/GlobalToast'
+import { useBackNavigation } from '@/hooks/useBackNavigation'
+import { useNavStore } from '@/stores/nav'
 import { recordPlay } from '@/utils/recentPlays'
 import { PortraitPanel } from '@/components/PortraitPanel'
 import { InventoryPanel } from '@/components/InventoryPanel'
@@ -52,7 +55,13 @@ function App() {
     clearTruncationWarning
   } = useGameEngine()
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  /*
+    手机浮层状态放在 ui store 里（见 stores/ui.ts 的说明）：
+    useBackNavigation 需要订阅它才能给每个浮层压一条历史。
+    否则打开抽屉后按返回会把整页退掉。
+  */
+  const isMobileMenuOpen = useUIStore(s => s.mobileMenuOpen)
+  const setIsMobileMenuOpen = useUIStore(s => s.setMobileMenuOpen)
   const [rightPanelTab, setRightPanelTab] = useState<'inventory' | 'relationships'>('inventory')
   /**
    * 手机端当前打开的面板抽屉；null = 都关着。
@@ -61,67 +70,42 @@ function App() {
    * 于是点底栏什么都不出现（玩家反馈「底栏无效」）。
    * 现在它直接驱动 MobileSheet。
    */
-  const [mobileTab, setMobileTab] = useState<MobileTab | null>(null)
+  const mobileTab = useUIStore(s => s.mobileSheet) as MobileTab | null
+  const setMobileTab = useUIStore(s => s.setMobileSheet) as (t: MobileTab | null) => void
 
   const hasInitialized = useRef(false)
 
-  /**
-   * 手机返回键 / 浏览器后退键 → **退回上一级界面**，而不是退出网站。
-   *
-   * 为什么需要：手机上从浏览器打开时按系统返回键会直接离开页面回到主页，
-   * 玩家以为"退出到上一级"，结果整个游戏没了。
-   *
-   * 做法：打开浮层时压入一条**哨兵历史记录**，返回键先消费它。
-   *
-   * 这个功能我改了四版才对，把踩过的坑留在这里：
-   *  1. 用 `history.state?.__dxOverlay` 判断"栈顶是不是我的哨兵" ——
-   *     React effect 与 popstate 的时序交错时这个判断不可靠。
-   *  2. 让"切换页签"先关旧抽屉再开新的，而关旧抽屉里调了 `history.back()`
-   *     —— popstate 异步到达，把刚打开的新抽屉也关了。
-   *  3. 用一个"忽略自己发起的回退"的计数器，结果把**用户真正按的返回**
-   *     也当成自己的（我先加计数再调 back，用户的 popstate 永远被吞）。
-   *  4. **打开的动作必须是同步的**：如果压哨兵放在 effect 里，
-   *     用户（或测试）在 effect 执行前按返回，就会直接离开页面。
-   *
-   * 最终形态：**打开与关闭都在事件处理里同步改历史**，
-   * effect 只保留一个兜底（浮层通过其它路径被关掉时把哨兵收回来）。
-   */
-  /** 当前栈里是否有我们压的哨兵 */
-  const sentinelRef = useRef(false)
-  /** 当前浮层是靠弹栈关掉的（用于避免关闭时再弹一次） */
-  const closedByPopRef = useRef(false)
+  /*
+    返回键的完整逻辑搬到 useBackNavigation 里了 —— 它需要同时知道
+    "应用层级"（navStore）与"浮层状态"（ui store），放在 App 里会又长又绕。
+    这里只负责：浮层状态由它统一关闭。
+  */
+  useBackNavigation()
 
-  const openOverlay = useCallback((next: { tab?: MobileTab | null; menu?: boolean }) => {
-    if (!sentinelRef.current) {
-      sentinelRef.current = true
-      window.history.pushState({ __dxOverlay: true }, '')
+  /**
+   * 开局状态的层级兜底。
+   *
+   * 正常流程里 `StartScreen.handleLaunch` 会 push 一个 `game` 层级。
+   * 但**断点续玩**（刷新后从存档恢复）不会走那条路 —— 那时
+   * `isGameStarted` 已经是 true，层级却停在 menu，
+   * 于是返回键会以为"已经在主菜单"而要求按两次退出，
+   * 玩家在游戏里第一次按返回就被要求"再按一次退出"，很困惑。
+   */
+  useEffect(() => {
+    if (isGameStarted && useNavStore.getState().view.name !== 'game') {
+      useNavStore.getState().push({ name: 'game' })
     }
-    closedByPopRef.current = false
+  }, [isGameStarted])
+
+  /** 打开浮层。历史哨兵由 useBackNavigation 统一维护，这里只管状态 */
+  const openOverlay = useCallback((next: { tab?: MobileTab | null; menu?: boolean }) => {
     if (next.tab !== undefined) setMobileTab(next.tab)
     if (next.menu !== undefined) setIsMobileMenuOpen(next.menu)
   }, [])
 
   const closeOverlay = useCallback(() => {
-    const wasOpen = sentinelRef.current
-    sentinelRef.current = false
-    closedByPopRef.current = false
     setMobileTab(null)
     setIsMobileMenuOpen(false)
-    // 浮层是我们自己关的 → 把哨兵收回来，保持历史栈干净
-    if (wasOpen) window.history.back()
-  }, [])
-
-  useEffect(() => {
-    const onPop = () => {
-      if (!sentinelRef.current) return
-      // 浏览器已经帮我们弹掉了哨兵 → 只需关掉浮层，不要再 back 一次
-      sentinelRef.current = false
-      closedByPopRef.current = true
-      setMobileTab(null)
-      setIsMobileMenuOpen(false)
-    }
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
   }, [])
 
   // 应用成功跑起来 8 秒后，把「模块加载失败自动重载」的计数归零，
@@ -193,7 +177,18 @@ function App() {
   }
 
   if (!isGameStarted) {
-    return <StartScreen />
+    /*
+      `GlobalToast` 必须也挂在这里。
+      主菜单上的"再按一次返回即退出游戏"就是在这里提示的 ——
+      而 `statusMessage` 原先只在游戏界面的 StatusBar 里渲染，
+      于是主菜单上的提示**根本没有 DOM**，玩家看到的是"按键没反应"。
+    */
+    return (
+      <>
+        <StartScreen />
+        <GlobalToast />
+      </>
+    )
   }
 
   // 主界面顶部资源速览：只取前三个资源，避免自定义资源过多时挤爆
@@ -205,6 +200,7 @@ function App() {
       <div className="absolute inset-0 bg-radial-gradient from-transparent via-background/50 to-background pointer-events-none z-0" />
 
       <ApiKeyModal />
+      <GlobalToast />
       {/* 全身立绘面板（点角色头像打开） */}
       <PortraitPanel />
 

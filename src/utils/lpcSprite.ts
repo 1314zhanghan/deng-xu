@@ -360,8 +360,27 @@ const OUTER_LAYERS = new Set([
   'legs_skirt_overskirt',
 ])
 
-/** 用于打底的衬衣 —— 必须**完整覆盖躯干**，且款式朴素（不抢外层） */
+/**
+ * 用于打底的衬衣。
+ *
+ * ⚠️ 关键区别：**优先选声明了空 `recolors` 的部件**。
+ * 这类部件（`torso_clothes_longsleeve_formal` 系列、`torso_jacket_*` 系列）
+ * 在上游是"不上色"的 —— 它们保持素材自带的固有颜色，不跟着 `cloth` 调色板走。
+ * 于是它们能天然与外层（会被染成 cloth 色）形成层次：
+ * 「黑色燕尾服」的外层被染黑，而里面的白色正装衬衫仍然是白的。
+ *
+ * 这是我试了两轮才弄清的机制：
+ *  第一次以为"所有衣服共用一个 cloth 色，多色描述做不到"（见 RecolorSpec），
+ *  后来查 runtime.json 才发现这些部件根本没有 recolors 字段 ——
+ *  它们压根不参与换色，颜色是画死在 PNG 里的。
+ *
+ * 后两类（会被染色的普通衬衫）作为兜底，顺序在固有色的之后。
+ */
 const BASE_SHIRTS = [
+  // 不上色：保持固有颜色，天然形成内外层次
+  'torso_clothes_longsleeve_formal',
+  'torso_clothes_longsleeve_formal_striped',
+  // 上色：兜底（与外层同色，但至少有件衣服，不会裸露）
   'torso_clothes_longsleeve2',
   'torso_clothes_longsleeve',
   'torso_clothes_shortsleeve',
@@ -451,31 +470,57 @@ function pickRequired(
  * 注意各分支的候选池里**不能混入 elderly**（除非真的推断出老者）——
  * 之前无性别线索时回退到 HEADS_ADULT 全池，结果管家被抽到一张老人脸。
  */
+/**
+ * 按性别过滤一组头部件。
+ *
+ * `heads_human_male` / `heads_human_female` 之类靠 id 里的 male/female 判断。
+ * 性别未知时原样返回（这时不该硬塞一个性别的脸）。
+ */
+function byGender(pool: string[], gender?: 'male' | 'female'): string[] {
+  if (!gender) return pool
+  if (gender === 'female') {
+    const f = pool.filter(h => /female/.test(h))
+    return f.length ? f : pool
+  }
+  const m = pool.filter(h => /male/.test(h) && !/female/.test(h))
+  return m.length ? m : pool
+}
+
 function pickHead(rng: () => number, t: AppearanceTraits, isBroad: boolean): string {
   const take = (pool: string[], fb: string) =>
     pool.length ? pool[Math.floor(rng() * pool.length) % pool.length] : fb
 
+  /*
+    ⚠️ 每个年龄分支都**必须**过一遍性别过滤。
+    原先 child 与 elder 两个分支只按年龄取头、完全没看性别，
+    于是「十五六岁的黑发少年」拿到 `heads_human_female_small`、
+    「独眼茶摊老板…男人」拿到 `heads_human_female_elderly` ——
+    玩家看到的是"男性角色长了张女人的脸"，这类错误一眼就看得出来。
+    只有成年分支当时做了过滤，属于漏改。
+  */
   if (t.age === 'child') {
-    const kids = HEADS.filter(h => /_small$|_child$/.test(h))
+    const kids = byGender(HEADS.filter(h => /_small$|_child$/.test(h)), t.gender)
     if (kids.length) return take(kids, 'head_male')
   }
   if (t.age === 'elder') {
-    const elders = HEADS_ADULT.filter(h => /elderly/.test(h))
+    const elders = byGender(HEADS_ADULT.filter(h => /elderly/.test(h)), t.gender)
     if (elders.length) return take(elders, 'head_male')
   }
 
   // 非老者：先从候选里剔除 elderly，避免"年轻人长老年脸"
   const adultNonElder = HEADS_ADULT.filter(h => !/elderly/.test(h))
-  const maleish = adultNonElder.filter(h => /male/.test(h) && !/female/.test(h))
-  const femaleish = adultNonElder.filter(h => /female/.test(h))
 
-  if (t.gender === 'female') return take(femaleish.length ? femaleish : adultNonElder, 'head_male')
+  if (t.gender === 'female') {
+    const f = byGender(adultNonElder, 'female')
+    return take(f, 'head_male')
+  }
   if (t.gender === 'male') {
+    const m = byGender(adultNonElder, 'male')
     if (isBroad) {
-      const plump = maleish.filter(h => /plump|gaunt/.test(h))
+      const plump = m.filter(h => /plump|gaunt/.test(h))
       if (plump.length) return take(plump, 'head_male')
     }
-    return take(maleish.length ? maleish : adultNonElder, 'head_male')
+    return take(m, 'head_male')
   }
   // 没线索就在男女之间随机，但始终避开老者
   return take(adultNonElder.length ? adultNonElder : HEADS_ADULT, 'head_male')
@@ -553,6 +598,14 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     LPC 的用法是先穿衬衣再套外层。若不补打底，选到它们时角色
     就是一个裸露上身的人（我画了 37 件上衣对照才发现有 7 件如此）。
     打底件放在 torso 之前，靠 zPos 自然被外层盖住。
+  */
+  /*
+    ⚠️ 这里**做不到**"外层黑、内层白"这种分别配色。
+    换色系统只有一个 `cloth` 色，所有衣服部件共用（见 RecolorSpec）——
+    要给每个部件单独指定颜色，得改整个合成管线（按部件分别建映射表）。
+    所以打底层只能靠**部件本身的固有颜色**来产生层次：
+    优先选带皮革原色/素色的那些，它们在所有调色板下都不会被染成同一色。
+    这个限制写在这里，免得以后有人以为"多色描述"已经被支持了。
   */
   const underLayer = OUTER_LAYERS.has(torso) && BASE_SHIRTS.length
     ? [pick(rng, BASE_SHIRTS)]

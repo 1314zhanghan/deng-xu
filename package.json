@@ -25,6 +25,9 @@
     "check:menu": "node scripts/checks/main-menu.mjs",
     "check:sprites": "node scripts/checks/sprite-gallery.mjs",
     "check:mobile": "node scripts/checks/mobile.mjs",
+    "check:back": "node scripts/checks/back-nav.mjs",
+    "check:map": "node scripts/checks/map-gallery.mjs",
+    "check:npc": "node scripts/checks/npc-fidelity.mjs",
     "check:all": "node scripts/checks/all.mjs"
   },
   "dependencies": {

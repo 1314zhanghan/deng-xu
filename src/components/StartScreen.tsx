@@ -16,6 +16,7 @@ import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SaveManager } from '@/components/SaveManager'
 import { WorldPackManager } from '@/components/WorldPackManager'
 import { MainMenu } from '@/components/MainMenu'
+import { useNavStore } from '@/stores/nav'
 import { WorldbookPreview } from '@/components/WorldbookPreview'
 
 /**
@@ -48,19 +49,26 @@ export function StartScreen() {
   const importRef = useRef<HTMLInputElement>(null)
 
   /**
-   * 首页视图状态机。
+   * 首页层级。
    *
    * 之前打开网站**直接就是世界书卡片墙** —— 一种"门户大开"的感觉：
    * 新玩家一眼看到九张卡与一堆导入导出按钮，不知道自己该从哪开始，
    * 也看不出上次玩到哪了。卡片墙本质是"资料库"，不该当门厅。
    *
    * 现在：menu（主菜单）→ library（选世界开新局 / 卡片库）| worldbook（看设定）
+   *
+   * ⚠️ 这套层级**放在 navStore 里而不是这里**：
+   *  手机返回键需要知道"上一级是什么"才能逐级后退。
+   *  层级藏在组件内部状态里时，返回键没有任何东西可退，
+   *  只能一路穿透回浏览器主页 —— 这个问题被玩家反馈了两次。
    */
-  const [view, setView] = useState<'menu' | 'library' | 'worldbook'>('menu')
-  /** 正在预览的世界卡 id */
-  const [previewId, setPreviewId] = useState<string | null>(null)
-  /** 从「世界书」进来时，卡片墙只展示内置世界（资料库则展示全部） */
-  const [worldbookMode, setWorldbookMode] = useState(false)
+  const view = useNavStore(s => s.view)
+  const navPush = useNavStore(s => s.push)
+  const navBack = useNavStore(s => s.back)
+  /** 卡片墙是否只展示内置世界（从「世界书」进来时为真） */
+  const worldbookMode = view.name === 'library' ? !!view.worldbookMode : false
+  /** 正在预览的世界卡 id —— 就是 worldbook 这一层本身携带的 */
+  const previewId = view.name === 'worldbook' ? view.worldId : null
   /**
    * 世界书搜索与筛选。
    * 内置世界到 9 个之后列表已经变长，用户再导入几十张就会很难找 ——
@@ -280,6 +288,8 @@ export function StartScreen() {
     resetGame()
     setPendingSetup(null)
     setSetupWorldId(worldId)
+    // 把"选角"也记成一个层级，返回键才能从选角退回上一级
+    navPush({ name: 'setup', worldId })
   }
 
   const handleLaunch = () => {
@@ -295,23 +305,35 @@ export function StartScreen() {
     */
     setPendingSetup(null)
     startGame()
+    // 进入游戏界面 = 最深的一层，返回键要从这里逐级退回主菜单
+    navPush({ name: 'game' })
   }
 
   if (isGameStarted) return null
 
-  // 会话配置独立成一屏
-  if (setupWorld) {
+  /*
+    会话配置独立成一屏。
+    显示条件必须**跟随路由层级**（view.name === 'setup'）而不只是 `setupWorld` ——
+    否则用返回键从选角退回时 `setupWorldId` 还留着，SessionSetup 会继续渲染，
+    看起来就是"返回键在选角界面没反应"。
+  */
+  if (setupWorld && view.name === 'setup') {
     return (
       <SessionSetup
         world={setupWorld}
-        onCancel={() => { setSetupWorldId(null); setPendingSetup(null) }}
+        onCancel={() => {
+          setSetupWorldId(null)
+          setPendingSetup(null)
+          // 从选角返回上一级（卡片库/世界书），而不是直接跳回主菜单
+          navBack()
+        }}
         onLaunch={handleLaunch}
       />
     )
   }
 
   /** 主菜单视图：不渲染卡片墙，只有五个入口 */
-  if (view === 'menu') {
+  if (view.name === 'menu') {
     return (
       <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
         <div className="absolute inset-0 bg-neutral-900 opacity-[0.04] pointer-events-none" />
@@ -330,9 +352,9 @@ export function StartScreen() {
         <main className="relative z-10 flex-1 overflow-y-auto">
           <MainMenu
             onContinue={handleResume}
-            onNewGame={() => { setWorldbookMode(false); setView('library') }}
-            onWorldbook={() => { setWorldbookMode(true); setView('library') }}
-            onLibrary={() => { setWorldbookMode(false); setView('library') }}
+            onNewGame={() => navPush({ name: 'library', worldbookMode: false })}
+            onWorldbook={() => navPush({ name: 'library', worldbookMode: true })}
+            onLibrary={() => navPush({ name: 'library', worldbookMode: false })}
             onOpenSettings={() => setApiKeyModalOpen(true)}
             onPickWorld={id => beginSetup(id)}
           />
@@ -343,7 +365,7 @@ export function StartScreen() {
 
   /** 世界书预览：只读地看一个世界的全部设定 */
   const previewWorld = previewId ? worlds.find(w => w.id === previewId) : null
-  if (view === 'worldbook' && previewWorld) {
+  if (view.name === 'worldbook' && previewWorld) {
     return (
       <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
         <div className="absolute inset-0 bg-neutral-900 opacity-[0.04] pointer-events-none" />
@@ -352,9 +374,9 @@ export function StartScreen() {
           <WorldbookPreview
             world={previewWorld}
             isBuiltin={previewWorld.builtin}
-            onBack={() => { setPreviewId(null); setView('worldbook') }}
+            onBack={navBack}
             onEdit={() => { setEditingWorldId(previewWorld.id); setCardEditorOpen(true) }}
-            onStart={() => { setWorldbookMode(false); setView('library'); setSetupWorldId(previewWorld.id) }}
+            onStart={() => { setSetupWorldId(previewWorld.id); navPush({ name: 'setup', worldId: previewWorld.id }) }}
           />
         </main>
       </div>
@@ -380,7 +402,7 @@ export function StartScreen() {
             加上主菜单之后，这里必须给出回去的路。
           */}
           <button
-            onClick={() => { setPreviewId(null); setView('menu') }}
+            onClick={() => navPush({ name: 'menu' })}
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors shrink-0"
             title="返回主菜单"
           >
@@ -615,7 +637,7 @@ export function StartScreen() {
                   现在：看设定 → 满意了再点「开始」。
                 */}
                 <button
-                  onClick={() => { setPreviewId(world.id); setView('worldbook') }}
+                  onClick={() => navPush({ name: 'worldbook', worldId: world.id })}
                   className="relative block w-full h-36 overflow-hidden bg-black/40 text-left"
                   title="查看世界书详情"
                 >
@@ -674,7 +696,7 @@ export function StartScreen() {
                     </button>
 
                     <button
-                      onClick={() => { setPreviewId(world.id); setView('worldbook') }}
+                      onClick={() => navPush({ name: 'worldbook', worldId: world.id })}
                       title="查看世界书详情（只读）"
                       className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40 transition-colors"
                     >

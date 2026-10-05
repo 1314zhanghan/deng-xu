@@ -1,0 +1,103 @@
+import { create } from 'zustand'
+
+/**
+ * 应用层级（"视野"）。
+ *
+ * 为什么要把它做成显式状态，而不是散在各个组件的 useState 里：
+ *
+ *  手机返回键需要知道"上一条路"是什么。原先层级散落各处 ——
+ *  App 管游戏界面、StartScreen 自己用 `view` 状态管主菜单/卡片库/世界书 ——
+ *  于是返回键没有任何"上一级"可以退：它只能一路穿透到浏览器，
+ *  把玩家直接送回浏览器主页。这是同一个问题被反馈了两次的原因。
+ *
+ *  现在所有层级都写在这里，返回键只需沿着这个栈往上退。
+ *
+ * 层级顺序（从深到浅）：
+ *   game → setup → worldbook → library → menu
+ *
+ * `stack` 记录走过的路径，用来支持"层层后退"；
+ * 它不是浏览器的历史栈，而是**应用自己的**层级栈，
+ * 和浏览器历史一一对应地同步（见 useBackNavigation）。
+ */
+export type View =
+  | { name: 'menu' }
+  | { name: 'library'; worldbookMode?: boolean }
+  | { name: 'worldbook'; worldId: string }
+  | { name: 'setup'; worldId: string }
+  | { name: 'game' }
+
+interface NavState {
+  /** 当前层级 */
+  view: View
+  /** 走过的层级（不含当前），最后一个是"上一级" */
+  stack: View[]
+  /** 跳到某个层级（同时压入一条浏览器历史，保证返回键有东西可退） */
+  push: (v: View) => void
+  /** 回到上一级（同时弹掉一条历史）；已经在最浅层时返回 false */
+  back: () => boolean
+  /** 只改层级、不碰历史（供 popstate 处理器使用） */
+  backSilent: () => boolean
+  /** 清空层级栈并回到主菜单 */
+  reset: () => void
+}
+
+/**
+ * 层级与浏览器历史**必须一一对应**。
+ *
+ * ⚠️ 这是返回键功能被反馈三次的最终病根：
+ *   前几版只维护 nav 的 stack，历史却没有同步增长。
+ *   于是"游戏界面"这种深层级在历史里只占**一条**，
+ *   按一次返回就跨过好几个层级直接退出页面。
+ *   实测表现：打开抽屉按返回，抽屉关了但页面也退出了。
+ *
+ * 现在：push 压一条历史、back 弹一条、backSilent 只改状态（用于 popstate 回调，
+ * 因为那时浏览器已经替我们弹过了）。
+ */
+export const useNavStore = create<NavState>()((set, get) => ({
+  view: { name: 'menu' },
+  stack: [],
+
+  push: (v) => {
+    const cur = get().view
+    // 同一层级重复压栈没有意义（例如反复点同一个世界书）
+    if (JSON.stringify(cur) === JSON.stringify(v)) return
+    set({ view: v, stack: [...get().stack, cur] })
+    // 与层级同步压入历史：返回键才有东西可退
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ __dxNav: true, depth: get().stack.length }, '')
+    }
+  },
+
+  back: () => {
+    const { stack } = get()
+    if (!stack.length) return false
+    // 交给浏览器弹栈，popstate 里再走 backSilent —— 历史与层级保持一致
+    if (typeof window !== 'undefined') {
+      window.history.back()
+      return true
+    }
+    const prev = stack[stack.length - 1]
+    set({ view: prev, stack: stack.slice(0, -1) })
+    return true
+  },
+
+  /**
+   * 只改层级、不碰历史。
+   * 由 `useBackNavigation` 的 popstate 处理器调用 ——
+   * 那时浏览器**已经**弹掉了一条，再弹一次就会多退一级。
+   */
+  backSilent: () => {
+    const { stack } = get()
+    if (!stack.length) return false
+    const prev = stack[stack.length - 1]
+    set({ view: prev, stack: stack.slice(0, -1) })
+    return true
+  },
+
+  reset: () => set({ view: { name: 'menu' }, stack: [] }),
+}))
+
+/** 这个层级是否算"最外层"（在这里再退就该问玩家要不要退出） */
+export function isRootView(v: View): boolean {
+  return v.name === 'menu'
+}

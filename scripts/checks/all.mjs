@@ -24,6 +24,9 @@ const CHECKS = [
   { name: '玩家体验', file: 'playtest.mjs', port: 9871 },
   { name: '出错路径', file: 'error-paths.mjs', port: 9872 },
   { name: '手机端', file: 'mobile.mjs', port: 9873 },
+  { name: '返回键层级', file: 'back-nav.mjs', port: 9874 },
+  { name: '地图昼夜', file: 'map-gallery.mjs', port: 9875 },
+  { name: 'NPC 贴合度', file: 'npc-fidelity.mjs', port: 9876 },
 ]
 
 const only = process.argv.slice(2)

@@ -171,14 +171,32 @@ check('进入了选角界面', m5.inSetup)
 check('有名字输入框', m5.hasName)
 check('能从选角返回', m5.canBack)
 
-console.log('\n=== 5) 返回链路：选角 → 主菜单 ===')
-await clickRe('/返回卡库/')
+console.log('\n=== 5) 返回链路：选角 → 逐级后退 ===')
+/*
+  从选角返回应当退到**它的上一级**（世界书详情），而不是直接跳回主菜单 ——
+  返回键的语义就是"逐级后退"。
+  原先这里断言"返回后立刻是主菜单"，那是按旧实现（组件内部 setView 直接跳）
+  写的；改成层级链之后必须逐级验证。
+*/
+await clickRe('/返回卡库|返回/')
 await sleep(1800)
-console.log('  返回后:', await ev(`(document.body.innerText.match(/主菜单|卡片库|世界书/)||['?'])[0]`))
-console.log('  点主菜单:', await clickRe('/^主菜单$/'))
-await sleep(2000)
+const afterSetup = JSON.parse(await ev(`JSON.stringify({
+  view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
+  hasDetailBtns: /用这个世界开始/.test(document.body.innerText),
+})`))
+console.log('  返回后:', JSON.stringify(afterSetup))
+check('从选角退到上一级（世界书详情）', afterSetup.view === 'worldbook' && afterSetup.hasDetailBtns, afterSetup.view)
+
+await ev(`window.history.back()`); await sleep(1500)
+const atLibrary = JSON.parse(await ev(`JSON.stringify({
+  view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
+})`))
+console.log('  再退一级:', JSON.stringify(atLibrary))
+check('再退一级到卡片库/世界书列表', atLibrary.view === 'library', atLibrary.view)
+
+await ev(`window.history.back()`); await sleep(1500)
 const m6 = JSON.parse(await snap())
-check('回到了主菜单', m6.menuEntries.some(x => /开始新游戏/.test(x)))
+check('再退一级回到主菜单', m6.menuEntries.some(x => /开始新游戏/.test(x)))
 check('主菜单标题还在', m6.hasMenuTitle)
 await shot('menu-05-back')
 

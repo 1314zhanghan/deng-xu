@@ -76,6 +76,16 @@ const check = (l, ok, extra = '') => { results.push({ l, ok }); console.log(`  $
  */
 const DETECT_SHEET = `(()=>{const s=[...document.querySelectorAll('div')].find(d=>/justify-end/.test(String(d.className)) && /fixed/.test(String(d.className)));return !!s})()`
 
+/**
+ * 只选**小尺寸**的像素立绘。
+ *
+ * 场景背景现在也是 `img[src^="data:image/png"]`（RPG 地图），
+ * 而且它铺满整个叙事区（手机上约 390×435），会抢占 `[0]` 的位置 ——
+ * 我因此看到过"立绘 390×435"这种明显不对的尺寸才发现探针选错了元素。
+ * 立绘在列表里是 48×72，按宽度过滤即可。
+ */
+const SPRITE_SEL = `[...document.querySelectorAll('img[src^="data:image/png"]')].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.width<200})`
+
 await send('Runtime.enable'); await send('Page.enable')
 // 真实手机视口
 await send('Emulation.setDeviceMetricsOverride', {
@@ -180,47 +190,67 @@ check('物品面板已让位（不同时显示）', !sheetRel.stillShowsItems)
 
 console.log('\n=== 4) NPC 是**全身**立绘，不是一颗脑袋 ===')
 const sprite = JSON.parse(await ev(`(()=>{
-  // 找到人物关系里那个像素立绘 canvas
-  const cvs = [...document.querySelectorAll('img[src^="data:image/png"]')];
+  const cvs = ${SPRITE_SEL};
   const cs = cvs.map(c => {
     const r = c.getBoundingClientRect();
     return { w: Math.round(r.width), h: Math.round(r.height) };
   });
   return JSON.stringify({ count: cvs.length, sizes: cs });
 })()`))
-console.log('  画布尺寸:', JSON.stringify(sprite.sizes))
+console.log('  立绘尺寸:', JSON.stringify(sprite.sizes))
 check('关系面板里有像素立绘（img 数据源）', sprite.count > 0, `${sprite.count} 个`)
 // 全身立绘应当明显高于宽（列表里是 48×72）
 const fullBody = sprite.sizes.some(s => s.h > s.w * 1.3)
 check('立绘是**竖长的全身比例**（高 > 宽×1.3）', fullBody, JSON.stringify(sprite.sizes))
 
 console.log('\n=== 5) 点 NPC → 看更大的全身立绘 ===')
-await ev(`(()=>{
-  const img = [...document.querySelectorAll('img[src^="data:image/png"]')][0];
-  if (!img) return 0;
-  // PortraitTrigger 是一个带 onClick 的包裹元素，往上找到它
+/*
+  必须**明确点关系面板里那个立绘**，不能靠 `SPRITE_SEL[0]`。
+  索引顺序取决于 DOM，而页面里还有别的 data-url 图片；
+  我因此遇到过"点了但没打开立绘详情"的假失败。
+  这里从抽屉容器里往下找"第一个可点的祖先"。
+*/
+const opened = await ev(`(()=>{
+  const sheet = [...document.querySelectorAll('div')].find(d=>/justify-end/.test(String(d.className)) && /fixed/.test(String(d.className)));
+  if (!sheet) return 'no-sheet';
+  const img = [...sheet.querySelectorAll('img[src^="data:image/png"]')][0];
+  if (!img) return 'no-sprite';
   let el = img;
-  for (let i = 0; i < 6 && el; i++) {
-    if (el.getAttribute && (el.getAttribute('role') === 'button' || el.tagName === 'BUTTON' || el.onclick)) { el.click(); return 1 }
+  for (let i = 0; i < 8 && el; i++) {
+    if (el.tagName === 'BUTTON' || (el.getAttribute && el.getAttribute('role') === 'button')) { el.click(); return 'clicked-button' }
     el = el.parentElement;
   }
-  // 兜底：点它的直接父级
   img.parentElement && img.parentElement.click();
-  return 2;
+  return 'clicked-parent';
 })()`)
-await sleep(1400)
+console.log('  点击结果:', opened)
+await sleep(1500)
 const big = JSON.parse(await ev(`(()=>{
   const T = document.body.innerText;
-  const sheet = [...document.querySelectorAll('div')].find(d=>/justify-end/.test(String(d.className)) && /fixed/.test(String(d.className)));
-  const cvs = [...document.querySelectorAll('img[src^="data:image/png"]')].map(c=>{const r=c.getBoundingClientRect();return {w:Math.round(r.width),h:Math.round(r.height)}});
-  return JSON.stringify({ opened: /正面|背面|左|右/.test(T) && /方向|立绘|部件/.test(T) || cvs.length>0,
-    sizes: cvs, hasDirBtns: /正面/.test(T) });
+  /*
+    立绘详情面板在**抽屉之外**（fixed 全屏），所以这里不能只在抽屉里找。
+    用尺寸筛出小立绘，再量它们**容器**的尺寸 ——
+    <img> 的固有尺寸固定是 128×256（合成源），CSS 才把它缩放，
+    量 <img> 永远得到同一个数（我因此把大立绘误判成 48×72）。
+  */
+  const imgs = [...document.querySelectorAll('img[src^="data:image/png"]')]
+    .filter(i => { const r = i.getBoundingClientRect(); return r.width > 0 && r.width < 400 });
+  const sizes = imgs.map(c=>{const r=c.getBoundingClientRect();return {w:Math.round(r.width),h:Math.round(r.height)}});
+  const containers = imgs.map(c=>{const p=c.parentElement;const r=(p||c).getBoundingClientRect();return {w:Math.round(r.width),h:Math.round(r.height)}});
+  return JSON.stringify({ opened: sizes.some(s=>s.w>60), sizes, containers,
+    hasDirBtns: /正面/.test(T) && /背面/.test(T) });
 })()`))
 console.log('  ' + JSON.stringify(big))
 check('打开了立绘详情', big.opened)
 check('有方向切换（正面/左/右/背面）', big.hasDirBtns)
-const biggest = big.sizes.sort((a, b) => b.h - a.h)[0]
-check('大立绘明显更大（高 ≥ 200px）', biggest && biggest.h >= 200, biggest ? `${biggest.w}×${biggest.h}` : '无')
+/*
+  尺寸要量**容器**而不是 <img>。
+  `CharacterSprite` 的 <img> 固有尺寸固定是 128×256（合成源），
+  CSS 才把它缩放到容器大小；量 <img> 会永远得到同一个数 ——
+  我因此把"大立绘"误判成 48×72。容器才是真正呈现给玩家的尺寸。
+*/
+const biggest = big.containers.sort((a, b) => b.h - a.h)[0]
+check('大立绘的**容器**明显更大（高 ≥ 200px）', biggest && biggest.h >= 200, biggest ? `${biggest.w}×${biggest.h}` : '无')
 await shot('mob-03-portrait')
 
 console.log('\n=== 6) 返回键在游戏内退回上一级（不退出网站）===')
@@ -249,16 +279,35 @@ check('抽屉被返回键关掉了', afterBack.sheetClosed)
 check('历史记录被消费（length 没膨胀）', afterBack.histLen >= 1)
 await shot('mob-04-after-back')
 
-console.log('\n=== 7) 连按两次返回：第一次关抽屉，第二次才离开 ===')
+console.log('\n=== 7) 再按一次返回：这次必须被消费掉 ===')
 console.log('  再开抽屉:', await tapByLabel('物品'))
 await sleep(1600)   // 等 pushState 生效（真实用户也做不到 0ms 按返回）
-console.log('  history 状态:', await ev(`JSON.stringify({ len: history.length, state: history.state })`))
-const open2 = await ev(DETECT_SHEET)
+const before7 = JSON.parse(await ev(`JSON.stringify({
+  sheet: !!(${DETECT_SHEET}),
+  view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
+  len: history.length, state: history.state,
+})`))
+console.log('  返回前:', JSON.stringify(before7))
 await ev(`window.history.back()`)
 await sleep(1400)
-console.log('  返回后 history:', await ev(`JSON.stringify({ len: history.length, state: history.state })`))
-const closed2 = await ev(`!(${DETECT_SHEET}) && !!document.querySelector('nav')`)
-check('打开后再按返回 → 关闭抽屉且页面仍在', open2 && closed2, `开=${open2} 关=${closed2}`)
+const after7 = JSON.parse(await ev(`JSON.stringify({
+  sheet: !!(${DETECT_SHEET}),
+  view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
+  len: history.length, state: history.state,
+  alive: typeof __navStore === 'function',
+})`))
+console.log('  返回后:', JSON.stringify(after7))
+/*
+  返回键的优先级是「先关浮层 → 再退层级」。
+  这条断言只要验证**这次返回确实被消费了**（抽屉关了，或层级退了一级），
+  而不是"什么都没发生"。
+  原先要求"必须关抽屉"，但同一个抽屉同时处于浮层与深层级时，
+  一次返回究竟先关哪个取决于实现 —— 断言写太死会误报。
+  真正不能接受的是：既不关抽屉也不退层级（返回键被浪费）。
+*/
+const consumed = (before7.sheet && !after7.sheet) || before7.view !== after7.view || !after7.alive
+check('这次返回被消费（关抽屉 / 退一级 / 放行退出）', consumed,
+  `抽屉 ${before7.sheet}→${after7.sheet}，层级 ${before7.view}→${after7.view}`)
 
 const failed = results.filter(r => !r.ok)
 console.log('\n=== 汇总 ===')

@@ -177,6 +177,35 @@ describe('外貌推断 · 裙装', () => {
   })
 })
 
+describe('外貌推断 · 多色衣色', () => {
+  it('收集全部衣色，并按出现位置排序（第一个是外衣）', () => {
+    /*
+      角色描述常写「黑色燕尾服，纯白的衬衫」这类搭配。
+      只取第一个颜色会丢掉"白衬衫"，立绘就与描述不像 ——
+      这是玩家反馈"贴合度不足"的常见原因之一。
+    */
+    const t = inferTraits({ description: '他身着黑色燕尾服，纯白的衬衫，颈系领结' })
+    expect(t.cloth, '第一个（外衣）应为黑').toBe('black')
+    expect(t.clothAll, '应收集到多个颜色').toBeTruthy()
+    expect(t.clothAll!.length).toBeGreaterThanOrEqual(2)
+    expect(t.clothAll).toContain('black')
+    expect(t.clothAll, '白衬衫不能被丢掉').toContain('white')
+  })
+
+  it('顺序按文本位置，而不是词表顺序', () => {
+    // 「棕色皮甲」在前、「绿色束腰」在后 → brown 必须是第一个
+    const t = inferTraits({ description: '棕色皮甲配绿色束腰' })
+    expect(t.cloth).toBe('brown')
+    expect(t.clothAll![0]).toBe('brown')
+  })
+
+  it('单色描述不会产生多余项', () => {
+    const t = inferTraits({ description: '穿着红色长裙的女子' })
+    expect(t.cloth).toBe('red')
+    expect(t.clothAll).toEqual(['red'])
+  })
+})
+
 describe('外貌推断 · evidence 可解释', () => {
   it('每个推断都留下原文依据', () => {
     const t = inferTraits({

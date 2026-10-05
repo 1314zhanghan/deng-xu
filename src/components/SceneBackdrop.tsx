@@ -1,48 +1,64 @@
 import { useMemo } from 'react'
 import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
-import { generateScene, getSceneAsset } from '@/utils/sceneArt'
+import { getSceneAsset } from '@/utils/sceneArt'
+import { generateMap, ARCHETYPE_TO_MAP, isNightHour, timeOfDayLabel, type MapArchetype } from '@/utils/rpgMap'
 
 /**
- * 叙事区背景。
+ * 叙事区背景 —— **RPG 俯瞰瓦片地图**，随游戏内时间切换昼夜。
  *
- * 由 AI 通过 SET_SCENE 切换场景 id，渲染成一张图
- * （程序化生成，或素材表里指定的真实图片）。
+ * 为什么重做（玩家反馈「割裂且意义不明」+「时间变化看不出来」）：
+ *  旧版是"天空/远山/中景/近景"四层横向色块。两个问题：
+ *   1. 色块没有可辨认的语义 —— 看不出那是路、是屋顶、还是水；
+ *      而且每个场景都是同一种"三条横带"构图，像同一张图换了颜色。
+ *   2. 完全不随游戏内时间变化，想知道白天黑夜必须打开上边栏看钟。
  *
- * ⚠️ 这里踩过一个坑，改法记下来免得再犯：
- *   第一版用「图片 opacity 0.28 + 上面盖 from-background/70 via-background/80 to-background」，
- *   而 background 是 #0c0c0c。底部完全不透明 ⇒ 最终亮度约
- *   0.28×0.3 + 0.72×0.05 ≈ 0.12，整块就是纯黑，等于没画。
- *   教训：验证"背景显示了没"不能只看 DOM 里有没有 <img>，必须看**渲染后的像素**。
+ *  现在改成 16×16 一格的俯瞰地图：草地/道路/水面/屋顶/树干形状可辨认；
+ *  并且 **19:00 后自动换夜景配色**（整体压暗偏蓝紫 + 窗户与路灯亮起暖光），
+ *  不用看钟就能感到时间在走。
  *
- * 现在改成：图片保持较高可见度，只用一层**上下重、中间透**的渐变压边，
- * 既让场景看得清，又保证正文压在上面仍然能读。
+ * ⚠️ 保留上一版的一个教训：
+ *  曾经用「图片 opacity 0.28 + 上面盖不透明渐变」，最终亮度只剩约 0.12 —— 等于没画。
+ *  验证"背景显示了没"不能只看 DOM 里有没有 <img>，必须看**渲染后的像素**。
+ *  所以图保持接近全不透明，压暗交给遮罩，且遮罩中间最轻（0.22）。
  */
 export function SceneBackdrop({ className = '' }: { className?: string }) {
   const sceneId = useGameStore(s => s.sceneId)
+  const hour = useGameStore(s => s.time.hour)
   const world = useSessionStore(s => s.world)
 
-  const scene = useMemo(() => {
-    if (!sceneId) return null
-    return generateScene(sceneId, world?.avatarStyle, world?.avatarTone, getSceneAsset(sceneId))
-  }, [sceneId, world?.avatarStyle, world?.avatarTone])
+  const night = isNightHour(hour)
 
-  if (!scene) return null
+  const map = useMemo(() => {
+    const asset = getSceneAsset(sceneId)
+    // 没有场景 id 时用街景兜底，而不是什么都不画 —— 空背景更"意义不明"
+    const arche: MapArchetype = (asset && ARCHETYPE_TO_MAP[asset.archetype]) || 'street'
+    // seed 用场景 id + 色调，保证同一场景稳定，不会每次渲染都换一张图
+    const seed = `${sceneId || 'default'}:${world?.avatarStyle || 'ink'}`
+    return generateMap(arche, seed, night)
+  }, [sceneId, world?.avatarStyle, night])
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`} aria-hidden="true">
-      {/* 场景图：保持接近全不透明。压暗交给下面的渐变，而不是把图本身调透明 */}
       <img
-        src={scene.dataUrl}
+        src={map.dataUrl}
         alt=""
+        /* 像素图必须关闭插值，否则放大后糊成一片 */
+        style={{ imageRendering: 'pixelated' }}
         className="w-full h-full object-cover opacity-100 transition-opacity duration-[1200ms]"
       />
 
       {/*
+        夜景再叠一层冷色，加强"天黑了"的观感。
+        不透明度压得很低，只是染色，不参与"能不能看清"的问题。
+      */}
+      {night && (
+        <div className="absolute inset-0" style={{ background: 'rgba(30,40,90,0.16)' }} />
+      )}
+
+      {/*
         可读性遮罩。
-        这里的关键是**别把遮罩做厚**：第一版 middle 用了 0.45 的不透明黑，
-        加上图本身 opacity 0.28，最终亮度只剩约 0.12×原图 —— 等于没画。
-        实测原始场景图亮度约 30–60/255，遮罩超过 ~0.5 就几乎看不见了。
+        关键是**别把遮罩做厚**：middle 超过 ~0.5 就几乎看不见图了。
         现在：顶端/底端重（压住状态栏与输入框），中间最轻（0.22）。
       */}
       <div
@@ -62,9 +78,14 @@ export function SceneBackdrop({ className = '' }: { className?: string }) {
         }}
       />
 
-      {/* 右上角标出当前场景，便于确认 AI 切对了 */}
-      <div className="absolute top-2 right-3 text-[10px] font-mono text-text-muted/70 select-none">
-        {getSceneAsset(sceneId)?.label || ''}
+      {/*
+        右上角标出当前场景与昼夜。
+        昼夜主要靠画面本身表达，这里只做很克制的补充。
+      */}
+      <div className="absolute top-2 right-3 text-[10px] font-mono text-text-muted/70 select-none flex items-center gap-1.5">
+        <span>{night ? '🌙' : '☀'}</span>
+        <span>{getSceneAsset(sceneId)?.label || ''}</span>
+        <span className="text-text-muted/40">{timeOfDayLabel(hour)}</span>
       </div>
     </div>
   )

@@ -239,7 +239,7 @@ describe('zPos 层级必须符合 LPC 约定（叠错层会画出穿模）', () 
       'torso_aprons_overalls', 'torso_aprons_suspenders', 'torso_jacket_tabard',
       'torso_jacket_pockets', 'legs_skirt_overskirt',
     ]
-    const BASE = /^torso_clothes_(longsleeve2?|shortsleeve|tshirt|longsleeves2)$/
+    const BASE = /^torso_clothes_(longsleeve2?|longsleeve_formal(_striped)?|shortsleeve|tshirt|longsleeves2)$/
     const { recipeFor } = await import('@/utils/lpcSprite')
 
     for (const outer of OUTER) {

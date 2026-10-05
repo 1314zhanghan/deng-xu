@@ -44,14 +44,16 @@ if (import.meta.env.DEV) {
     import('./stores/game'),
     import('./stores/session'),
     import('./stores/library'),
-  ]).then(([ui, game, session, library]) => {
+    import('./stores/nav'),
+  ]).then(([ui, game, session, library, nav]) => {
     Object.assign(window, {
       __uiStore: ui.useUIStore,
       __gameStore: game.useGameStore,
       __sessionStore: session.useSessionStore,
       __libraryStore: library.useLibraryStore,
+      __navStore: nav.useNavStore,
     })
-    console.log('[dev] store 已挂到 window：__uiStore / __gameStore / __sessionStore / __libraryStore')
+    console.log('[dev] store 已挂到 window：__uiStore / __gameStore / __sessionStore / __libraryStore / __navStore')
   })
 }
 

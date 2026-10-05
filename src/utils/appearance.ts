@@ -26,8 +26,16 @@ export interface AppearanceTraits {
   hairStyle?: string[]
   /** 肤色（LPC body 调色板名） */
   skin?: string
-  /** 衣色（LPC cloth 调色板名） */
+  /** 衣色（LPC cloth 调色板名）—— 描述里最靠前的那一种（通常是外衣） */
   cloth?: string
+  /**
+   * 描述里提到的**全部**衣色，按出现位置排序。
+   *
+   * 为什么要全部：NPC 描述常写「黑色燕尾服，纯白的衬衫」这类多色搭配，
+   * 只取第一个会丢掉"白衬衫"，立绘就与描述不像。
+   * 配方用它来挑打底层（外层深色 + 内层浅色，层次才对）。
+   */
+  clothAll?: string[]
   /** 瞳色（LPC eye 调色板名） */
   eye?: string
   /** 年龄气质 */
@@ -77,23 +85,38 @@ const HAIR_COLORS: [RegExp, string][] = [
   [/粉(色)?(的)?(长)?发|桃粉(的)?发|pink hair/i, 'pink'],
 ]
 
-/** 发型 → 部件 id 里可能出现的关键词 */
+/**
+ * 发型关键词。**按优先级排列：越靠前越先被采用。**
+ *
+ * ⚠️ 两条踩过的坑：
+ *
+ * 1) 原来写的是 `利落.*发` —— `.*` 会**跨越整个句子**。管家描述是
+ *    「他有着一头乌黑锃亮的长发……利落地向后束成一条及腰的马尾」，
+ *    "利落" 与句首的 "发" 被 `.*` 连起来，于是判定成"短发"；
+ *    而库里没有 `hair_short*`，回退随机时**拿到了光头部件** ——
+ *    玩家看到的是一个秃头管家。
+ *    修法：用 `[^。；，\n]{0,6}` 限定距离，绝不让 `.*` 跨句。
+ *
+ * 2) 原先只取**第一个命中**的发型项，所以"长发"（命中及腰）会被排在
+ *    更前面的"短发"（误命中）覆盖。现在由调用方收集全部并按本表顺序
+ *    保留优先级：具体款式（马尾/发髻）优先于泛泛的"短发"。
+ */
 const HAIR_STYLES: [RegExp, string[]][] = [
-  [/马尾|束起|扎起|ponytail|bound back/i, ['ponytail', 'long', 'bob']],
   [/双马尾|twin.?tail|pigtail/i, ['pig', 'ponytail', 'bangs']],
+  [/马尾|ponytail|束成|扎成/i, ['ponytail', 'long', 'bob']],
   [/发髻|盘发|丸子头|bun|updo/i, ['bun', 'updo']],
-  [/光头|秃|bald|shaven/i, ['bald', 'balding']],
-  [/短寸|寸头|板寸|buzz/i, ['buzz', 'short', 'balding']],
-  [/短发|利落.*发|干练.*发|short hair/i, ['short', 'bangs', 'bob']],
-  // 「长直发」这种连写要单独列 —— 只写「长发」匹配不到它（词表漏过）
+  [/光头|秃顶|bald|shaven head/i, ['bald', 'balding']],
   [/长直发|直发|长直|straight hair/i, ['long', 'long_straight', 'relm_xlong']],
   [/长发|披肩|垂至|及腰|long hair/i, ['long', 'ponytail', 'bangslong', 'relm_xlong']],
-  [/卷发|波浪|卷曲|curly|wavy|wavy hair/i, ['curly', 'wavy', 'long']],
-  [/刘海|齐刘海|bangs|fringe/i, ['bangs', 'bangsshort', 'bangslong']],
-  [/爆炸头|蓬松.*发|afro/i, ['afro', 'curly']],
+  [/卷发|波浪|卷曲|curly|wavy/i, ['curly', 'wavy', 'long']],
   [/脏辫|辫子|braid|dreadlock/i, ['braid', 'dread', 'long']],
+  [/刘海|齐刘海|bangs|fringe/i, ['bangs', 'bangsshort', 'bangslong']],
+  [/爆炸头|蓬松[^。；，\n]{0,4}发|afro/i, ['afro', 'curly']],
   [/莫西干|mohawk/i, ['mohawk']],
   [/蓬乱|凌乱|乱蓬|未打理|unkempt|messy|bedhead/i, ['bedhead', 'messy', 'long']],
+  [/短寸|寸头|板寸|buzz/i, ['buzz', 'balding']],
+  // 「短发」放最后：它是兜底描述，具体款式应当优先（见上面坑 2）
+  [/短发|short hair|利落[^。；，\n]{0,4}发|干练[^。；，\n]{0,4}发/i, ['short', 'bangs', 'bob']],
 ]
 
 /** 肤色 → LPC body 调色板名 */
@@ -112,24 +135,40 @@ const SKINS: [RegExp, string][] = [
  * 不能只写"白衣/白袍" —— 我第一版就是这样漏掉了「白色长裙」，
  * 于是莉莉安的裙子被随机配成石板灰。
  */
+/**
+ * 衣物名词 —— 出现在颜色之后（可隔着"的"）。
+ *
+ * 抽出来是因为原来的模式写成 `白(色|衣|袍|裙|衫|服|斗篷|披风)`：
+ * 这种"颜色字 + 单字衣物"的写法匹配不了**双字衣物名**，
+ * 于是「纯白的衬衫」「黑色的燕尾服」全都漏掉 ——
+ * 玩家反馈的"立绘与描述不像"有一部分就是这里漏的。
+ * （之前只补过"长裙"这一个特例，属于打补丁而不是修根因。）
+ */
+const GARMENT = '(?:色)?(?:的)?(?:长|短|厚|薄)?' +
+  '(?:衣|袍|裙|衫|服|甲|斗篷|披风|外套|大衣|风衣|正装|礼服|燕尾服|衬衫|衬衣|上衣|' +
+  '马甲|背心|制服|军装|长袍|罩袍|围裙|皮甲|铠甲|胸甲|锁甲|板甲|和服|浴衣|旗袍|' +
+  'tunic|shirt|coat|cloak|robe|armou?r|jacket|vest|dress|skirt)'
+
+const clothRe = (color: string) => new RegExp(`${color}${GARMENT}|${color}`, 'i')
+
 const CLOTH_COLORS: [RegExp, string][] = [
-  [/白(色|衣|袍|裙|衫|服|斗篷|披风)|素白|皎白|雪白|white\b/i, 'white'],
-  [/黑(色|衣|袍|裙|衫|服|斗篷|披风|甲)|玄色|墨色|漆黑|black\b/i, 'black'],
-  [/灰(色|衣|袍|裙|衫|服|斗篷|披风)|灰袍|grey\b|gray\b/i, 'gray'],
+  [new RegExp(`(?:白${GARMENT}|纯白|素白|皎白|雪白|银白|white\\b)`, 'i'), 'white'],
+  [new RegExp(`(?:黑${GARMENT}|玄色|墨色|漆黑|乌黑|black\\b)`, 'i'), 'black'],
+  [new RegExp(`(?:灰${GARMENT}|灰袍|grey\\b|gray\\b)`, 'i'), 'gray'],
   [/深蓝|藏青|靛蓝|navy|dark blue/i, 'navy'],
-  [/蓝(色|衣|袍|裙|衫|服|斗篷|披风)|blue\b/i, 'blue'],
-  [/红(色|衣|袍|裙|衫|服|斗篷|披风)|绯红|猩红|red\b/i, 'red'],
+  [clothRe('蓝'), 'blue'],
+  [clothRe('红'), 'red'],
   [/酒红|暗红|栗红|maroon|burgundy/i, 'maroon'],
-  [/绿(色|衣|袍|裙|衫|服|斗篷|披风)|墨绿|翠绿|green\b/i, 'green'],
+  [clothRe('绿'), 'green'],
   [/森林绿|深绿|forest green/i, 'forest'],
-  [/棕(色|衣|袍|裙|衫|服)|褐(色|衣|袍)|皮革|皮甲|皮衣|brown\b|leather/i, 'brown'],
-  [/紫(色|衣|袍|裙|衫|服|斗篷)|purple\b|violet\b/i, 'purple'],
+  [/棕(?:色)?(?:的)?(?:衣|袍|裙|衫|服|甲|外套|大衣)|褐色|皮革|皮甲|皮衣|brown\b|leather/i, 'brown'],
+  [clothRe('紫'), 'purple'],
   [/薰衣草|淡紫|lavender/i, 'lavender'],
-  [/粉(色|衣|袍|裙)|桃粉|pink\b|rose\b/i, 'pink'],
-  [/金(色|袍|衣|甲)|金黄|gold\b/i, 'yellow'],
-  [/黄(色|衣|袍|裙)|土黄|yellow\b/i, 'yellow'],
-  [/橙(色|衣|袍|裙)|orange\b/i, 'orange'],
-  [/青(色|衣|袍)|蓝绿|teal\b/i, 'teal'],
+  [clothRe('粉'), 'pink'],
+  [/金(?:色)?(?:的)?(?:袍|衣|甲|冠)|金黄|gold\b/i, 'yellow'],
+  [new RegExp(`(?:黄${GARMENT}|土黄|yellow\\b)`, 'i'), 'yellow'],
+  [new RegExp(`(?:橙${GARMENT}|orange\\b)`, 'i'), 'orange'],
+  [new RegExp(`(?:青${GARMENT}|蓝绿|teal\\b)`, 'i'), 'teal'],
   [/天蓝|sky blue/i, 'sky'],
   [/木炭|炭黑|charcoal/i, 'charcoal'],
   [/石板|slate/i, 'slate'],
@@ -271,6 +310,25 @@ function allHits<T>(text: string, table: [RegExp, T][]): { values: T[]; evidence
 }
 
 /**
+ * 按**在原文里出现的位置**收集命中项。
+ *
+ * 与 `allHits` 的区别：那个按词表顺序返回，这个按文本顺序。
+ * 对衣色很重要 —— 「黑色燕尾服，纯白的衬衫」里黑色在前，
+ * 它才是外衣（最显眼的那个）；按词表顺序可能先命中"白"，
+ * 于是立绘给一件白外套，与描述正相反。
+ */
+function hitsInOrder<T>(text: string, table: [RegExp, T][]): { value: T; evidence: string; at: number }[] {
+  const out: { value: T; evidence: string; at: number }[] = []
+  for (const [re, value] of table) {
+    // 用全局匹配找出该模式在文本里最早的位置
+    const g = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g')
+    const m = g.exec(text)
+    if (m) out.push({ value, evidence: m[0], at: m.index })
+  }
+  return out.sort((a, b) => a.at - b.at)
+}
+
+/**
  * 从角色信息里推断外貌特征。
  *
  * @param input 把角色卡里所有可用文本都传进来 —— 描述、性格、身份、名字都能提供线索。
@@ -312,8 +370,19 @@ export function inferTraits(input: {
   const skin = firstHit(text, SKINS)
   if (skin) { out.skin = skin.value; out.evidence.push(`肤色:${skin.evidence}`) }
 
-  const cloth = firstHit(text, CLOTH_COLORS)
-  if (cloth) { out.cloth = cloth.value; out.evidence.push(`衣色:${cloth.evidence}`) }
+  /*
+    衣色：**收集全部**，不只取第一个。
+    描述里常常写了多种颜色（「黑色燕尾服，纯白的衬衫」「棕色皮甲配绿色束腰」），
+    只取第一个会丢掉后面的信息 —— 那正是"立绘和描述不像"的常见原因。
+    按出现位置排序，`cloth` 取最靠前的（通常是外衣，最显眼），
+    其余放进 `clothAll` 供配方挑打底层。
+  */
+  const clothHits = hitsInOrder(text, CLOTH_COLORS)
+  if (clothHits.length) {
+    out.cloth = clothHits[0].value
+    out.clothAll = [...new Set(clothHits.map(h => h.value))]
+    out.evidence.push(`衣色:${clothHits.map(h => h.evidence).join('/')}`)
+  }
 
   const eye = firstHit(text, EYE_COLORS)
   if (eye) { out.eye = eye.value; out.evidence.push(`瞳色:${eye.evidence}`) }

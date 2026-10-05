@@ -37,6 +37,20 @@ interface UIState {
    */
   portraitCharacterId: string | null
   setPortraitCharacterId: (id: string | null) => void
+
+  /**
+   * 手机端面板抽屉当前显示的页签；null = 没打开。
+   *
+   * 放在 store 里而不是 App 的 useState：
+   *  `useBackNavigation` 需要订阅"有没有浮层打开"才能给每个浮层压一条历史。
+   *  浮层状态藏在组件内部时，hook 看不到它，于是打开抽屉后按返回
+   *  会把整页退掉（实测出现过 `alive:false`）。
+   */
+  mobileSheet: 'status' | 'inventory' | 'relationships' | null
+  setMobileSheet: (t: 'status' | 'inventory' | 'relationships' | null) => void
+  /** 手机端「更多」菜单是否打开（设置类操作的容器） */
+  mobileMenuOpen: boolean
+  setMobileMenuOpen: (open: boolean) => void
 }
 
 /** 切换服务商时同步默认地址与模型 */
@@ -78,8 +92,13 @@ export const useUIStore = create<UIState>()(
       pendingSetup: null,
       setPendingSetup: (seed) => set({ pendingSetup: seed }),
 
-  portraitCharacterId: null,
-  setPortraitCharacterId: (id) => set({ portraitCharacterId: id }),
+      portraitCharacterId: null,
+      setPortraitCharacterId: (id) => set({ portraitCharacterId: id }),
+
+      mobileSheet: null,
+      setMobileSheet: (t) => set({ mobileSheet: t }),
+      mobileMenuOpen: false,
+      setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
     }),
     {
       name: 'pale-notes-ui',
