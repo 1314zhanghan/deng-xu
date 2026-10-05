@@ -175,22 +175,34 @@ console.log('\n=== 5) 返回链路：选角 → 逐级后退 ===')
 /*
   从选角返回应当退到**它的上一级**（世界书详情），而不是直接跳回主菜单 ——
   返回键的语义就是"逐级后退"。
-  原先这里断言"返回后立刻是主菜单"，那是按旧实现（组件内部 setView 直接跳）
-  写的；改成层级链之后必须逐级验证。
+
+  ⚠️ 这个断言必须**同时**支持 dev 与生产构建：
+  CI 会先在 preview（真实 dist 产物）上跑这一套做冒烟，
+  而生产构建里没有 `__navStore` 调试钩子（被 import.meta.env.DEV 剔除），
+  只认 store 的话会在 CI 上假失败 —— 我为此白跑了一轮 CI。
+  所以读不到 store 时回退到 DOM 判断。
 */
+const READ_VIEW = `(() => {
+  if (typeof __navStore === 'function') return __navStore.getState().view.name
+  const T = document.body.innerText
+  if (/用这个世界开始/.test(T)) return 'worldbook'
+  if (/开始新游戏/.test(T) && /卡片库/.test(T)) return 'menu'
+  if (/新建世界卡/.test(T) || /导出全部/.test(T)) return 'library'
+  if (/你要扮演谁/.test(T)) return 'setup'
+  return '?'
+})()`
+
 await clickRe('/返回卡库|返回/')
 await sleep(1800)
 const afterSetup = JSON.parse(await ev(`JSON.stringify({
-  view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
+  view: ${READ_VIEW},
   hasDetailBtns: /用这个世界开始/.test(document.body.innerText),
 })`))
 console.log('  返回后:', JSON.stringify(afterSetup))
 check('从选角退到上一级（世界书详情）', afterSetup.view === 'worldbook' && afterSetup.hasDetailBtns, afterSetup.view)
 
 await ev(`window.history.back()`); await sleep(1500)
-const atLibrary = JSON.parse(await ev(`JSON.stringify({
-  view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
-})`))
+const atLibrary = JSON.parse(await ev(`JSON.stringify({ view: ${READ_VIEW} })`))
 console.log('  再退一级:', JSON.stringify(atLibrary))
 check('再退一级到卡片库/世界书列表', atLibrary.view === 'library', atLibrary.view)
 
