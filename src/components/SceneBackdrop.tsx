@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { getSceneAsset } from '@/utils/sceneArt'
-import { generateMap, ARCHETYPE_TO_MAP, isNightHour, timeOfDayLabel, type MapArchetype } from '@/utils/rpgMap'
+import { generateMap, ARCHETYPE_TO_MAP, dayPhase, type MapArchetype } from '@/utils/rpgMap'
+import { phaseLabel, type DayPhase } from '@/utils/mapPalette'
 
 /**
  * 叙事区背景 —— **RPG 俯瞰瓦片地图**，随游戏内时间切换昼夜。
@@ -27,7 +28,8 @@ export function SceneBackdrop({ className = '' }: { className?: string }) {
   const hour = useGameStore(s => s.time.hour)
   const world = useSessionStore(s => s.world)
 
-  const night = isNightHour(hour)
+  const night = dayPhase(hour) === 'night'
+  const phase: DayPhase = dayPhase(hour)
 
   const map = useMemo(() => {
     const asset = getSceneAsset(sceneId)
@@ -35,8 +37,8 @@ export function SceneBackdrop({ className = '' }: { className?: string }) {
     const arche: MapArchetype = (asset && ARCHETYPE_TO_MAP[asset.archetype]) || 'street'
     // seed 用场景 id + 色调，保证同一场景稳定，不会每次渲染都换一张图
     const seed = `${sceneId || 'default'}:${world?.avatarStyle || 'ink'}`
-    return generateMap(arche, seed, night)
-  }, [sceneId, world?.avatarStyle, night])
+    return generateMap(arche, seed, phase)
+  }, [sceneId, world?.avatarStyle, phase])
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`} aria-hidden="true">
@@ -83,9 +85,9 @@ export function SceneBackdrop({ className = '' }: { className?: string }) {
         昼夜主要靠画面本身表达，这里只做很克制的补充。
       */}
       <div className="absolute top-2 right-3 text-[10px] font-mono text-text-muted/70 select-none flex items-center gap-1.5">
-        <span>{night ? '🌙' : '☀'}</span>
+        <span>{night ? '🌙' : phase === 'dusk' ? '🌇' : phase === 'dawn' ? '🌅' : '☀'}</span>
         <span>{getSceneAsset(sceneId)?.label || ''}</span>
-        <span className="text-text-muted/40">{timeOfDayLabel(hour)}</span>
+        <span className="text-text-muted/40">{phaseLabel(phase)}</span>
       </div>
     </div>
   )

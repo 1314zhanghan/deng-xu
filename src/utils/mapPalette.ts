@@ -91,6 +91,69 @@ export function mapPalette(night: boolean): MapPalette {
 }
 
 /**
+ * 黄昏 / 清晨：**同一套形状，换暖色斜照**。
+ *
+ * 为什么昼夜只做两档不够：玩家从"白天"切到"夜晚"是一个突变，
+ * 而真实感受是**逐渐暗下去**。加一档黄昏之后：
+ *   白天 → 黄昏（天变橙、影子拉长）→ 夜晚（蓝紫 + 灯火）
+ * 时间流动才有过程感。
+ *
+ * 黄昏与清晨共用这套暖色（都以低角度暖光为主），
+ * 区别由 `timeOfDay` 的标签与是否点灯体现 —— 清晨慢慢亮起来、灯还亮着；
+ * 黄昏正在暗下去、灯刚点起。这里不再造两套色板，
+ * 因为四套色板会让"记忆一种色调"变得困难，玩家反而感觉不到规律。
+ */
+export const MAP_DUSK: Omit<MapPalette, 'night'> = {
+  sky: [186, 126, 96],
+  ground: { dark: [56, 62, 44], mid: [84, 92, 58], light: [116, 118, 76], hi: [150, 144, 98] },
+  path:   { dark: [92, 70, 52], mid: [126, 100, 72], light: [158, 132, 96], hi: [186, 164, 126] },
+  stone:  { dark: [72, 66, 72], mid: [104, 96, 102], light: [136, 126, 132], hi: [170, 158, 162] },
+  water:  { dark: [30, 52, 92], mid: [48, 78, 126], light: [78, 108, 156], hi: [122, 150, 186] },
+  wood:   { dark: [70, 48, 34], mid: [104, 74, 50], light: [140, 104, 70], hi: [172, 138, 98] },
+  roof:   { dark: [96, 48, 42], mid: [136, 72, 56], light: [170, 100, 76], hi: [198, 134, 104] },
+  leaf:   { dark: [40, 52, 32], mid: [58, 76, 42], light: [82, 102, 54], hi: [112, 132, 74] },
+  lamp: [255, 200, 110],
+  shadow: [26, 22, 30],
+}
+
+/**
+ * 时间档。
+ *
+ * 分界刻意不是均匀四等分：
+ *  - 05–07 清晨、07–17 白天、17–20 黄昏、其余为夜
+ *    黄昏给了三个小时而清晨只给两小时 —— 因为"天黑了"的观感变化
+ *    比"天亮了"更值得强调（玩家在夜里更容易迷路/遇袭，叙事上也更重要）。
+ */
+export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night'
+
+export function dayPhase(hour: number): DayPhase {
+  const h = ((hour % 24) + 24) % 24
+  if (h >= 5 && h < 7) return 'dawn'
+  if (h >= 7 && h < 17) return 'day'
+  if (h >= 17 && h < 20) return 'dusk'
+  return 'night'
+}
+
+/** 该时段的材质色板 */
+export function paletteForPhase(phase: DayPhase): MapPalette {
+  if (phase === 'night') return { ...MAP_NIGHT, night: true }
+  if (phase === 'dusk') return { ...MAP_DUSK, night: false }
+  if (phase === 'dawn') return { ...MAP_DUSK, night: false }
+  return { ...MAP_DAY, night: false }
+}
+
+/** 该时段是否需要点灯（窗与路灯） */
+export function phaseLightsOn(phase: DayPhase): boolean {
+  // 黄昏刚点灯、清晨灯还亮着、白天熄灯
+  return phase === 'night' || phase === 'dusk' || phase === 'dawn'
+}
+
+/** 时段的中文名，用于 UI 与测试 */
+export function phaseLabel(phase: DayPhase): string {
+  return phase === 'dawn' ? '清晨' : phase === 'day' ? '白天' : phase === 'dusk' ? '黄昏' : '夜'
+}
+
+/**
  * 把某一档与阴影混合，用来做"夜晚压暗"或"阴影叠加"。
  * `k` 越大越暗。
  */

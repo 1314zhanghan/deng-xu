@@ -14,13 +14,48 @@ describe('外貌推断 · 发色', () => {
     ['金发碧眼的年轻女子', 'blonde'],
     ['红发艾拉是北门最凶的守卫', 'red'],
     ['深棕色的短发，看起来很干练', 'dark_brown'],
-    ['she had raven hair and pale skin', 'black'],
+    // 「鸦羽」比纯黑更具体：调色板里 raven 是独立的一档
+    ['she had raven hair and pale skin', 'raven'],
   ]
   for (const [text, want] of cases) {
     it(`「${text.slice(0, 18)}…」→ ${want}`, () => {
       expect(inferTraits({ description: text }).hairColor).toBe(want)
     })
   }
+
+  /*
+    中文角色卡里的发色常常**不是标准色名** —— 这些说法原先一个都认不出来，
+    于是立绘退回随机发色，玩家看到的就是"和我写的不像"。
+    下面这批覆盖了最常见的非标准说法。
+  */
+  const chineseCases: [string, string][] = [
+    ['浅亚麻色的长发编成一条辫子垂在肩前', 'sandy'],
+    ['麦色的头发挽成发髻', 'gold'],
+    ['栗棕色的卷发', 'chestnut'],
+    ['一头乌黑锃亮的长发', 'raven'],
+    ['铂金色的长发', 'platinum'],
+    ['月白色的发丝', 'silver'],
+    ['焦糖色的短发', 'light_brown'],
+    ['灰烬色的头发', 'ash'],
+    ['稻草色的乱发', 'sandy'],
+    ['茶色的短发', 'brown'],
+    ['咖啡色的长发', 'dark_brown'],
+    ['姜红色的编发', 'ginger'],
+    ['草莓金的卷发', 'strawberry'],
+    ['深灰色的头发', 'dark_gray'],
+    ['雪白的短发', 'white'],
+  ]
+  for (const [text, want] of chineseCases) {
+    it(`非标准发色「${text.slice(0, 12)}…」→ ${want}`, () => {
+      expect(inferTraits({ description: text }).hairColor).toBe(want)
+    })
+  }
+
+  it('白手套这类白色物件不会被误认成发色', () => {
+    // 第一版就踩过：裸的 white 匹配到「白手套上永远残留墨痕」→ 管家一头白发
+    const t = inferTraits({ description: '他身着黑色燕尾服，手上戴着白手套，袖口没有一丝褶皱' })
+    expect(t.hairColor, '不该从白手套推出白发').not.toBe('white')
+  })
 
   it('名字里的外貌词优先级最高', () => {
     // 名字说红发，描述里又提到"黑色的靴子" —— 应当以名字为准

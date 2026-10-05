@@ -17,7 +17,10 @@
  * 再按地图铺上去。直接逐像素画整张图会慢十几倍，而在 React 里重绘会卡。
  */
 import type { RGB } from '@/utils/sceneArt'
-import { mapPalette, shade, glow, type MapPalette, type MaterialRamp } from '@/utils/mapPalette'
+import { paletteForPhase, phaseLightsOn, dayPhase, phaseLabel, type DayPhase, shade, glow, type MapPalette, type MaterialRamp } from '@/utils/mapPalette'
+
+/** 转出时段接口，调用方不必再从 mapPalette 单独 import */
+export { dayPhase, phaseLabel, type DayPhase }
 
 /** 一格 16px，整图 20×12 格 = 320×192，再整数放大 */
 export const TILE = 16
@@ -257,56 +260,92 @@ function fillRect(m: Layout, x: number, y: number, w: number, h: number, k: Tile
 }
 
 /**
- * 每个 archetype 一张布局。
+ * 每个 archetype 的布局。
+ *
+ * `variant` 用来在同一地形里换不同构图：同一个世界反复进"街道"时，
+ * 如果每次都是同一张图，玩家很快就会看出"这不就是那张背景吗"。
+ * 具体用哪一版由 seed 决定（`variant = hash % 套数`），
+ * 所以同一个场景 id 仍然稳定，不同场景/不同世界会得到不同布局。
  *
  * 布局刻意**不对称、不居中**：旧的远景图之所以"割裂"，
  * 一部分原因是所有场景都是"天空/山/地"三条横带，看起来像同一张图换了颜色。
  * 俯瞰地图用建筑位置、道路走向、水面形状来区分场景。
  */
-function buildLayout(a: MapArchetype, rng: () => number): Layout {
+function buildLayout(a: MapArchetype, rng: () => number, variant: number): Layout {
   const m = blank('grass')
+  const v = ((variant % 3) + 3) % 3
 
   switch (a) {
     case 'street': {
-      fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'grass')
-      // 一条纵向主路 + 一条横向支路
-      fillRect(m, 8, 0, 4, MAP_ROWS, 'path')
-      fillRect(m, 0, 6, MAP_COLS, 3, 'path')
-      // 两侧房屋（屋顶 + 墙）
-      for (const [x, y, w, h] of [[1, 1, 5, 4], [13, 2, 6, 3], [2, 9, 5, 2], [14, 9, 5, 2]] as const) {
-        fillRect(m, x, y, w, h, 'roof')
-        fillRect(m, x, y + h - 1, w, 1, 'wall')
+      if (v === 0) {
+        // 主街贯通 + 两侧房屋
+        fillRect(m, 8, 0, 4, MAP_ROWS, 'path')
+        fillRect(m, 0, 6, MAP_COLS, 3, 'path')
+        for (const [x, y, w, h] of [[1, 1, 5, 4], [13, 2, 6, 3], [2, 9, 5, 2], [14, 9, 5, 2]] as const) {
+          fillRect(m, x, y, w, h, 'roof')
+          fillRect(m, x, y + h - 1, w, 1, 'wall')
+        }
+        m[5][7] = 'tree'; m[5][12] = 'tree'; m[10][7] = 'tree'
+        m[5][6] = 'fence'
+      } else if (v === 1) {
+        // 十字路口 + 广场
+        fillRect(m, 6, 0, 5, MAP_ROWS, 'path')
+        fillRect(m, 0, 4, MAP_COLS, 4, 'path')
+        fillRect(m, 7, 4, 3, 4, 'stone')          // 广场铺石
+        for (const [x, y, w, h] of [[1, 1, 4, 2], [1, 9, 4, 2], [15, 1, 4, 2], [15, 9, 4, 2]] as const) {
+          fillRect(m, x, y, w, h, 'roof')
+          fillRect(m, x, y + h - 1, w, 1, 'wall')
+        }
+        m[4][9] = 'tree'; m[8][10] = 'tree'
+      } else {
+        // 沿河街道：一侧是水
+        fillRect(m, 0, 8, MAP_COLS, 4, 'water')
+        fillRect(m, 0, 6, MAP_COLS, 2, 'path')
+        for (const [x, y, w, h] of [[2, 1, 4, 4], [8, 2, 5, 3], [15, 1, 4, 4]] as const) {
+          fillRect(m, x, y, w, h, 'roof')
+          fillRect(m, x, y + h - 1, w, 1, 'wall')
+        }
+        fillRect(m, 7, 6, 2, 3, 'fence')            // 小码头
+        m[5][14] = 'tree'
       }
-      // 街边树与栅栏
-      m[5][7] = 'tree'; m[5][12] = 'tree'; m[10][7] = 'tree'
-      fillRect(m, 6, 5, 1, 1, 'fence')
       break
     }
     case 'forest': {
-      fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'grass2')
-      // 一条小径蜿蜒穿过
-      let x = 2
+      const pathStart = v === 0 ? 2 : v === 1 ? 16 : 9
+      let x = pathStart
       for (let y = 0; y < MAP_ROWS; y++) {
         fillRect(m, x, y, 3, 1, 'path')
         x += Math.round((rng() - 0.5) * 2)
         x = Math.max(1, Math.min(MAP_COLS - 4, x))
       }
-      // 密林：树占多数格子，但避开小径
+      // v1 是林间空地：中间少放树
+      const clearing = v === 1
       for (let y = 0; y < MAP_ROWS; y++) {
         for (let xx = 0; xx < MAP_COLS; xx++) {
           if (m[y][xx] === 'path') continue
-          if (rng() < 0.55) m[y][xx] = 'tree'
+          if (clearing && Math.hypot(xx - 10, (y - 6) * 1.4) < 4.5) continue
+          if (rng() < (v === 2 ? 0.68 : 0.55)) m[y][xx] = 'tree'
         }
       }
+      if (v === 2) { m[9][4] = 'rock'; m[3][15] = 'rock' }
       break
     }
     case 'mountain': {
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'rock')
-      // 之字形山道
-      fillRect(m, 2, 10, 6, 2, 'path')
-      fillRect(m, 6, 6, 2, 6, 'path')
-      fillRect(m, 8, 4, 6, 2, 'path')
-      fillRect(m, 12, 1, 2, 5, 'path')
+      if (v === 0) {
+        fillRect(m, 2, 10, 6, 2, 'path'); fillRect(m, 6, 6, 2, 6, 'path')
+        fillRect(m, 8, 4, 6, 2, 'path'); fillRect(m, 12, 1, 2, 5, 'path')
+      } else if (v === 1) {
+        // 环形盘山道
+        fillRect(m, 3, 3, 14, 2, 'path'); fillRect(m, 3, 8, 14, 2, 'path')
+        fillRect(m, 3, 3, 2, 7, 'path'); fillRect(m, 16, 3, 1, 7, 'path')
+        fillRect(m, 9, 5, 2, 3, 'path')
+      } else {
+        // 山谷：中间一条河，两侧是路
+        fillRect(m, 9, 0, 3, MAP_ROWS, 'water')
+        fillRect(m, 5, 0, 3, MAP_ROWS, 'path')
+        fillRect(m, 13, 0, 3, MAP_ROWS, 'path')
+      }
       for (let i = 0; i < 16; i++) {
         const rx = Math.floor(rng() * MAP_COLS), ry = Math.floor(rng() * MAP_ROWS)
         if (m[ry][rx] === 'rock') m[ry][rx] = 'stone'
@@ -316,36 +355,56 @@ function buildLayout(a: MapArchetype, rng: () => number): Layout {
     }
     case 'coast': {
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'sand')
-      // 海在下方
-      fillRect(m, 0, 7, MAP_COLS, 5, 'water')
-      // 岸线做成不规则，避免"一条直边"
+      const shore = v === 0 ? 7 : v === 1 ? 5 : 9
+      fillRect(m, 0, shore, MAP_COLS, MAP_ROWS - shore, 'water')
       for (let xx = 0; xx < MAP_COLS; xx++) {
         const j = Math.round(rng() * 2) - 1
-        if (j < 0) m[7][xx] = 'sand'
-        else if (j > 0) m[6][xx] = 'water'
+        if (j < 0) m[shore][xx] = 'sand'
+        else if (j > 0 && shore > 0) m[shore - 1][xx] = 'water'
       }
-      // 码头伸进水里。
-      // ⚠️ 这里原先写的是 `'wood' as TileKind` —— 但 `'wood'` **不是合法的地形类型**，
-      //    `as TileKind` 这个断言骗过了编译器，于是 `bank.get('wood')` 是 undefined，
-      //    铺出来的那两列是**全黑**。视觉上表现为"海被切断、中间露出绿色"，
-      //    我一开始还以为是水的配色问题。教训：**别用 as 断言绕过联合类型**，
-      //    它换来的编译通过正好掩盖了这种"贴图不存在"的错误。
-      fillRect(m, 9, 6, 2, 4, 'fence')
-      fillRect(m, 4, 2, 4, 3, 'roof')
-      fillRect(m, 4, 4, 4, 1, 'wall')
-      m[2][15] = 'tree'; m[3][2] = 'tree'
+      if (v === 0) {
+        fillRect(m, 9, shore - 1, 2, 4, 'fence')
+        fillRect(m, 4, 2, 4, 3, 'roof'); fillRect(m, 4, 4, 4, 1, 'wall')
+      } else if (v === 1) {
+        // 渔村：一排小屋 + 晒网
+        for (const [x, y, w, h] of [[2, 1, 4, 2], [8, 1, 4, 2], [15, 1, 4, 2]] as const) {
+          fillRect(m, x, y, w, h, 'roof'); fillRect(m, x, y + h - 1, w, 1, 'wall')
+        }
+        fillRect(m, 6, 4, 3, 1, 'fence'); fillRect(m, 12, 4, 3, 1, 'fence')
+      } else {
+        // 礁石海岸
+        for (let i = 0; i < 14; i++) {
+          const rx = Math.floor(rng() * MAP_COLS), ry = shore + Math.floor(rng() * (MAP_ROWS - shore))
+          if (m[ry] && m[ry][rx] === 'water') m[ry][rx] = 'rock'
+        }
+        m[2][15] = 'tree'
+      }
       break
     }
     case 'ruins': {
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'grass2')
-      // 断墙围出一个院落（不闭合，显得破败）
-      fillRect(m, 3, 2, 12, 1, 'wall')
-      fillRect(m, 3, 2, 1, 7, 'wall')
-      fillRect(m, 14, 2, 1, 5, 'wall')
-      fillRect(m, 3, 8, 7, 1, 'wall')
-      fillRect(m, 8, 4, 5, 4, 'floor')
-      // 碎石
-      for (let i = 0; i < 22; i++) {
+      if (v === 0) {
+        fillRect(m, 3, 2, 12, 1, 'wall'); fillRect(m, 3, 2, 1, 7, 'wall')
+        fillRect(m, 14, 2, 1, 5, 'wall'); fillRect(m, 3, 8, 7, 1, 'wall')
+        fillRect(m, 8, 4, 5, 4, 'floor')
+      } else if (v === 1) {
+        // 倒塌的塔基：环形断墙
+        for (let a2 = 0; a2 < 32; a2++) {
+          const ang = (a2 / 32) * Math.PI * 2
+          const rx = Math.round(10 + Math.cos(ang) * 6), ry = Math.round(6 + Math.sin(ang) * 4)
+          if (rx >= 0 && rx < MAP_COLS && ry >= 0 && ry < MAP_ROWS) {
+            if (a2 % 7 !== 0) m[ry][rx] = 'wall'      // 留缺口，显得破败
+          }
+        }
+        fillRect(m, 8, 5, 5, 3, 'floor')
+      } else {
+        // 废弃市集：零散摊位
+        for (const [x, y] of [[4, 3], [10, 2], [15, 4], [6, 7], [12, 8]] as const) {
+          fillRect(m, x, y, 3, 1, 'wall'); m[y + 1][x + 1] = 'stone'
+        }
+        fillRect(m, 8, 5, 4, 3, 'floor')
+      }
+      for (let i = 0; i < 20; i++) {
         const rx = 2 + Math.floor(rng() * 16), ry = 1 + Math.floor(rng() * 9)
         if (m[ry][rx] === 'grass2') m[ry][rx] = 'stone'
       }
@@ -354,41 +413,66 @@ function buildLayout(a: MapArchetype, rng: () => number): Layout {
     }
     case 'interior': {
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'floor')
-      // 四面墙留门
       fillRect(m, 0, 0, MAP_COLS, 1, 'wall')
       fillRect(m, 0, MAP_ROWS - 1, MAP_COLS, 1, 'wall')
       fillRect(m, 0, 0, 1, MAP_ROWS, 'wall')
       fillRect(m, MAP_COLS - 1, 0, 1, MAP_ROWS, 'wall')
-      m[0][9] = 'floor'; m[0][10] = 'floor'   // 门
-      // 家具（用石/木格表示桌柜）
-      fillRect(m, 3, 3, 3, 2, 'stone')
-      fillRect(m, 14, 3, 3, 2, 'stone')
-      fillRect(m, 3, 8, 4, 1, 'stone')
-      fillRect(m, 15, 8, 2, 2, 'stone')
-      // 地毯
-      fillRect(m, 8, 5, 4, 2, 'roof')
+      if (v === 0) {
+        m[0][9] = 'floor'; m[0][10] = 'floor'
+        fillRect(m, 3, 3, 3, 2, 'stone'); fillRect(m, 14, 3, 3, 2, 'stone')
+        fillRect(m, 3, 8, 4, 1, 'stone'); fillRect(m, 15, 8, 2, 2, 'stone')
+        fillRect(m, 8, 5, 4, 2, 'roof')            // 地毯
+      } else if (v === 1) {
+        // 长厅：两侧列柱 + 尽头高台
+        m[0][6] = 'floor'; m[MAP_ROWS - 1][14] = 'floor'
+        for (let yy = 3; yy < 9; yy += 2) { m[yy][5] = 'stone'; m[yy][14] = 'stone' }
+        fillRect(m, 15, 4, 4, 4, 'roof')
+        fillRect(m, 8, 5, 4, 2, 'roof')
+      } else {
+        // 居所：多个小房间
+        m[0][3] = 'floor'; m[0][15] = 'floor'
+        fillRect(m, 9, 1, 1, 5, 'wall'); fillRect(m, 9, 8, 1, 3, 'wall')
+        fillRect(m, 2, 5, 5, 1, 'wall'); fillRect(m, 12, 5, 6, 1, 'wall')
+        fillRect(m, 3, 2, 2, 2, 'stone'); fillRect(m, 15, 2, 2, 2, 'stone')
+        fillRect(m, 3, 8, 3, 2, 'stone'); fillRect(m, 14, 8, 3, 2, 'stone')
+      }
       break
     }
     case 'underground': {
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'rock')
-      // 挖出的洞窟
+      const cx0 = v === 0 ? 10 : v === 1 ? 6 : 14
       for (let y = 1; y < MAP_ROWS - 1; y++) {
         for (let x = 1; x < MAP_COLS - 1; x++) {
-          const d = Math.hypot(x - 10, (y - 6) * 1.4)
+          const d = Math.hypot(x - cx0, (y - 6) * 1.4)
           if (d < 6.5 + rng() * 1.2) m[y][x] = 'floor'
         }
       }
-      fillRect(m, 2, 9, 4, 2, 'water')
+      if (v === 0) fillRect(m, 2, 9, 4, 2, 'water')
+      else if (v === 1) fillRect(m, 14, 2, 4, 3, 'water')
+      else { fillRect(m, 3, 3, 3, 2, 'water'); fillRect(m, 14, 8, 3, 2, 'water') }
       for (let i = 0; i < 10; i++) m[1 + Math.floor(rng() * 10)][1 + Math.floor(rng() * 18)] = 'stone'
       break
     }
     case 'sky': {
-      // 太空/高空：用"船体结构 + 星空底"表达，而不是草地
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'rock')
-      fillRect(m, 3, 4, 14, 4, 'stone')
-      fillRect(m, 5, 3, 3, 1, 'wall')
-      fillRect(m, 12, 3, 3, 1, 'wall')
-      fillRect(m, 8, 8, 4, 2, 'wall')
+      if (v === 0) {
+        fillRect(m, 3, 4, 14, 4, 'stone')
+        fillRect(m, 5, 3, 3, 1, 'wall'); fillRect(m, 12, 3, 3, 1, 'wall')
+        fillRect(m, 8, 8, 4, 2, 'wall')
+      } else if (v === 1) {
+        // 环形空间站
+        for (let a2 = 0; a2 < 40; a2++) {
+          const ang = (a2 / 40) * Math.PI * 2
+          const rx = Math.round(10 + Math.cos(ang) * 7), ry = Math.round(6 + Math.sin(ang) * 4)
+          if (rx >= 0 && rx < MAP_COLS && ry >= 0 && ry < MAP_ROWS) m[ry][rx] = 'stone'
+        }
+        fillRect(m, 9, 5, 3, 3, 'wall')
+      } else {
+        // 长条形舰体
+        fillRect(m, 2, 5, 16, 3, 'stone')
+        fillRect(m, 4, 4, 3, 1, 'wall'); fillRect(m, 13, 4, 3, 1, 'wall')
+        fillRect(m, 9, 8, 3, 2, 'wall')
+      }
       for (let i = 0; i < 30; i++) {
         const rx = Math.floor(rng() * MAP_COLS), ry = Math.floor(rng() * MAP_ROWS)
         if (m[ry][rx] === 'rock') m[ry][rx] = rng() < 0.5 ? 'floor' : 'stone'
@@ -397,11 +481,24 @@ function buildLayout(a: MapArchetype, rng: () => number): Layout {
     }
     case 'night': {
       fillRect(m, 0, 0, MAP_COLS, MAP_ROWS, 'grass2')
-      // 夜里的村镇：房屋 + 亮着的窗
-      fillRect(m, 0, 7, MAP_COLS, 3, 'path')
-      for (const [x, y, w, h] of [[2, 2, 5, 4], [9, 1, 6, 4], [15, 3, 4, 3], [3, 10, 5, 2], [12, 10, 6, 2]] as const) {
-        fillRect(m, x, y, w, h, 'roof')
-        fillRect(m, x, y + h - 1, w, 1, 'wall')
+      if (v === 0) {
+        fillRect(m, 0, 7, MAP_COLS, 3, 'path')
+        for (const [x, y, w, h] of [[2, 2, 5, 4], [9, 1, 6, 4], [15, 3, 4, 3], [3, 10, 5, 2], [12, 10, 6, 2]] as const) {
+          fillRect(m, x, y, w, h, 'roof'); fillRect(m, x, y + h - 1, w, 1, 'wall')
+        }
+      } else if (v === 1) {
+        // 夜里的小巷：窄而密
+        fillRect(m, 4, 0, 2, MAP_ROWS, 'path'); fillRect(m, 13, 0, 2, MAP_ROWS, 'path')
+        for (const [x, y, w, h] of [[0, 1, 4, 4], [6, 2, 7, 3], [15, 1, 5, 4], [6, 8, 7, 3], [0, 8, 4, 3]] as const) {
+          fillRect(m, x, y, w, h, 'roof'); fillRect(m, x, y + h - 1, w, 1, 'wall')
+        }
+      } else {
+        // 野外的篝火营地
+        fillRect(m, 6, 4, 8, 5, 'path')
+        for (const [x, y] of [[3, 2], [16, 3], [4, 9], [15, 9]] as const) {
+          fillRect(m, x, y, 2, 2, 'roof'); fillRect(m, x, y + 1, 2, 1, 'wall')
+        }
+        m[6][10] = 'stone'; m[6][11] = 'stone'
       }
       m[2][6] = 'tree'; m[9][6] = 'tree'; m[1][15] = 'tree'
       break
@@ -432,6 +529,8 @@ export interface GeneratedMap {
   width: number
   height: number
   night: boolean
+  /** 时段（清晨/白天/黄昏/夜）—— 决定材质配色与是否点灯 */
+  phase: DayPhase
   /** 画的是哪种地形，便于调试与自动化测试 */
   archetype: MapArchetype
 }
@@ -443,16 +542,20 @@ const MAP_CACHE = new Map<string, GeneratedMap>()
  *
  * @param archetype 地形
  * @param seed      布局种子（同一个 id 每次同一张图）
- * @param night     是否夜晚 —— 决定材质配色与灯火
+ * @param phase     时段 —— 决定材质配色与是否点灯
  */
-export function generateMap(archetype: MapArchetype, seed: string, night: boolean): GeneratedMap {
-  const key = `${archetype}|${seed}|${night ? 'n' : 'd'}`
+export function generateMap(archetype: MapArchetype, seed: string, phase: DayPhase): GeneratedMap {
+  const key = `${archetype}|${seed}|${phase}`
   const hit = MAP_CACHE.get(key)
   if (hit) return hit
 
-  const p = mapPalette(night)
+  const p = paletteForPhase(phase)
+  const night = phase === 'night'
+  const lightsOn = phaseLightsOn(phase)
   const rng = makeRng(hashSeed(key))
-  const layout = buildLayout(archetype, rng)
+  // 布局版本由 seed 决定：同一场景稳定，不同场景/世界会换构图
+  const variant = hashSeed(`v:${seed}`) % 3
+  const layout = buildLayout(archetype, rng, variant)
 
   /*
     瓦片贴图缓存：每种地形先画 3 个变体，再按地图铺。
@@ -492,45 +595,55 @@ export function generateMap(archetype: MapArchetype, seed: string, night: boolea
   }
 
   /*
-    夜间：整体再压一层暗，并把墙上的窗点亮。
-    为什么要"整体压暗 + 点灯"两件事一起做：
+    按**时段**调整整体明暗。
+    四档而不是两档：玩家从白天直接跳到夜里是突变，而真实感受是逐渐暗下去。
+    加一档黄昏之后，时间流动才有过程感。
+      dawn  清晨：略压暗（天刚亮，还残留一点夜色）
+      day   白天：不处理
+      dusk  黄昏：压一点暗 + 偏暖（斜照的暖光）
+      night 夜：压得最多 + 偏蓝紫
+  */
+  const dim = night ? 0.14 : phase === 'dusk' ? 0.10 : phase === 'dawn' ? 0.08 : 0
+  if (dim > 0) {
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        canvas.set(x, y, shade(canvas.get(x, y), p.shadow, dim))
+      }
+    }
+  }
+
+  /*
+    点灯。黄昏刚点起、清晨还亮着、白天熄灯、夜里最亮。
+    为什么要"压暗 + 点灯"两件事一起做：
       只压暗会变成"白天图调暗"，没有时间感；
       亮点暖光才让人一眼看出"天黑了，屋里有人"。
   */
-  if (night) {
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        canvas.set(x, y, shade(canvas.get(x, y), p.shadow, 0.14))
-      }
-    }
-    /*
-      点亮窗与灯。
-      这是夜景**最重要**的一步：只有压暗会变成"白天图调暗"，没有时间感；
-      暖色亮点才让人一眼看出"天黑了，屋里有人"。
-      所以亮度给足（纯 lamp 色），并在周围铺一圈可见的光晕。
-    */
+  if (lightsOn) {
+    // 黄昏/清晨的灯比夜里含蓄一些（灯刚点起/快熄了）
+    const strength = night ? 1 : 0.6
     const wins = windowTiles(layout)
     for (const [tx, ty] of wins) {
       const cx = tx * TILE + 8, cy = ty * TILE + 8
       /*
         3×3 亮窗 + 两圈光晕。
         第一版只给 2×2 + 四个点，放大到玩家屏幕后几乎看不见 ——
-        场景本来就是缩放显示的（320×192 铺满上千像素），
+        场景是缩放显示的（320×192 铺满上千像素），
         单像素的光点会被插值抹掉，必须给足尺寸。
       */
       canvas.rect(cx - 1, cy - 1, 3, 3, p.lamp)
-      const halo = glow(p.stone.light, p.lamp, 0.72)
+      const halo = glow(p.stone.light, p.lamp, 0.72 * strength)
       for (let dy = -4; dy <= 4; dy++) {
         for (let dx = -4; dx <= 4; dx++) {
           const d = Math.max(Math.abs(dx), Math.abs(dy))
           if (d === 2) canvas.set(cx + dx, cy + dy, halo)
-          else if (d === 3) canvas.set(cx + dx, cy + dy, glow(p.stone.mid, p.lamp, 0.42))
-          else if (d === 4) canvas.set(cx + dx, cy + dy, glow(p.stone.dark, p.lamp, 0.26))
+          else if (d === 3) canvas.set(cx + dx, cy + dy, glow(p.stone.mid, p.lamp, 0.42 * strength))
+          else if (d === 4) canvas.set(cx + dx, cy + dy, glow(p.stone.dark, p.lamp, 0.26 * strength))
         }
       }
     }
     // 路灯：路面上几盏，带一片地面光斑
-    for (let i = 0; i < 7; i++) {
+    const lampCount = night ? 7 : 4
+    for (let i = 0; i < lampCount; i++) {
       const lx = 2 + Math.floor(rng() * (MAP_COLS - 4))
       const ly = 1 + Math.floor(rng() * (MAP_ROWS - 2))
       if (!/path|floor|grass/.test(layout[ly][lx])) continue
@@ -551,6 +664,7 @@ export function generateMap(archetype: MapArchetype, seed: string, night: boolea
     width: W,
     height: H,
     night,
+    phase,
     archetype,
   }
   MAP_CACHE.set(key, out)
@@ -571,20 +685,9 @@ export const ARCHETYPE_TO_MAP: Record<string, MapArchetype> = {
 }
 
 /**
- * 游戏内时间 → 是否夜晚。
- *
- * 分界刻意用 19 点 / 6 点而不是 18/6：
- * 黄昏那一小时用白天配色更好看（暖光还在），
- * 真正黑下来是 19 点以后，也与"夜里 19 点天开始暗"的直觉一致。
+ * 时间的一句话描述，用于 UI 与测试断言。
+ * 直接复用 `dayPhase` 的分界，避免两处各写一套阈值后不一致。
  */
-export function isNightHour(hour: number): boolean {
-  return hour >= 19 || hour < 6
-}
-
-/** 时间的一句话描述，用于调试与测试断言 */
 export function timeOfDayLabel(hour: number): string {
-  if (hour >= 19 || hour < 5) return '夜'
-  if (hour >= 5 && hour < 8) return '清晨'
-  if (hour >= 8 && hour < 17) return '白天'
-  return '黄昏'
+  return phaseLabel(dayPhase(hour))
 }

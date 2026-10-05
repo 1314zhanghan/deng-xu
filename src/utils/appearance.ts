@@ -67,22 +67,83 @@ export interface AppearanceTraits {
 /**
  * 发色词表。
  *
- * ⚠️ 每条都必须**明确指向头发**。第一版这里写了裸的 `/white hair|silver hair/`
- * 之类，结果「白手套上永远残留墨痕」里的 white 被当成发色，
- * 管家于是得到一头白发。凡是修饰"发"的规则，就不能匹配别的白色物件。
+ * ⚠️ 两条必须遵守的规则：
+ *
+ * 1) 每条都必须**明确指向头发**。第一版这里写了裸的 `/white hair|silver hair/`
+ *    之类，结果「白手套上永远残留墨痕」里的 white 被当成发色，
+ *    管家于是得到一头白发。凡是修饰"发"的规则，就不能匹配别的白色物件。
+ *
+ * 2) 描述里的发色常常不是标准色名 ——「浅亚麻色」「月白」「麦色」「栗棕」
+ *    这类说法在中文角色卡里非常普遍。原先只认"金发/银发/棕发"这些标准词，
+ *    于是大量角色推断不出颜色 → 退回随机 → 立绘与描述不符。
+ *    下面用 `hairRe()` 把**程度修饰词**（浅/深/淡/暗/亮/银/亚麻/麦…）
+ *    系统地组合进去，而不是逐个打补丁。
  */
+const HAIR_NOUN = '(?:色)?(?:的)?(?:(?:长|短|直|卷|波浪|蓬松|细软|柔顺)的?)*(?:头发|发丝|长发|短发|卷发|发)'
+/** 程度修饰词：允许出现在颜色词之前（"浅亚麻色长发"）或之后（"亚麻色浅发"） */
+const DEG = '(?:浅|淡|深|暗|亮|浓|浅色|深色|亚麻|麦|麦色|银|灰|金|蜜|焦糖|奶茶)'
+/**
+ * 构造发色正则。
+ * @param body 颜色主体（可能含多个同义说法，用 `|` 分隔）
+ * @param withDeg 是否允许程度修饰词 —— 用于区分"浅X"与"X"对应不同调色板
+ */
+const hairRe = (body: string, withDeg = false) =>
+  new RegExp(
+    withDeg
+      ? `${DEG}?(?:${body})${HAIR_NOUN}|${DEG}(?:${body})|(?:${body})${HAIR_NOUN}`
+      : `(?:${body})${HAIR_NOUN}|(?:${body})`,
+    'i'
+  )
+
+const ENGLISH_NOUN = 'hair'
+
 const HAIR_COLORS: [RegExp, string][] = [
-  [/乌黑|漆黑|墨黑|纯黑|黑(色)?(的)?(长)?(发|头发)|raven hair|jet.?black|black hair/i, 'black'],
-  [/深棕|暗棕|褐发|棕发|栗色(的)?发|栗发|brown hair|chestnut hair|brunette/i, 'dark_brown'],
-  [/金发|淡金|铂金(色)?(的)?发|金(色)?(的)?(长)?发|blond|blonde|golden hair|platinum blond/i, 'blonde'],
-  [/银发|银白(色)?(的)?(长)?发|霜白(的)?发|银丝|silver hair|white hair|grey hair|gray hair/i, 'silver'],
-  [/花白(的)?(头)?发|灰白(的)?(头)?发|斑白/i, 'silver'],
-  [/红发|赤发|火红(的)?(长)?发|姜红(的)?发|red hair|ginger hair|auburn/i, 'red'],
-  [/橙(色)?(的)?发|橘(色)?(的)?发|orange hair/i, 'orange'],
-  [/蓝(色)?(的)?(长)?发|靛蓝(的)?发|blue hair/i, 'blue'],
-  [/绿(色)?(的)?(长)?发|翠绿(的)?发|green hair/i, 'green'],
-  [/紫(色)?(的)?(长)?发|紫罗兰(色)?(的)?发|薰衣草(色)?(的)?发|purple hair|violet hair|lavender hair/i, 'purple'],
-  [/粉(色)?(的)?(长)?发|桃粉(的)?发|pink hair/i, 'pink'],
+  // ── 浅色系（放在深色前面：颜色词的匹配顺序决定"浅X"不会被"X"抢走）──
+  [new RegExp(`${DEG}?亚麻(?:色)?|亚麻${HAIR_NOUN}|(?:浅|淡)金|浅亚麻|flaxen|linen ${ENGLISH_NOUN}`, 'i'), 'sandy'],
+  [new RegExp(`(?:浅|淡|亮)褐|浅棕|浅栗|焦糖|奶茶色|light brown ${ENGLISH_NOUN}`, 'i'), 'light_brown'],
+
+  // ── 金 / 铂 ──
+  /*
+    ⚠️ 顺序规则：**具体色名必须排在泛化色名之前**。
+    「草莓金」原本排在「金」后面，于是被 `金发` 先匹配成 blonde ——
+    这类"被更泛的规则抢走"的问题会随着词表变大而变多，所以把
+    有专名的（草莓金/铂金/麦金）统一放到最前面。
+  */
+  [new RegExp(`草莓(?:金|色)|strawberry`, 'i'), 'strawberry'],
+  [new RegExp(`铂金|白金色?|(?:银白|霜白)金|platinum`, 'i'), 'platinum'],
+  [new RegExp(`麦(?:色|浪|穗)|麦金色|wheat|honey ${ENGLISH_NOUN}`, 'i'), 'gold'],
+  [new RegExp(`稻草色|干草色|straw`, 'i'), 'sandy'],
+  [new RegExp(`金${HAIR_NOUN}|金发|(?:金|蜜)色(?:的)?${HAIR_NOUN}|黄金|blond|blonde|golden ${ENGLISH_NOUN}`, 'i'), 'blonde'],
+
+  // ── 银 / 白 / 灰 ──
+  [new RegExp(`银${HAIR_NOUN}|银发|银白|霜白|月白|银丝|silver|white ${ENGLISH_NOUN}|grey ${ENGLISH_NOUN}|gray ${ENGLISH_NOUN}`, 'i'), 'silver'],
+  [new RegExp(`花白|灰白|斑白|salt.?and.?pepper`, 'i'), 'silver'],
+  [new RegExp(`炭灰|烟灰|深灰${HAIR_NOUN}|charcoal ${ENGLISH_NOUN}`, 'i'), 'dark_gray'],
+  [new RegExp(`灰${HAIR_NOUN}|灰发| ash ${ENGLISH_NOUN}|grey|gray`, 'i'), 'gray'],
+  [new RegExp(`灰烬色|ash(?:en)?`, 'i'), 'ash'],
+  [new RegExp(`纯白|雪白|素白|white`, 'i'), 'white'],
+
+  // ── 黑 ──
+  [new RegExp(`乌黑|漆黑|墨黑|墨色|纯黑|鸦羽|raven|jet.?black|black ${ENGLISH_NOUN}`, 'i'), 'raven'],
+  [new RegExp(`黑${HAIR_NOUN}|黑发|黑色(?:的)?${HAIR_NOUN}|black`, 'i'), 'black'],
+
+  // ── 棕 / 褐 / 栗 ──
+  [new RegExp(`栗色|栗棕|板栗|chestnut|maroon ${ENGLISH_NOUN}`, 'i'), 'chestnut'],
+  [new RegExp(`(?:深|暗)棕|深褐|咖啡色|巧克力色|dark brown|espresso`, 'i'), 'dark_brown'],
+  [new RegExp(`棕${HAIR_NOUN}|棕发|褐色${HAIR_NOUN}|褐发|茶色|蜜褐|brown ${ENGLISH_NOUN}|brunette`, 'i'), 'brown'],
+
+  // ── 红 / 橙 ──
+  [new RegExp(`姜红|姜黄|ginger|carrot|cinnamon`, 'i'), 'ginger'],
+  [new RegExp(`酒红|暗红|赤褐|auburn`, 'i'), 'redhead'],
+  [new RegExp(`红${HAIR_NOUN}|红发|赤发|火红|绯红|red ${ENGLISH_NOUN}|redhead`, 'i'), 'red'],
+  [new RegExp(`橙${HAIR_NOUN}|橘${HAIR_NOUN}|橙色|橘色|orange ${ENGLISH_NOUN}`, 'i'), 'orange'],
+
+  // ── 其他 ──
+  [hairRe('蓝|靛蓝|海蓝|藏青|blue|navy'), 'blue'],
+  [hairRe('绿|翠绿|墨绿|green'), 'green'],
+  [hairRe('紫|紫罗兰|薰衣草|violet|purple|lavender'), 'purple'],
+  [hairRe('粉|桃粉|樱花|rose|pink'), 'pink'],
+  [new RegExp(`玫瑰色|玫红`, 'i'), 'rose'],
 ]
 
 /**
@@ -104,7 +165,7 @@ const HAIR_COLORS: [RegExp, string][] = [
 const HAIR_STYLES: [RegExp, string[]][] = [
   [/双马尾|twin.?tail|pigtail/i, ['pig', 'ponytail', 'bangs']],
   [/马尾|ponytail|束成|扎成/i, ['ponytail', 'long', 'bob']],
-  [/发髻|盘发|丸子头|bun|updo/i, ['bun', 'updo']],
+  [/发髻|盘发|丸子头|bun|updo/i, ['topknot', 'bun', 'updo']],
   [/光头|秃顶|bald|shaven head/i, ['bald', 'balding']],
   [/长直发|直发|长直|straight hair/i, ['long', 'long_straight', 'relm_xlong']],
   [/长发|披肩|垂至|及腰|long hair/i, ['long', 'ponytail', 'bangslong', 'relm_xlong']],

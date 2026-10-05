@@ -439,16 +439,54 @@ const HEADS_ADULT = HEADS.filter(h => !/_small$|_child$/.test(h))
  * 因为素材库里没有眼镜类部件，被随机配了一顶**野蛮人头盔** ——
  * 比不戴帽子糟糕得多。宁可少一个配饰，也不能给错。
  */
+/**
+ * 在候选里按关键词匹配，并**按匹配质量排序**后择优。
+ *
+ * 为什么不能只取"第一个命中"：
+ *  关键词顺序只表达了**大类**优先级（马尾 > 长发），
+ *  同一类里的多个候选却只能靠池子顺序碰运气。
+ *  例如关键词 `ponytail` 同时命中 `hair_ponytail2`（普通马尾）
+ *  与 `hair_high_ponytail`（高马尾），原先取池中第一个，
+ *  结果"束成一条及腰的马尾"被画成高马尾 —— 与描述不符。
+ *
+ * 打分依据（都是"越贴近字面意思越好"）：
+ *  - 关键词在 id 里出现得**越早**越好（`ponytail2` 优于 `high_ponytail`）
+ *  - 关键词**覆盖 id 的比例越高**越好（`long` 命中 `hair_long` 优于命中 `hair_long_messy2`）
+ *  - id 里**额外的修饰词越少**越好（`long` 优于 `long_center_part`）
+ * 同分时随机，保留多样性。
+ */
 function pickByKeywords(
   rng: () => number,
   pool: string[],
   keywords: string[] | undefined
 ): string | undefined {
   if (!keywords?.length) return undefined
-  // 关键词按顺序试探：靠前的更精确
+
   for (const kw of keywords) {
-    const hits = pool.filter(id => id.toLowerCase().includes(kw.toLowerCase()))
-    if (hits.length) return hits[Math.floor(rng() * hits.length) % hits.length]
+    const k = kw.toLowerCase()
+    // 先剔掉"字面命中但风格不同"的部件（见 KEYWORD_EXCLUDE）
+    const ex = KEYWORD_EXCLUDE[k]
+    const base = ex ? pool.filter(id => !ex.test(id)) : pool
+    const hits = (base.length ? base : pool).filter(id => id.toLowerCase().includes(k))
+    if (!hits.length) continue
+    if (hits.length === 1) return hits[0]
+
+    // 对每个候选算一个"贴近度"分数，越小越贴近
+    const score = (id: string) => {
+      const low = id.toLowerCase()
+      const at = low.indexOf(k)
+      // 去掉 kind 前缀（hair_ / torso_ 之类）后再算覆盖率，否则前缀会稀释比例
+      const bare = low.replace(/^(hair|torso|legs|feet|head|hat|beard|cape|arms|nose|eyebrows|body|dress|belt)_/, '')
+      const bareAt = Math.max(0, bare.indexOf(k))
+      // 额外修饰词的数量：id 里除关键词之外的段数
+      const extra = bare.split(/[_\d]+/).filter(s => s && !k.includes(s) && !s.includes(k)).length
+      return bareAt * 10 + extra * 4 + (bare.length - k.length) * 0.5 + at * 0.1
+    }
+
+    const ranked = hits.slice().sort((a, b) => score(a) - score(b))
+    // 只在前若干名里随机：既贴近描述，又避免所有角色都长一模一样
+    const top = ranked.slice(0, Math.max(1, Math.min(3, Math.ceil(ranked.length / 3))))
+    return top[Math.floor(rng() * top.length) % top.length]
   }
   return undefined
 }
@@ -462,6 +500,23 @@ function pickRequired(
 ): string {
   if (!pool.length) return fallback
   return pickByKeywords(rng, pool, keywords) ?? pool[Math.floor(rng() * pool.length) % pool.length]
+}
+
+/**
+ * 关键词 → 必须排除的 id 片段。
+ *
+ * 为什么需要：中缀匹配会把**风格完全不同**的部件算成命中。
+ * 最典型的是 `short` —— `hair_shorthawk` 里含 "short"，
+ * 但它是莫西干发型；「深棕色的短发，看起来很干练」因此被画成莫西干。
+ * 这类"字面命中但语义不同"的必须显式排除，靠打分修不好
+ * （`shorthawk` 的评分甚至比 `bangsshort` 还靠前）。
+ */
+const KEYWORD_EXCLUDE: Record<string, RegExp> = {
+  short: /hawk|balding|mohawk/i,
+  long: /dread|mohawk/i,
+  bangs: /hawk/i,
+  straight: /dread/i,
+  curly: /dread/i,
 }
 
 /**
