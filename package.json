@@ -28,6 +28,7 @@
     "check:back": "node scripts/checks/back-nav.mjs",
     "check:map": "node scripts/checks/map-gallery.mjs",
     "check:npc": "node scripts/checks/npc-fidelity.mjs",
+    "check:npc-cov": "node scripts/checks/npc-coverage.mjs",
     "check:all": "node scripts/checks/all.mjs"
   },
   "dependencies": {

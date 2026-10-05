@@ -27,6 +27,7 @@ const CHECKS = [
   { name: '返回键层级', file: 'back-nav.mjs', port: 9874 },
   { name: '地图昼夜', file: 'map-gallery.mjs', port: 9875 },
   { name: 'NPC 贴合度', file: 'npc-fidelity.mjs', port: 9876 },
+  { name: 'NPC 词表覆盖', file: 'npc-coverage.mjs', port: 9877 },
 ]
 
 const only = process.argv.slice(2)

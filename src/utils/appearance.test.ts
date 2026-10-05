@@ -57,6 +57,25 @@ describe('外貌推断 · 发色', () => {
     expect(t.hairColor, '不该从白手套推出白发').not.toBe('white')
   })
 
+  it('**银丝眼镜框不会被误认成银发**（与白手套同类错误）', () => {
+    /*
+      管家的真实描述：「他有着一头乌黑锃亮的**长发**……右眼佩戴着一枚
+      镶有**银丝**的精致单片眼镜」。原先的银发模式里有裸的 `银丝`，
+      它命中了眼镜框，于是管家被画成一头银发 —— 而描述明写乌黑。
+      修法：去掉裸词，银发模式必须绑定"发"。
+    */
+    const desc = '他有着一头乌黑锃亮的长发，右眼佩戴着一枚镶有银丝的精致单片眼镜，深邃的暗绿色眼眸透过镜片观察着一切。'
+    const t = inferTraits({ description: desc })
+    expect(t.hairColor, '应识别出乌黑长发，而不是眼镜框上的银丝').not.toBe('silver')
+    expect(['black', 'raven'], `实际=${t.hairColor}`).toContain(t.hairColor)
+  })
+
+  it('真正的银发仍然识别得出来', () => {
+    for (const d of ['银白色的长发', '银发的老者', '一头霜白的长发', 'gray hair and a scar']) {
+      expect(inferTraits({ description: d }).hairColor, d).toBe('silver')
+    }
+  })
+
   it('名字里的外貌词优先级最高', () => {
     // 名字说红发，描述里又提到"黑色的靴子" —— 应当以名字为准
     const t = inferTraits({ name: '红发艾拉', description: '穿着黑色的靴子' })
@@ -239,6 +258,34 @@ describe('外貌推断 · 多色衣色', () => {
     expect(t.cloth).toBe('red')
     expect(t.clothAll).toEqual(['red'])
   })
+
+  /*
+    ⚠️ 这条测试是为了防住一类**很难发现的表格不一致**：
+    改衣色表时，brown 那一条漏用了 `clothRe()`、手写成窄列表
+    `(?:衣|袍|裙|衫|服|甲|外套|大衣)` —— 里面没有「围裙」，
+    于是「围着棕色围裙」推断不出衣色。
+    `GARMENT` 常量里明明有围裙，但表格另写了一份 —— 两份词表不一致，
+    而且不报错、只是静默失效。这里把两者接起来测。
+  */
+  const GARMENTS = [
+    ['围裙', '围着棕色围裙的厨师'],
+    ['外套', '穿橙色外套的人'],
+    ['衬衫', '白色衬衫'],
+    ['燕尾服', '黑色燕尾服'],
+    ['制服', '蓝色制服的店员'],
+    ['斗篷', '灰色斗篷'],
+    ['皮甲', '绿色皮甲'],
+    ['长袍', '紫色长袍'],
+    ['和服', '红色和服'],
+    ['胸甲', '银色胸甲'],
+    ['马甲', '棕色马甲'],
+    ['背心', '黑色背心'],
+  ]
+  for (const [label, desc] of GARMENTS) {
+    it(`衣物名「${label}」能推出衣色：${desc}`, () => {
+      expect(inferTraits({ description: desc }).cloth, `${label} 没推出衣色`).toBeTruthy()
+    })
+  }
 })
 
 describe('外貌推断 · evidence 可解释', () => {

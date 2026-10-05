@@ -116,10 +116,17 @@ const HAIR_COLORS: [RegExp, string][] = [
   [new RegExp(`金${HAIR_NOUN}|金发|(?:金|蜜)色(?:的)?${HAIR_NOUN}|黄金|blond|blonde|golden ${ENGLISH_NOUN}`, 'i'), 'blonde'],
 
   // ── 银 / 白 / 灰 ──
-  [new RegExp(`银${HAIR_NOUN}|银发|银白|霜白|月白|银丝|silver|white ${ENGLISH_NOUN}|grey ${ENGLISH_NOUN}|gray ${ENGLISH_NOUN}`, 'i'), 'silver'],
+  /*
+    ⚠️ 这里绝不能出现裸的「银丝」「银」这类词。
+    管家的描述是「右眼佩戴着一枚镶有**银丝**的精致单片眼镜」——
+    原先的 `银丝` 命中了眼镜框，于是管家被画成一头银发（描述写的是乌黑长发）。
+    与"白手套→白发"是同一类错误：**修饰发色的词必须绑定"发"**。
+    下面每条要么是"银X发/银发"，要么是明确的发色词（霜白/月白/花白）。
+  */
+  [new RegExp(`银${HAIR_NOUN}|银发|银白(?:色)?(?:的)?${HAIR_NOUN}|霜白|月白|silver ${ENGLISH_NOUN}|white ${ENGLISH_NOUN}|grey ${ENGLISH_NOUN}|gray ${ENGLISH_NOUN}`, 'i'), 'silver'],
   [new RegExp(`花白|灰白|斑白|salt.?and.?pepper`, 'i'), 'silver'],
   [new RegExp(`炭灰|烟灰|深灰${HAIR_NOUN}|charcoal ${ENGLISH_NOUN}`, 'i'), 'dark_gray'],
-  [new RegExp(`灰${HAIR_NOUN}|灰发| ash ${ENGLISH_NOUN}|grey|gray`, 'i'), 'gray'],
+  [new RegExp(`灰${HAIR_NOUN}|灰发|ash ${ENGLISH_NOUN}|grey|gray`, 'i'), 'gray'],
   [new RegExp(`灰烬色|ash(?:en)?`, 'i'), 'ash'],
   [new RegExp(`纯白|雪白|素白|white`, 'i'), 'white'],
 
@@ -181,13 +188,34 @@ const HAIR_STYLES: [RegExp, string[]][] = [
 ]
 
 /** 肤色 → LPC body 调色板名 */
+/**
+ * 肤色 / 种族肤色。
+ *
+ * ⚠️ 覆盖率诊断显示这里原先只有 10% 命中 —— 因为词表几乎只认「肤」字，
+ * 而角色卡里更多写的是**气色**（"面容疲惫""苍白到发青"）或**种族**
+ * （"绿皮肤"其实命中了，但精灵/矮人/亡灵这些没被利用）。
+ *
+ * 肤色随机出错其实很难被察觉（不像"男人穿裙子"那样一眼可见），
+ * 但种族确定时肤色也应当确定 —— 兽人总是绿皮、亡灵总是灰皮，
+ * 这是玩家会注意到的设定一致性。
+ */
 const SKINS: [RegExp, string][] = [
-  [/苍白|惨白|白得|病态.*白|瓷白|pale|porcelain|fair skin/i, 'light'],
-  [/白皙|白净|浅肤|fair|light skin/i, 'light'],
-  [/小麦|古铜|健康.*肤|tan|bronze|olive skin/i, 'olive'],
-  [/深肤|黑肤|黝黑|dark skin|brown skin|ebony/i, 'dark'],
-  [/灰肤|灰色.*肤|亡灵|尸|undead|ashen skin/i, 'grey'],
-  [/绿肤|绿皮|orc|goblin/i, 'green'],
+  // 种族优先：种族能决定肤色时，比"看起来白净"更可信
+  [/兽人|半兽人|orc|goblin|地精|绿皮|绿肤|绿皮肤/i, 'green'],
+  [/亡灵|尸|骷髅|undead|lich|zombie|不死/i, 'grey'],
+  [/暗精灵|卓尔|drow|dark elf/i, 'taupe'],
+  [/黑精灵|夜精灵/i, 'taupe'],
+  [/青铜肤|古铜肤|bronze skin/i, 'bronze'],
+  [/褐肤|棕肤|brown skin/i, 'brown'],
+  [/幽蓝|青灰肤|蓝灰肤/i, 'blue'],
+  [/淡紫肤|薰衣草肤|lavender skin/i, 'lavender'],
+  [/苍白|惨白|色白|病态.{0,3}白|瓷白|青白|pale|porcelain|ashen|wan\b/i, 'light'],
+  [/白皙|白净|白嫩|浅肤|肤色白|fair|light skin|cream/i, 'light'],
+  [/小麦|古铜|健康.{0,3}肤|日晒|tan|bronze|olive skin|sun.?tanned/i, 'olive'],
+  [/琥珀|蜜色肤|amber skin|golden skin/i, 'amber'],
+  [/黝黑|深肤|黑肤|肤色深|dark skin|ebony|swarthy/i, 'dark'],
+  [/灰肤|灰色.{0,3}肤|尸灰|灰色皮肤|undead|ashen skin/i, 'grey'],
+  [/苍白到发青|发青|青紫/i, 'grey'],
 ]
 
 /**
@@ -213,6 +241,15 @@ const GARMENT = '(?:色)?(?:的)?(?:长|短|厚|薄)?' +
 const clothRe = (color: string) => new RegExp(`${color}${GARMENT}|${color}`, 'i')
 
 const CLOTH_COLORS: [RegExp, string][] = [
+  /*
+    ⚠️ 除少数专名外，**一律用 `clothRe(颜色字)` 生成**，不要手写衣物名列表。
+    我改这张表时 brown 那条漏用 clothRe、手写成了
+    `(?:衣|袍|裙|衫|服|甲|外套|大衣)` —— 里面**没有「围裙」**，
+    于是「围着棕色围裙」推断不出衣色。
+    更糟的是这个错误很难发现：`GARMENT` 常量明明列了围裙，
+    表格里却另写了一份窄列表，两份"衣物名词表"不一致。
+    下面补了一条测试专门守这件事（提到衣物名就必须能推出衣色）。
+  */
   [new RegExp(`(?:白${GARMENT}|纯白|素白|皎白|雪白|银白|white\\b)`, 'i'), 'white'],
   [new RegExp(`(?:黑${GARMENT}|玄色|墨色|漆黑|乌黑|black\\b)`, 'i'), 'black'],
   [new RegExp(`(?:灰${GARMENT}|灰袍|grey\\b|gray\\b)`, 'i'), 'gray'],
@@ -222,17 +259,25 @@ const CLOTH_COLORS: [RegExp, string][] = [
   [/酒红|暗红|栗红|maroon|burgundy/i, 'maroon'],
   [clothRe('绿'), 'green'],
   [/森林绿|深绿|forest green/i, 'forest'],
-  [/棕(?:色)?(?:的)?(?:衣|袍|裙|衫|服|甲|外套|大衣)|褐色|皮革|皮甲|皮衣|brown\b|leather/i, 'brown'],
+  [clothRe('棕'), 'brown'],
+  [clothRe('褐'), 'brown'],
+  [/皮革|皮衣|leather/i, 'brown'],
   [clothRe('紫'), 'purple'],
   [/薰衣草|淡紫|lavender/i, 'lavender'],
   [clothRe('粉'), 'pink'],
-  [/金(?:色)?(?:的)?(?:袍|衣|甲|冠)|金黄|gold\b/i, 'yellow'],
-  [new RegExp(`(?:黄${GARMENT}|土黄|yellow\\b)`, 'i'), 'yellow'],
-  [new RegExp(`(?:橙${GARMENT}|orange\\b)`, 'i'), 'orange'],
-  [new RegExp(`(?:青${GARMENT}|蓝绿|teal\\b)`, 'i'), 'teal'],
+  [clothRe('金'), 'yellow'],
+  [/金黄|gold\\b/i, 'yellow'],
+  [clothRe('黄'), 'yellow'],
+  [clothRe('橙'), 'orange'],
+  [clothRe('青'), 'teal'],
+  [/蓝绿|teal\\b/i, 'teal'],
   [/天蓝|sky blue/i, 'sky'],
   [/木炭|炭黑|charcoal/i, 'charcoal'],
   [/石板|slate/i, 'slate'],
+  // 银色/铜色/铁色：金属色不是 cloth 调色板的强项，退到最接近的灰/褐
+  [new RegExp(`银${GARMENT}|银色|silver`, 'i'), 'gray'],
+  [new RegExp(`铜${GARMENT}|古铜色|青铜`, 'i'), 'walnut'],
+  [new RegExp(`墨${GARMENT}`, 'i'), 'black'],
 ]
 
 /** 瞳色 */
@@ -248,11 +293,21 @@ const EYE_COLORS: [RegExp, string][] = [
 ]
 
 /** 年龄 */
+/**
+ * 年龄。
+ *
+ * ⚠️ 顺序很重要，"老"必须排在"中年"**之后**判断不了 ——
+ * 因为「五十岁的老者」同时含数字与"老"，`firstHit` 取第一个命中的，
+ * 所以更**具体**的规则要写在前面（这里 50 岁 → adult 是错的，
+ * 因此把"岁数大"的规则提到中年之前）。
+ */
 const AGES: [RegExp, 'child' | 'young' | 'adult' | 'elder'][] = [
-  [/孩童|幼童|小孩|少年|少女|child|kid|young boy|young girl|\b1[0-6] ?岁/i, 'child'],
-  [/青年|年轻|少年郎|rookie|young man|young woman|youth|\b(1[7-9]|2[0-9]) ?岁/i, 'young'],
-  [/中年|壮年|middle.?aged|\b(4[0-9]|5[0-9]) ?岁/i, 'adult'],
-  [/老|年迈|白发苍苍|古稀|花甲|elder|elderly|old man|old woman|aged|\b[6-9][0-9] ?岁/i, 'elder'],
+  [/孩童|幼童|小孩|儿童|少年|少女|child|kid|young boy|young girl|\b([1-9]|1[0-6]) ?岁/i, 'child'],
+  [/十六岁|十五六|十七八/i, 'child'],
+  // 先判"很老"的表述，再判中年，避免「五十岁的老者」被判成中年
+  [/老|年迈|白发苍苍|古稀|花甲|耄耋|垂暮|elder|elderly|old man|old woman|aged|\b([6-9][0-9]) ?岁/i, 'elder'],
+  [/中年|壮年|不惑|知天命|middle.?aged|\b([4-5][0-9]) ?岁/i, 'adult'],
+  [/青年|年轻|二十出头|三十出头|少年郎|rookie|young man|young woman|youth|\b(1[7-9]|2[0-9]|3[0-9]) ?岁/i, 'young'],
 ]
 
 /** 体型 */
@@ -275,33 +330,60 @@ const BUILDS: [RegExp, 'slim' | 'average' | 'broad' | 'muscular'][] = [
  * 下面的关键词都对着 lpcSprite.ts 里实际存在的 id 核对过。
  */
 const ROLES: [RegExp, string[]][] = [
-  // 守卫/骑士/士兵 → 盔甲
-  [/守卫|卫兵|骑士|士兵|武士|巡逻|队长|guard|knight|soldier|warrior|sentry|watchman/i,
+  // 守卫/骑士/士兵/战士 → 盔甲
+  [/守卫|卫兵|骑士|士兵|武士|战士|佣兵|雇佣兵|巡逻|队长|guard|knight|soldier|warrior|sentry|watchman|paladin|圣殿|mercenary|legion/i,
     ['torso_armour_plate', 'torso_armour_legion', 'torso_armour_leather']],
-  // 法师/学者 → 长袍
-  [/法师|术士|巫师|学者|研究|mage|wizard|sorcer|scholar|warlock/i,
+  // 修行者/弟子/门派 → 长袍（仙侠与武侠题材的主力衣着）
+  [/弟子|门人|传人|修士|剑修|散修|道人|真人|尊者|长老|掌门|宗主|侠客|剑客|刀客|武人|disciple|monk|ascetic|cultivator|swordsman/i,
+    ['torso_clothes_robe', 'torso_clothes_longsleeve_formal']],
+  // 法师/学者/祭司 → 长袍
+  [/法师|术士|巫师|学者|研究|祭司|牧师|神官|萨满|mage|wizard|sorcer|scholar|warlock|priest|cleric|shaman|druid/i,
     ['torso_clothes_robe']],
-  // 管家/仆从/贵族 → 正装外套
-  [/管家|仆从|侍者|女仆|butler|servant|maid|steward/i,
+  // 管家/仆从/女仆 → 正装外套
+  [/管家|仆从|侍者|女仆|侍从|butler|servant|maid|steward|valet|footman/i,
     ['torso_jacket_collared', 'torso_jacket_pockets', 'torso_jacket_frock']],
-  // 商人/店主 → 马甲/外套
-  [/商人|店主|掌柜|merchant|shopkeep|trader/i,
+  // 商人/店主/酒保 → 马甲/外套
+  [/商人|店主|掌柜|老板|酒保|商贩|merchant|shopkeep|trader|innkeep|barkeep|bartender|shopkeeper/i,
     ['torso_jacket_pockets', 'torso_clothes_longsleeve2_buttoned']],
-  // 盗贼/刺客/游侠 → 皮甲或无袖（便于行动）
-  [/盗贼|刺客|游侠|猎|rogue|thief|assassin|ranger|hunter/i,
+  // 盗贼/刺客/游侠/猎手 → 皮甲或无袖（便于行动）
+  [/盗贼|刺客|游侠|猎手|猎人|斥候|rogue|thief|assassin|ranger|hunter|scout|bandit/i,
     ['torso_armour_leather', 'torso_clothes_sleeveless1']],
-  // 贵族/领主/王 → 礼服
-  [/贵族|领主|国王|女王|王|noble|lord|lady|king|queen|prince|princess/i,
+  // 贵族/领主/王室 → 礼服
+  [/贵族|领主|国王|女王|亲王|公主|王子|伯爵|公爵|noble|lord|lady|king|queen|prince|princess|duke|count|baron/i,
     ['torso_jacket_tabard', 'torso_jacket_iverness', 'torso_jacket_frock']],
   // 铁匠/工匠/矿工 → 皮围裙
-  [/铁匠|工匠|矿工|smith|blacksmith|miner|craftsman/i,
+  [/铁匠|工匠|矿工|技工|smith|blacksmith|miner|craftsman|artisan/i,
     ['torso_aprons_apron', 'torso_aprons_apron_half']],
-  // 农民/农妇/村民 → 长袖或工装
-  [/农民|农妇|农夫|farmer|peasant|villager/i,
+  // 农民/村民 → 长袖或工装
+  [/农民|农妇|农夫|村民|农户|farmer|peasant|villager|peasantry/i,
     ['torso_clothes_longsleeve', 'torso_aprons_overalls']],
-  // 船员/水手/船长 → 束袖长衫
-  [/船员|水手|船长|sailor|captain|pirate/i,
+  // 船员/水手/船长/海盗 → 束袖长衫
+  [/船员|水手|船长|海盗|渔夫|sailor|captain|pirate|fisher|boatswain/i,
     ['torso_clothes_longsleeves_cuffed', 'torso_clothes_longsleeve']],
+  // 官员/文官/吏员 → 正装外套（对应中式官袍的"正式"感）
+  [/官员|文官|官吏|吏员|县令|知府|宰相|大臣|official|magistrate|bureaucrat|mandarin|minister/i,
+    ['torso_jacket_collared', 'torso_clothes_longsleeve_formal']],
+  // 学生/学徒 → 衬衫马甲
+  [/学生|学徒|门生|student|apprentice|acolyte|pupil/i,
+    ['torso_clothes_longsleeve2_buttoned', 'torso_clothes_vest']],
+  // 医生/药师/护士 → 白衣长衫
+  [/医生|医师|药师|护士|郎中|doctor|physician|apothecary|nurse|healer/i,
+    ['torso_clothes_longsleeve_formal', 'torso_clothes_longsleeve']],
+  // 现代职业（西装/制服感）
+  [/上班族|职员|白领|公务员|律师|银行|office|clerk|businessman|salaryman|lawyer|banker/i,
+    ['torso_clothes_longsleeve_formal', 'torso_clothes_longsleeve2_buttoned']],
+  [/警察|警官|保安|巡警|police|officer|sheriff|constable/i,
+    ['torso_jacket_collared', 'torso_armour_leather']],
+  [/厨师|厨子|伙夫|cook|chef/i, ['torso_aprons_apron', 'torso_clothes_shortsleeve']],
+  [/艺人|吟游|歌者|舞|bard|minstrel|performer|dancer/i,
+    ['torso_clothes_longsleeve2_scoop', 'torso_jacket_iverness']],
+  [/店员|收银|服务生|waitress|waiter|shop assistant/i,
+    ['torso_clothes_shortsleeve_polo', 'torso_clothes_longsleeve2_polo']],
+  // 种族本身也能定型：精灵多穿轻甲长衣、矮人偏工装
+  [/精灵|elf|elven/i, ['torso_armour_leather', 'torso_clothes_longsleeve_formal']],
+  [/矮人|dwarf|dwarven/i, ['torso_aprons_overalls', 'torso_armour_leather']],
+  [/兽人|半兽人|orc|goblin|地精/i, ['torso_armour_leather', 'torso_clothes_sleeveless1']],
+  [/亡灵|尸|骷髅|undead|lich/i, ['torso_clothes_robe']],
 ]
 
 /**
@@ -311,22 +393,42 @@ const ROLES: [RegExp, string[]][] = [
  * 匹配不到时配方会**不加头饰**而不是随机加一个 —— 见 lpcSprite 的说明。
  */
 const HEADWEAR: [RegExp, string[]][] = [
-  [/头盔|盔|helm|helmet/i, ['hat_helmet_nasal', 'hat_helmet_barbuta_simple', 'hat_helmet_flattop', 'hat_helmet_legion']],
-  [/兜帽|连帽|hood/i, ['hat_hood_cloth', 'hat_hood_hijab']],
-  [/头巾|包头|turban|headband|头带|发带/i, ['hat_headband_thick', 'hat_headband_tied', 'hat_bandana']],
-  [/王冠|冠冕|crown|coronet/i, ['hat_formal_crown']],
-  [/三角帽|海盗帽|tricorne|bicorne/i, ['hat_bicorne_athwart_admiral', 'hat_tricorne_captain_skull', 'hat_bicorne_foreaft_commodore']],
-  [/帽子|礼帽|hat|cap/i, ['hat_cap_leather', 'hat_cap_bonnie_tilt', 'hat_cap_bonnie']],
+  [/头盔|兜鍪|helm|helmet/i,
+    ['hat_helmet_nasal', 'hat_helmet_barbuta_simple', 'hat_helmet_flattop', 'hat_helmet_legion', 'hat_helmet_morion', 'hat_helmet_sugarloaf']],
+  [/兜帽|连帽|风帽|头罩|hood/i, ['hat_hood_cloth', 'hat_hood_hijab']],
+  [/头巾|包头|包巾|抹额|turban|headband|头带|发带/i,
+    ['hat_headband_thick', 'hat_headband_tied', 'hat_bandana', 'hat_bandana_pirate']],
+  [/王冠|冠冕|皇冠|宝冠|金冠|crown|coronet/i, ['hat_formal_crown', 'hat_accessory_crest']],
+  [/角冠|犄角|horns/i, ['hat_accessory_horns_upward']],
+  [/翼冠|羽翼冠/i, ['hat_accessory_wings']],
+  [/三角帽|海盗帽|双角帽|tricorne|bicorne/i,
+    ['hat_bicorne_athwart_admiral', 'hat_tricorne_captain_skull', 'hat_bicorne_foreaft_commodore', 'hat_bandana_pirate_skull']],
+  /*
+    帽子。
+    ⚠️ 上游**没有棒球帽 / 无檐帽 / 针织帽**（我核对了 36 件 hat 部件的 id，
+    只有 cap_leather / cap_bonnie 这几个）。所以"戴棒球帽"这类描述
+    只能落到皮质便帽上 —— 这是素材边界，不是词表问题。
+    把常见帽子词都归到这里，至少能加一顶"帽子"，而不是什么都没有。
+    另外「乌纱帽」「官帽」也归这里：上游没有中式官帽，
+    用深色皮帽近似比不加更接近设定。
+  */
+  [/帽子|礼帽|便帽|棒球帽|鸭舌帽|无檐帽|针织帽|毛线帽|斗笠|毡帽|乌纱帽|官帽|hat|cap|beanie/i,
+    ['hat_cap_leather', 'hat_cap_leather_feather', 'hat_cap_bonnie_tilt', 'hat_cap_bonnie']],
+  [/尖顶盔|维京|spangenhelm|sugarloaf/i, ['hat_helmet_spangenhelm_viking', 'hat_helmet_sugarloaf']],
+  [/大盔|全罩|封闭式|greathelm/i, ['hat_helmet_greathelm']],
+  [/面甲|护面|visor/i, ['hat_visor_round_raised', 'hat_visor_horned']],
+  [/圣诞帽|holiday/i, ['hat_holiday_christmas']],
+  [/法冠|星辰冠|仙冠|celestial/i, ['hat_magic_celestial']],
   /*
     眼镜/单片眼镜/眼罩/面具：**上游没有这类部件**（我在 LPC 定义树里搜过，
     hat_glasses_* / hat_eyepatch / hat_mask_* 都不存在）。
-    但仍然保留这条规则并给出**空关键词列表**，理由是：
+    仍然保留这条规则并给出**空关键词列表**，理由是：
       - 关键词列表为空 ⇒ 配方不会加任何头饰（正确的行为：宁可少一个配饰，
         也不能因为"戴眼镜"就随机配一顶野蛮人头盔）；
       - 同时 evidence 里会留下「头饰:单片眼镜」，说明作者的设定被读到了。
     将来如果补了眼镜素材，只需把 id 填进这个数组即可。
   */
-  [/单片眼镜|眼镜|眼罩|面具|面罩|glasses|monocle|eyepatch|mask|visor/i, []],
+  [/单片眼镜|眼镜|眼罩|面具|面罩|glasses|monocle|eyepatch|mask/i, []],
 ]
 
 /** 胡须 */
