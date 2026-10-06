@@ -152,18 +152,90 @@ function drawTile(kind: TileKind, p: MapPalette, rng: () => number): RgbCanvas {
     for (let i = 0; i < n; i++) c.set(Math.floor(rng() * TILE), Math.floor(rng() * TILE), col)
   }
 
+  /**
+   * 一簇草/一朵花 —— 2~4 像素的**水平短线**，而不是单个像素。
+   *
+   * 为什么要成簇：单像素点在 16px 的瓦片里只是一个脏点，密铺之后看不出
+   * "这里有簇草"，只觉得画面有噪点。凑成短线才有"一撮"的形状。
+   * 这也是本轮"装饰物"的核心 —— **一格只有 16px，独立的小物件根本画不下**，
+   * 装饰必须做进瓦片本身的纹理里。
+   */
+  const tuft = (col: RGB, lenMin = 2, lenMax = 4) => {
+    const x = 1 + Math.floor(rng() * (TILE - 5))
+    const y = 1 + Math.floor(rng() * (TILE - 3))
+    const len = lenMin + Math.floor(rng() * (lenMax - lenMin + 1))
+    c.rect(x, y, len, 1, col)
+    // 半数情况再多一层，形成"小三角"而不是一根横杠
+    if (rng() < 0.5) c.rect(x + 1, y + 1, Math.max(1, len - 1), 1, col)
+  }
+
+  /** 撒若干装饰（成簇） */
+  const tufts = (n: number, col: RGB) => { for (let i = 0; i < n; i++) tuft(col) }
+
+  /**
+   * 变体分档。
+   * ⚠️ 旧版所有变体只随机"噪点位置"，图案一模一样 ——
+   * 于是同一地形铺出来毫无节奏（`grass`/`path`/`floor`/`sand` 的三套变体几乎不可分辨）。
+   * 现在先摇一档，**改变装饰的密度与种类**，而不只是位置。
+   */
+  const tier = rng()
+
   switch (kind) {
     case 'grass': case 'grass2': {
-      speck(kind === 'grass' ? 8 : 12, r.dark)
-      speck(6, r.light)
+      // 三档：稀疏草皮 / 密集草丛 / 带小花的草 —— 密度本身就有变化
+      const dense = kind === 'grass2' || tier > 0.55
+      tufts(dense ? 5 : 2, r.light)
+      tufts(2, r.dark)
+      speck(dense ? 6 : 3, r.dark)
+      /*
+        偶发小花。必须**低频**（每档只给约两成瓦片加），
+        否则密铺之后整片草地像撒了糖霜 —— 点缀的关键是"少"。
+      */
+      if (rng() < 0.22) {
+        const flower: RGB = p.lamp
+        c.set(4 + Math.floor(rng() * 8), 4 + Math.floor(rng() * 8), flower)
+      }
       break
     }
-    case 'path': case 'floor': case 'sand': {
-      speck(10, r.dark)
-      speck(5, r.hi)
-      // 右上受光：地图的立体感来自"统一的受光方向"
-      c.rect(TILE - 1, 0, 1, TILE, r.light)
+    case 'path': {
+      if (tier < 0.34) {
+        // 车辙：两条纵向浅痕
+        const lx = 3 + Math.floor(rng() * 4)
+        c.rect(lx, 0, 1, TILE, r.dark)
+        c.rect(lx + 7, 0, 1, TILE, r.dark)
+      } else if (tier < 0.67) {
+        // 碎石：几粒高光碎石
+        tufts(4, r.hi)
+      } else {
+        // 蹄印/坑洼：小暗坑
+        tufts(3, r.dark)
+      }
+      speck(6, r.dark)
+      speck(4, r.hi)
+      break
+    }
+    case 'floor': {
+      /*
+        室内地板：给一条**板缝**，让它读起来是"铺过的地面"而不是"土路"。
+        路径和地板原本用同一套画法（都是 speck），在俯瞰图里几乎分不清。
+      */
       c.rect(0, 0, TILE, 1, r.light)
+      c.rect(0, 0, 1, TILE, r.light)
+      c.rect(0, 7, TILE, 1, r.dark)
+      speck(5, r.dark)
+      speck(3, r.hi)
+      break
+    }
+    case 'sand': {
+      // 沙：横向风纹（一层层的），比噪点更能表达"沙面"
+      for (let i = 0; i < 3; i++) {
+        const y = 3 + Math.floor(rng() * (TILE - 6))
+        const x = Math.floor(rng() * 6)
+        c.rect(x, y, 5 + Math.floor(rng() * 6), 1, r.light)
+      }
+      // 三档里有一档掺碎石
+      if (tier > 0.7) tufts(2, r.dark)
+      speck(5, r.dark)
       break
     }
     case 'water': {
@@ -174,16 +246,53 @@ function drawTile(kind: TileKind, p: MapPalette, rng: () => number): RgbCanvas {
         const x = Math.floor(rng() * (TILE - 8))
         c.rect(x, y, 6, 1, r.hi)
       }
+      // 一档加碎波：短亮线，让水面的疏密也有变化
+      if (tier > 0.6) {
+        for (let i = 0; i < 3; i++) {
+          const y = 1 + Math.floor(rng() * (TILE - 2))
+          const x = Math.floor(rng() * (TILE - 3))
+          c.rect(x, y, 2, 1, r.light)
+        }
+      }
       break
     }
-    case 'stone': case 'rock': {
-      // 石块：分格 + 缝隙
+    case 'stone': {
+      // 砌石：分格 + 缝隙（人工铺装）
       c.rect(0, 0, TILE, 1, r.dark)
       c.rect(0, 0, 1, TILE, r.dark)
       c.rect(0, 7, TILE, 1, r.dark)
       c.rect(7, 0, 1, 8, r.dark)
       c.rect(3, 8, 1, 8, r.dark)
       speck(6, r.light)
+      break
+    }
+    case 'rock': {
+      /*
+        岩层：与砌石**分开画**。
+        旧版 stone 和 rock 共用一套画法，结果"石墙"和"山岩"在俯瞰图里长得一样。
+        岩层用随机走向的裂缝 + 大块明暗，读起来是天然岩面。
+      */
+      c.rect(0, 0, TILE, TILE, r.mid)
+      // 两三块大面，做出天然岩块的明暗
+      for (let i = 0; i < 3; i++) {
+        const x = Math.floor(rng() * 8)
+        const y = Math.floor(rng() * 8)
+        const w = 4 + Math.floor(rng() * 6)
+        const h = 3 + Math.floor(rng() * 5)
+        c.rect(x, y, w, h, rng() < 0.5 ? r.dark : r.light)
+      }
+      // 裂缝：斜向短线
+      for (let i = 0; i < 3; i++) {
+        let x = Math.floor(rng() * TILE)
+        let y = Math.floor(rng() * TILE)
+        for (let k = 0; k < 5; k++) {
+          c.set(x, y, r.dark)
+          x += rng() < 0.5 ? 1 : 0
+          y += 1
+          if (x >= TILE || y >= TILE) break
+        }
+      }
+      speck(5, r.hi)
       break
     }
     case 'wall': {
