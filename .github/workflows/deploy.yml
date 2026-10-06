@@ -56,6 +56,25 @@ jobs:
         # 单元测试放在构建之前：测试挂了就不必浪费一次部署
         run: pnpm test
 
+      # ── 静态守卫（不需要浏览器，几秒钟）──
+      # 这两项查的都是**静默失效**：编译通过、测试通过、只有玩家看得出来。
+      # 放在这里而不是靠人肉发现，是因为它们抓到的每一类缺陷
+      # （关键词指向不存在的部件、源码被写坏成乱码）都曾经真的发生过。
+      - name: Check source encoding
+        # 源码/文档级乱码与非法 UTF-8。历史上 PowerShell 把 UTF-8 当 GBK
+        # 读写，弄坏过文件，而且这类损坏不报错、不影响编译。
+        run: pnpm check:encoding
+
+      - name: Check keyword tables against real assets
+        # 词表里的部件 id 片段是否真实存在。写错的代价是不报错、
+        # 只退化成随机（"铁匠穿工装裤""管家戴野蛮人头盔"）。
+        run: pnpm check:keywords
+
+      - name: Self-test the guards
+        # 用**污染测试**证明上面两个守卫真的会报警 ——
+        # 一个只会打印"全部通过"的检测器毫无价值。
+        run: pnpm check:tools
+
       - name: Build
         run: pnpm build
 

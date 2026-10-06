@@ -172,7 +172,7 @@ const HAIR_COLORS: [RegExp, string][] = [
 const HAIR_STYLES: [RegExp, string[]][] = [
   [/双马尾|twin.?tail|pigtail/i, ['pig', 'ponytail', 'bangs']],
   [/马尾|ponytail|束成|扎成/i, ['ponytail', 'long', 'bob']],
-  [/发髻|盘发|丸子头|bun|updo/i, ['topknot', 'bun', 'updo']],
+  [/发髻|盘发|丸子头|bun|updo/i, ['topknot']],
   [/光头|秃顶|bald|shaven head/i, ['bald', 'balding']],
   [/长直发|直发|长直|straight hair/i, ['long', 'long_straight', 'relm_xlong']],
   [/长发|披肩|垂至|及腰|long hair/i, ['long', 'ponytail', 'bangslong', 'relm_xlong']],
@@ -180,7 +180,11 @@ const HAIR_STYLES: [RegExp, string[]][] = [
   [/脏辫|辫子|braid|dreadlock/i, ['braid', 'dread', 'long']],
   [/刘海|齐刘海|bangs|fringe/i, ['bangs', 'bangsshort', 'bangslong']],
   [/爆炸头|蓬松[^。；，\n]{0,4}发|afro/i, ['afro', 'curly']],
-  [/莫西干|mohawk/i, ['mohawk']],
+  // ⚠️ 关键词必须是**真实存在的 id 片段**。库里的莫西干部件叫 `hair_shorthawk`，
+  //    所以片段要写 `shorthawk` —— 写 `mohawk` 匹配不到任何部件，
+  //    命中「莫西干头」后只会退化成随机（这个错是 `check-keywords.mjs` 查出来的）。
+  //    `spiked`（尖刺发）作为兜底：punk 风格里两者观感接近。
+  [/莫西干|mohawk/i, ['shorthawk', 'spiked']],
   [/蓬乱|凌乱|乱蓬|未打理|unkempt|messy|bedhead/i, ['bedhead', 'messy', 'long']],
   [/短寸|寸头|板寸|buzz/i, ['buzz', 'balding']],
   // 「短发」放最后：它是兜底描述，具体款式应当优先（见上面坑 2）
@@ -365,7 +369,7 @@ const ROLES: [RegExp, string[]][] = [
     ['torso_jacket_collared', 'torso_clothes_longsleeve_formal']],
   // 学生/学徒 → 衬衫马甲
   [/学生|学徒|门生|student|apprentice|acolyte|pupil/i,
-    ['torso_clothes_longsleeve2_buttoned', 'torso_clothes_vest']],
+    ['torso_clothes_longsleeve2_buttoned', 'torso_clothes_longsleeve2_polo', 'torso_clothes_longsleeve2_cardigan']],
   // 医生/药师/护士 → 白衣长衫
   [/医生|医师|药师|护士|郎中|doctor|physician|apothecary|nurse|healer/i,
     ['torso_clothes_longsleeve_formal', 'torso_clothes_longsleeve']],
@@ -480,8 +484,23 @@ function allHits<T>(text: string, table: [RegExp, T][]): { values: T[]; evidence
  * 它才是外衣（最显眼的那个）；按词表顺序可能先命中"白"，
  * 于是立绘给一件白外套，与描述正相反。
  */
-function hitsInOrder<T>(text: string, table: [RegExp, T][]): { value: T; evidence: string; at: number }[] {
-  const out: { value: T; evidence: string; at: number }[] = []
+/**
+ * 词表导出 —— **仅供校验工具与测试使用**，运行时代码不要依赖它。
+ *
+ * 为什么必须导出：`ROLES` / `HEADWEAR` 里写的是**部件 id 片段**，
+ * 而写错 id 的代价是**静默失效** —— 不报错、不抛异常，
+ * 只是关键词匹配不到任何部件，然后退化成随机（"铁匠穿工装裤、
+ * 管家戴野蛮人头盔"就是这么来的）。
+ *
+ * 这类缺陷无法靠运行时断言发现（它"正常工作"，只是结果错），
+ * 只能拿真实的 `runtime.json` 反查。`scripts/check-keywords.mjs` 就是干这个的。
+ */
+export const __tablesForValidation = {
+  HAIR_COLORS, HAIR_STYLES, SKINS, CLOTH_COLORS, AGES, BUILDS, ROLES, HEADWEAR,
+  GARMENT, BEARD_RE, SKIRT_RE,
+}
+
+function hitsInOrder<T>(text: string, table: [RegExp, T][]): { value: T; evidence: string; at: number }[] {  const out: { value: T; evidence: string; at: number }[] = []
   for (const [re, value] of table) {
     // 用全局匹配找出该模式在文本里最早的位置
     const g = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g')

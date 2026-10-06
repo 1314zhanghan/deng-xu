@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { inferTraits } from '@/utils/appearance'
+import { inferTraits, __tablesForValidation } from '@/utils/appearance'
 import runtime from '@/assets/lpc/runtime.json'
 
 /**
@@ -138,6 +138,42 @@ describe('发型关键词必须命中真实发型', () => {
       expect(hits(HAIR_POOL, t.hairStyle!).length, `${label} 的 ${JSON.stringify(t.hairStyle)} 没有对应发型`)
         .toBeGreaterThan(0)
     })
+  }
+})
+
+describe('**整张词表**不得有指向空气的片段（比逐条抽查严格得多）', () => {
+  /*
+    上面那些用例都是「至少命中一个」—— 这正好漏掉一类缺陷：
+    一条规则里写了 3 个片段，只有第 1 个是真的，后 2 个是空气。
+    因为第 1 个兜住了，测试照样绿，而那 2 个片段永远轮不到。
+
+    真实案例（都是 `scripts/check-keywords.mjs` 查出来的）：
+      · HAIR_STYLES /莫西干|mohawk/ → ['mohawk']，而库里的莫西干部件叫
+        `hair_shorthawk`：**唯一**候选是空气 → 命中「莫西干头」后退化成随机
+      · ROLES /学生/ → 含 `torso_clothes_vest`，库里没有 vest 类部件
+      · HAIR_STYLES /发髻|bun|updo/ → 后两个是空气，靠 topknot 兜住
+
+    这里把**整张表**逐条逐片段核一遍。唯一允许的例外是**空数组**：
+    那是有意留的"已知缺口"（上游没有眼镜/面具类素材），见上面那条用例。
+  */
+  const tables: [string, [RegExp, string[]][]][] = [
+    ['ROLES', __tablesForValidation.ROLES],
+    ['HEADWEAR', __tablesForValidation.HEADWEAR],
+    ['HAIR_STYLES', __tablesForValidation.HAIR_STYLES],
+  ]
+
+  for (const [name, table] of tables) {
+    for (const [re, frags] of table) {
+      if (!frags.length) continue          // 有意留空的"已知缺口"
+      for (const frag of frags) {
+        it(`${name} /${re.source}/ 的片段 "${frag}" 必须命中真实部件`, () => {
+          expect(
+            hits(parts.map(p => p.id), [frag]).length,
+            `片段 "${frag}" 匹配不到任何部件 —— 它会永远轮不到（写成空气了）`,
+          ).toBeGreaterThan(0)
+        })
+      }
+    }
   }
 })
 

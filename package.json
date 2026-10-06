@@ -29,7 +29,13 @@
     "check:map": "node scripts/checks/map-gallery.mjs",
     "check:npc": "node scripts/checks/npc-fidelity.mjs",
     "check:npc-cov": "node scripts/checks/npc-coverage.mjs",
-    "check:all": "node scripts/checks/all.mjs"
+    "check:all": "node scripts/checks/all.mjs",
+    "check:failed": "node scripts/checks/all.mjs --only-failed",
+    "check:list": "node scripts/checks/all.mjs --list",
+    "check:keywords": "node scripts/check-keywords.mjs",
+    "check:encoding": "node scripts/check-encoding.mjs",
+    "check:tools": "node scripts/check-tools-selftest.mjs",
+    "see": "node scripts/see.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.0",
