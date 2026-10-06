@@ -647,12 +647,103 @@ export function generateMap(archetype: MapArchetype, seed: string, phase: DayPha
   const baseKind: TileKind = archetype === 'sky' ? 'rock' : 'grass'
   canvas.rect(0, 0, W, H, archetype === 'sky' ? p.stone.dark : rampOf(baseKind, p).dark)
 
+  /*
+    铺底。
+    `chosen` 记下每格实际用了哪一个变体 —— 后面重新叠物件时必须用**同一个**变体，
+    否则轮廓会与底下的那一次不一致（出现"半个树冠"）。
+  */
+  const chosen: number[][] = []
   for (let y = 0; y < MAP_ROWS; y++) {
+    chosen.push([])
     for (let x = 0; x < MAP_COLS; x++) {
       const kind = layout[y][x]
       const arr = bank.get(kind)!
-      const tex = arr[Math.floor(rng() * variants) % variants]
-      canvas.blitFrom(tex, 0, 0, x * TILE, y * TILE, TILE, TILE)
+      const v = Math.floor(rng() * variants) % variants
+      chosen[y].push(v)
+      canvas.blitFrom(arr[v], 0, 0, x * TILE, y * TILE, TILE, TILE)
+    }
+  }
+
+  /*
+    ── 地形过渡 ──
+    铺完之后，相邻两种地形直接相接是一条硬边（"草地突然变石板"），
+    这是上一版读图时最扎眼的问题之一。
+
+    做法：给每一对相邻地形预生成一面"过渡条"贴图 ——
+    在 5px 内用 4×4 抖动把 A 逐渐换成 B，然后把两格相接处的这一条
+    叠上去。抖动而不是渐变，是因为像素画里渐变会糊成一条脏边。
+
+    两个要点：
+      1. **只给"地表"做过渡**。树/墙/屋顶/栅栏/岩石是**立体物件**，
+         不是地表 —— 给它们做过渡会让"树"沿着草地边缘糊成一片绿色，
+         物体轮廓反而没了。所以 TR_BLENDABLE 只列平面材质。
+      2. 过渡必须在**所有底格铺完之后**统一叠加，否则后面的格子会把
+         前面画好的过渡边盖掉。
+  */
+  const TR_BLENDABLE: ReadonlySet<TileKind> = new Set<TileKind>([
+    'grass', 'grass2', 'path', 'floor', 'sand', 'water', 'stone',
+  ])
+  const TR_DEPTH = 5
+  const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+  const trCache = new Map<string, RgbCanvas>()
+  /**
+   * 从 a、b 两格的交界处取一条过渡：dir 决定"b 从哪一侧侵入 a"。
+   *
+   * ⚠️ 必须**先把 A 整格铺满**，再往上盖 B 的抖动边。
+   * 第一版我只写了 "命中抖动就 set(b)"，而 RgbCanvas 的缓冲区是零填充的，
+   * `blitFrom` 又是**无条件整格复制** —— 于是没命中抖动的像素写进去全是
+   * 纯黑，地图上沿着水岸出现一排排黑色方块。**"没写"不等于"透明"。**
+   */
+  const transitionStrip = (a: TileKind, b: TileKind, dir: 'n' | 's' | 'w' | 'e') => {
+    const key = `${a}>${b}|${dir}`
+    const hit = trCache.get(key)
+    if (hit) return hit
+    const ta = drawTile(a, p, makeRng(hashSeed(`tr:${a}>${b}`)))
+    const tb = drawTile(b, p, makeRng(hashSeed(`tr:${a}>${b}`)))
+    const out = new RgbCanvas(TILE, TILE)
+    out.blitFrom(ta, 0, 0, 0, 0, TILE, TILE)
+    for (let y = 0; y < TILE; y++) {
+      for (let x = 0; x < TILE; x++) {
+        // dd = 该像素距离交界边的深度
+        const dd = dir === 'n' ? y : dir === 's' ? TILE - 1 - y : dir === 'w' ? x : TILE - 1 - x
+        if (dd >= TR_DEPTH) continue
+        // 越靠近交界，越倾向于显示 B
+        const keepB = (TR_DEPTH - dd) / TR_DEPTH
+        if (keepB > BAYER[y & 3][x & 3] / 16) out.set(x, y, tb.get(x, y))
+      }
+    }
+    trCache.set(key, out)
+    return out
+  }
+
+  for (let y = 0; y < MAP_ROWS; y++) {
+    for (let x = 0; x < MAP_COLS; x++) {
+      const a = layout[y][x]
+      if (!TR_BLENDABLE.has(a)) continue
+      const at = (xx: number, yy: number): TileKind | null =>
+        yy < 0 || yy >= MAP_ROWS || xx < 0 || xx >= MAP_COLS ? null : layout[yy][xx]
+      const paint = (b: TileKind | null, dir: 'n' | 's' | 'w' | 'e') => {
+        if (!b || b === a || !TR_BLENDABLE.has(b)) return
+        canvas.blitFrom(transitionStrip(a, b, dir), 0, 0, x * TILE, y * TILE, TILE, TILE)
+      }
+      paint(at(x, y - 1), 'n')
+      paint(at(x, y + 1), 's')
+      paint(at(x - 1, y), 'w')
+      paint(at(x + 1, y), 'e')
+    }
+  }
+
+  /*
+    把**立体物件**重新盖回它自己的那一格。
+    过渡条只在 5px 内混色，但它会碰到同一格里属于物件的那部分像素
+    （例如树干在下方 5px 内）。重新叠一次物件贴图即可保证轮廓干净。
+  */
+  for (let y = 0; y < MAP_ROWS; y++) {
+    for (let x = 0; x < MAP_COLS; x++) {
+      const kind = layout[y][x]
+      if (TR_BLENDABLE.has(kind)) continue
+      const arr = bank.get(kind)!
+      canvas.blitFrom(arr[chosen[y][x]], 0, 0, x * TILE, y * TILE, TILE, TILE)
     }
   }
 
