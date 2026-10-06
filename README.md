@@ -168,3 +168,12 @@ src/
 
 「Z测试版」意味着**功能在跑，但仍在打磨**。已知方向与待办记录在 [ROADMAP.md](./ROADMAP.md)。
 遇到问题欢迎提 Issue。
+
+---
+
+## 开发者：从这里开始
+
+- **[HANDOFF.md](./HANDOFF.md)** —— 自包含交接文档（架构、环境、命令、踩过的坑、待办优先级）
+- **
+ode scripts/resume.mjs** —— 一键恢复环境（类型检查 + 单元测试 + 启动 dev server）
+- **[ROADMAP.md](./ROADMAP.md)** —— 已完成 51 项与待办清单
