@@ -21,8 +21,10 @@ import { spawn } from 'node:child_process'
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
+import { outDir, profileDir, removeProfile } from './_browser.mjs'
 
-const OUT = process.env.AUDIT_OUT || 'D:/工作区/probe'
+// 必须绝对路径：--user-data-dir 用相对路径时 Chromium 会静默失败（见 _browser.mjs 的 outDir）
+const OUT = outDir()
 /**
  * Edge / Chrome 路径。**必须自动探测**：
  * 本地 Edge 在 Program Files (x86)，CI（windows-latest）在 Program Files，
@@ -73,7 +75,8 @@ const fake = http.createServer((req, res) => {
 await new Promise(r => fake.listen(FAKE_PORT, '127.0.0.1', r))
 console.log(`假服务商已启动 :${FAKE_PORT}（含 CORS 预检）`)
 
-const edge = spawn(EDGE, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${path.join(OUT, 'edge-err3-' + Date.now())}`,
+const PROFILE = profileDir('err3')
+const edge = spawn(EDGE, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
   '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--window-size=1280,950', 'about:blank'], { stdio: 'ignore' })
 let v = null
 for (let i = 0; i < 40; i++) { try { v = await getJson(`http://127.0.0.1:${PORT}/json/version`); break } catch { await sleep(500) } }
@@ -186,5 +189,5 @@ if (failed.length) { console.log('  未通过:'); failed.forEach(x => console.lo
 console.log('\n完整覆盖见 src/api/llmErrors.test.ts（16 条）与 src/api/llmRetry.test.ts（5 条）')
 
 ws.close(); edge.kill(); fake.close()
-await sleep(300)
+await sleep(300); removeProfile(PROFILE)
 process.exit(failed.length === 0 ? 0 : 1)

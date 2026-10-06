@@ -13,6 +13,7 @@ import { spawn } from 'node:child_process'
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
+import os from 'node:os'
 
 const CANDIDATES = [
   process.env.EDGE_PATH,
@@ -148,6 +149,48 @@ export function makeChecker() {
     return failed.length === 0 && errors.length === 0
   }
   return { check, summary, results }
+}
+
+/**
+ * 把截图输出目录解析成**绝对路径**。
+ *
+ * 为什么必须绝对：`--user-data-dir` 传相对路径时 Chromium **静默失败** ——
+ * 进程照常起来（PID 有效、exitCode 为 null），但既不创建 profile 目录、
+ * 也不绑定调试端口，脚本只能看到"端口未就绪"，完全猜不到是路径问题。
+ *
+ * 这个坑只在**单独运行某一套走查**时踩到：`all.mjs` 传给子进程的
+ * `AUDIT_OUT` 本来就是绝对路径，所以 CI 一直是绿的，
+ * 而 `pnpm check:map` / `check:npc` 这类直接调用全部必挂。
+ * 曾为此排查很久，故在此集中解析并加断言。
+ */
+export function outDir() {
+  const raw = process.env.AUDIT_OUT || 'playtest-shots'
+  const abs = path.resolve(raw)
+  if (!path.isAbsolute(abs)) throw new Error(`AUDIT_OUT 必须是绝对路径，得到：${abs}`)
+  fs.mkdirSync(abs, { recursive: true })
+  return abs
+}
+
+/**
+ * 每次走查用的临时浏览器 profile 目录（**绝对路径**）。
+ *
+ * 两个要点：
+ *  1. 必须绝对 —— 见 `outDir()` 的说明，相对路径会让 Chromium 静默失败。
+ *  2. 放在**系统临时目录**而不是截图目录 —— 一个 Edge profile 有几十 MB，
+ *     之前直接建在 `playtest-shots/edge-*` 下，会被 CI 当成截图产物一起上传，
+ *     也会在本地堆几十个目录（实测积了 23 个）。
+ *
+ * 调用方用完即弃，会在 close 时删掉。
+ */
+export function profileDir(tag) {
+  const dir = path.join(os.tmpdir(), `dx-check-${tag}-${Date.now()}`)
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+/** 删掉走查用的临时 profile（失败不影响结果） */
+export function removeProfile(dir) {
+  try { fs.rmSync(dir, { recursive: true, force: true }) } catch { /* 忽略 */ }
 }
 
 /** 等 dev server 起来（CI 里 build 之后要等它监听端口） */

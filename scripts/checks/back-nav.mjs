@@ -14,9 +14,11 @@ import { spawn } from 'node:child_process'
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
+import { outDir, profileDir, removeProfile } from './_browser.mjs'
 
 const SITE = process.env.SITE || 'http://localhost:5199/'
-const OUT = process.env.AUDIT_OUT || 'playtest-shots'
+// 必须绝对路径：--user-data-dir 用相对路径时 Chromium 会静默失败（见 _browser.mjs 的 outDir）
+const OUT = outDir()
 const EDGE = (() => {
   const cands = [
     process.env.EDGE_PATH,
@@ -33,7 +35,8 @@ const getJson = u => new Promise((res, rej) => {
   http.get(u, r => { let d = ''; r.on('data', c => d += c); r.on('end', () => { try { res(JSON.parse(d)) } catch (e) { rej(e) } }) }).on('error', rej)
 })
 fs.mkdirSync(OUT, { recursive: true })
-const edge = spawn(EDGE, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${path.join(OUT, 'edge-back-' + Date.now())}`,
+const PROFILE = profileDir('back')
+const edge = spawn(EDGE, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
   '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--window-size=390,844', 'about:blank'], { stdio: 'ignore' })
 let v = null
 for (let i = 0; i < 60; i++) { try { v = await getJson(`http://127.0.0.1:${PORT}/json/version`); break } catch { await sleep(500) } }
@@ -236,5 +239,5 @@ console.log(`  通过 ${results.length - failed.length}/${results.length}`)
 if (failed.length) { console.log('  未通过:'); failed.forEach(r => console.log('    · ' + r.l)) }
 console.log('  运行期异常:', errs.length ? [...new Set(errs)].slice(0, 4) : '(无)')
 
-ws.close(); edge.kill(); await sleep(300)
+ws.close(); edge.kill(); await sleep(300); removeProfile(PROFILE)
 process.exit(failed.length === 0 && errs.length === 0 ? 0 : 1)

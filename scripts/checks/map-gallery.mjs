@@ -14,9 +14,11 @@ import { spawn } from 'node:child_process'
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
+import { outDir, profileDir, removeProfile } from './_browser.mjs'
 
 const SITE = process.env.SITE || 'http://localhost:5199/'
-const OUT = process.env.AUDIT_OUT || 'playtest-shots'
+// 必须绝对路径：--user-data-dir 用相对路径时 Chromium 会静默失败（见 _browser.mjs 的 outDir）
+const OUT = outDir()
 const EDGE = (() => {
   const cands = [
     process.env.EDGE_PATH,
@@ -33,11 +35,15 @@ const getJson = u => new Promise((res, rej) => {
   http.get(u, r => { let d = ''; r.on('data', c => d += c); r.on('end', () => { try { res(JSON.parse(d)) } catch (e) { rej(e) } }) }).on('error', rej)
 })
 fs.mkdirSync(OUT, { recursive: true })
-const edge = spawn(EDGE, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${path.join(OUT, 'edge-map-' + Date.now())}`,
+const PROFILE = profileDir('map')
+const edge = spawn(EDGE, [`--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
   '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-gpu', '--window-size=1400,900', 'about:blank'], { stdio: 'ignore' })
 let v = null
 for (let i = 0; i < 60; i++) { try { v = await getJson(`http://127.0.0.1:${PORT}/json/version`); break } catch { await sleep(500) } }
-if (!v) { console.error('端口未就绪'); process.exit(1) }
+if (!v) {
+  console.error('端口未就绪（Edge 已启动但未绑定调试端口）。常见原因：--user-data-dir 不是绝对路径。')
+  process.exit(1)
+}
 const t = await getJson(`http://127.0.0.1:${PORT}/json/list`)
 const ws = new WebSocket(t.find(x => x.type === 'page').webSocketDebuggerUrl)
 await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej })
@@ -150,5 +156,5 @@ const failed = results.filter(r => !r.ok)
 console.log('\n=== 汇总 ===')
 console.log(`  通过 ${results.length - failed.length}/${results.length}`)
 if (failed.length) failed.forEach(r => console.log('    · ' + r.l))
-ws.close(); edge.kill(); await sleep(300)
+ws.close(); edge.kill(); await sleep(300); removeProfile(PROFILE)
 process.exit(failed.length === 0 ? 0 : 1)
