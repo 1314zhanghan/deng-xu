@@ -80,6 +80,60 @@ const snap = () => ev(`(()=>{
     bodyLen: T.length,
   });})()`)
 
+/**
+ * 读当前界面层级。
+ *
+ * ⚠️ 必须**同时**支持 dev 与生产构建：
+ * CI 会先在 preview（真实 dist 产物）上跑这一套做冒烟，
+ * 而生产构建里没有 `__navStore` 调试钩子（被 import.meta.env.DEV 剔除），
+ * 只认 store 的话会在 CI 上假失败 —— 我为此白跑过一轮 CI。
+ * 所以读不到 store 时回退到 DOM 判断。
+ */
+const READ_VIEW = `(() => {
+  if (typeof __navStore === 'function') return __navStore.getState().view.name
+  const T = document.body.innerText
+  if (/用这个世界开始/.test(T)) return 'worldbook'
+  if (/开始新游戏/.test(T) && /卡片库/.test(T)) return 'menu'
+  if (/新建世界卡/.test(T) || /导出全部/.test(T)) return 'library'
+  if (/你要扮演谁/.test(T)) return 'setup'
+  return '?'
+})()`
+
+/**
+ * 轮询等待界面变成期望的层级。
+ *
+ * 为什么必须轮询、不能 `await sleep(固定毫秒)`：
+ * 原来第 5 步写的是 `sleep(1800)` / `sleep(1500)`。本地（快机器）够用，
+ * 但 CI runner 上 React 重渲染 + 路由切换更慢，断言会在界面还没切过去时
+ * 就执行 —— 表现成 **"本地 29/29 全绿、CI 上 25/29 且说返回层级错了"**。
+ * 本轮 CI #36 正是如此：本地拿**同一个 dist 产物**跑 29/29 通过。
+ *
+ * 轮询把"等够时间"换成"等到状态成立"，并且超时时能报出
+ * **实际停在哪个层级**，比一句"断言失败"有用得多。
+ *
+ * @returns {{ ok: boolean, view: string, ms: number }}
+ */
+async function waitForView(expected, timeoutMs = 12000) {
+  const t0 = Date.now()
+  let view = '?'
+  while (Date.now() - t0 < timeoutMs) {
+    view = await ev(READ_VIEW)
+    if (view === expected) return { ok: true, view, ms: Date.now() - t0 }
+    await sleep(250)
+  }
+  return { ok: false, view, ms: Date.now() - t0 }
+}
+
+/** 轮询等待任意条件成立（表达式返回真值）—— 比死等毫秒稳 */
+async function waitFor(expr, timeoutMs = 12000, every = 250) {
+  const t0 = Date.now()
+  while (Date.now() - t0 < timeoutMs) {
+    if (await ev(expr)) return { ok: true, ms: Date.now() - t0 }
+    await sleep(every)
+  }
+  return { ok: false, ms: Date.now() - t0 }
+}
+
 await send('Runtime.enable'); await send('Page.enable')
 await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 950, deviceScaleFactor: 1, mobile: false })
 await send('Page.navigate', { url: SITE }); await sleep(3000)
@@ -100,7 +154,11 @@ await shot('menu-01-main')
 
 console.log('\n=== 2) 世界书：进入列表 → 打开详情（不进编辑器）===')
 console.log('  点世界书:', await clickRe('/^世界书/'))
-await sleep(2500)
+// 等"世界卡列表真的渲染出来"，而不是死等 2500ms
+{
+  const w = await waitFor(`document.querySelectorAll('button[title="查看世界书详情"]').length >= 5`)
+  console.log(`  等世界卡出现：${w.ok ? '已就绪' : '超时'}（${w.ms}ms）`)
+}
 const m2 = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({ header:(T.match(/世界书|卡片库/)||['?'])[0],
     cards: document.querySelectorAll('button[title="查看世界书详情"]').length,
@@ -162,7 +220,10 @@ await shot('menu-04-worldbook-tab')
 
 console.log('\n=== 4) 从详情页开始游戏 ===')
 console.log('  点开始:', await clickRe('/用这个世界开始/'))
-await sleep(2500)
+{
+  const w = await waitFor(`/你要扮演谁/.test(document.body.innerText) && !!document.querySelector('input[placeholder="你的名字"]')`)
+  console.log(`  等选角界面出现：${w.ok ? '已就绪' : '超时'}（${w.ms}ms）`)
+}
 const m5 = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
     inSetup: /你要扮演谁/.test(T),
@@ -175,43 +236,32 @@ check('有名字输入框', m5.hasName)
 check('能从选角返回', m5.canBack)
 
 console.log('\n=== 5) 返回链路：选角 → 逐级后退 ===')
-/*
-  从选角返回应当退到**它的上一级**（世界书详情），而不是直接跳回主菜单 ——
-  返回键的语义就是"逐级后退"。
-
-  ⚠️ 这个断言必须**同时**支持 dev 与生产构建：
-  CI 会先在 preview（真实 dist 产物）上跑这一套做冒烟，
-  而生产构建里没有 `__navStore` 调试钩子（被 import.meta.env.DEV 剔除），
-  只认 store 的话会在 CI 上假失败 —— 我为此白跑了一轮 CI。
-  所以读不到 store 时回退到 DOM 判断。
-*/
-const READ_VIEW = `(() => {
-  if (typeof __navStore === 'function') return __navStore.getState().view.name
-  const T = document.body.innerText
-  if (/用这个世界开始/.test(T)) return 'worldbook'
-  if (/开始新游戏/.test(T) && /卡片库/.test(T)) return 'menu'
-  if (/新建世界卡/.test(T) || /导出全部/.test(T)) return 'library'
-  if (/你要扮演谁/.test(T)) return 'setup'
-  return '?'
-})()`
+// 返回键的语义是"逐级后退"：选角 → 世界书详情 → 卡片库 → 主菜单。
+// 每一步都用 waitForView 轮询（而不是死等毫秒），理由见函数上的说明。
 
 await clickRe('/返回卡库|返回/')
-await sleep(1800)
+// 轮询等界面切过去，而不是死等固定毫秒（CI 上会不够 —— 见 waitForView 的说明）
+const afterSetupWait = await waitForView('worldbook')
 const afterSetup = JSON.parse(await ev(`JSON.stringify({
   view: ${READ_VIEW},
   hasDetailBtns: /用这个世界开始/.test(document.body.innerText),
 })`))
-console.log('  返回后:', JSON.stringify(afterSetup))
-check('从选角退到上一级（世界书详情）', afterSetup.view === 'worldbook' && afterSetup.hasDetailBtns, afterSetup.view)
+console.log('  返回后:', JSON.stringify(afterSetup), `（等了 ${afterSetupWait.ms}ms）`)
+check('从选角退到上一级（世界书详情）',
+  afterSetupWait.ok && afterSetup.hasDetailBtns,
+  afterSetupWait.ok ? afterSetup.view : `超时，实际停在 ${afterSetupWait.view}`)
 
-await ev(`window.history.back()`); await sleep(1500)
-const atLibrary = JSON.parse(await ev(`JSON.stringify({ view: ${READ_VIEW} })`))
-console.log('  再退一级:', JSON.stringify(atLibrary))
-check('再退一级到卡片库/世界书列表', atLibrary.view === 'library', atLibrary.view)
+await ev(`window.history.back()`)
+const atLibraryWait = await waitForView('library')
+console.log('  再退一级:', JSON.stringify({ view: atLibraryWait.view }), `（等了 ${atLibraryWait.ms}ms）`)
+check('再退一级到卡片库/世界书列表', atLibraryWait.ok, atLibraryWait.view)
 
-await ev(`window.history.back()`); await sleep(1500)
+await ev(`window.history.back()`)
+const atMenuWait = await waitForView('menu')
+console.log('  再退一级:', JSON.stringify({ view: atMenuWait.view }), `（等了 ${atMenuWait.ms}ms）`)
 const m6 = JSON.parse(await snap())
-check('再退一级回到主菜单', m6.menuEntries.some(x => /开始新游戏/.test(x)))
+check('再退一级回到主菜单', atMenuWait.ok && m6.menuEntries.some(x => /开始新游戏/.test(x)),
+  atMenuWait.ok ? '' : `超时，实际停在 ${atMenuWait.view}`)
 check('主菜单标题还在', m6.hasMenuTitle)
 await shot('menu-05-back')
 

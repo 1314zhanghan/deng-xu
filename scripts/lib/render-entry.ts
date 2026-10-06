@@ -15,7 +15,7 @@
  * ⚠️ 这个文件**不要**在浏览器代码里 import —— 它是构建期入口。
  */
 
-import { generateMap, ARCHETYPE_TO_MAP, timeOfDayLabel } from '@/utils/rpgMap'
+import { generateMap, ARCHETYPE_TO_MAP, timeOfDayLabel, TILE_KINDS, renderTilePreview, renderTileVariants } from '@/utils/rpgMap'
 import { recipeFor, renderSprite, FRAME_SIZE, DIRECTIONS } from '@/utils/lpcSprite'
 import { inferTraits } from '@/utils/appearance'
 import { dayPhase, phaseLabel } from '@/utils/mapPalette'
@@ -36,6 +36,16 @@ export function mapDataUrl(archetype, seed, phase) {
 export function mapInfo(archetype, seed, phase) {
   const g = generateMap(archetype, seed, phase)
   return { archetype, seed, phase, width: g.width, height: g.height, dataUrl: g.dataUrl }
+}
+
+/** 单个瓦片的放大预览（走真实 drawTile 路径，见 rpgMap.ts 的说明） */
+export function tileDataUrl(kind, phase, scale = 8, variant = 0) {
+  return renderTilePreview(kind, phase, scale, variant)
+}
+
+/** 某种地形三套变体的预览 */
+export function tileVariantUrls(kind, phase, scale = 8) {
+  return renderTileVariants(kind, phase, scale)
 }
 
 /**
@@ -66,4 +76,4 @@ export async function spriteDetail(key, description, opts = {}) {
   return { key, description, traits, recipe, dataUrl: url }
 }
 
-export { FRAME_SIZE, DIRECTIONS, ARCHETYPE_TO_MAP, timeOfDayLabel, dayPhase, phaseLabel, inferTraits }
+export { FRAME_SIZE, DIRECTIONS, ARCHETYPE_TO_MAP, TILE_KINDS, timeOfDayLabel, dayPhase, phaseLabel, inferTraits }

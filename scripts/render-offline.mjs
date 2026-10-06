@@ -25,6 +25,13 @@
  *   # 只看某几种地形
  *   node scripts/render-offline.mjs map --archetypes=forest,coast
  *
+ *   # 瓦片预览：每种地形的单格放大 N 倍（改 drawTile 时必用，
+ *   # 因为一格只有 16px，在整张地图上根本看不出画得对不对）
+ *   node scripts/render-offline.mjs tiles --kinds=tree --scale=14
+ *
+ *   # 放大对比：同一张图 1× / 2× / 3× 并排（最左才是玩家实际看到的尺寸）
+ *   node scripts/render-offline.mjs zoom --archetype=forest
+ *
  *   # 立绘对照图（用一组真实角色描述）
  *   node scripts/render-offline.mjs sprites
  *
@@ -33,6 +40,9 @@
  *
  *   # 检查渲染环境是否可用（不做浏览器，只验证垫片与打包）
  *   node scripts/render-offline.mjs selftest
+ *
+ *   # 与浏览器结果交叉验证（需 dev server；比较 recipeFor 选出的部件与配色）
+ *   node scripts/render-offline.mjs xcheck
  *
  * 输出目录默认 `playtest-shots/`（与走查脚本一致，便于对照）。
  * 命令会打印**可直接引用的 markdown 路径**。
@@ -231,7 +241,7 @@ async function cmdMap() {
 
   const file = path.join(OUT, 'offline-map.png')
   // 每行 4 档时段 + 3 套布局 = 7 列；地图逻辑尺寸 320×192
-  fs.writeFileSync(file, contactSheet(cells, { cols: 7, cellW: 320, cellH: 192 }))
+  fs.writeFileSync(file, contactSheet(cells, { cols: 7, cellW: 480, cellH: 288 }))
   console.log(`\n=== 离线地图对照图 ===`)
   console.log(`  ${list.length} 种地形 × ${M.PHASES.length} 档时段 + 每种 3 套布局 = ${cells.length} 张`)
   report(file, `行=地形（${list.join(', ')}）  列=dawn/day/dusk/night + 布局A/B/C`)
@@ -392,7 +402,86 @@ async function cmdXcheck() {
   process.exit(r.status ?? 1)
 }
 
-const CMDS = { map: cmdMap, sprites: cmdSprites, sprite: cmdSprite, selftest: cmdSelftest, xcheck: cmdXcheck }
+/**
+ * 瓦片预览：把每种地形的**单个瓦片**放大排开。
+ *
+ * 为什么必须有它：地图 320×192、一格只有 16px，缩略之后细节全糊成
+ * "一片绿"，根本判断不出某块瓦片画得好不好。而 `drawTile()` 改的
+ * 正是这 16×16 —— 把它放大 8 倍单独看，问题一眼就出来。
+ *
+ * 每行 = 一种地形；每行 3 格 = 该地形的三套变体。
+ */
+async function cmdTiles() {
+  const M = await loadRender()
+  const only = argVal('kinds')
+  const kinds = only ? only.split(',') : M.TILE_KINDS
+  const scale = Number(argVal('scale', '6'))
+  const phase = argVal('phase', 'day')
+
+  const cells = []
+  for (const k of kinds) {
+    for (const url of M.tileVariantUrls(k, phase, scale)) cells.push({ src: url })
+  }
+
+  const size = 16 * scale
+  const file = path.join(OUT, 'offline-tiles.png')
+  fs.writeFileSync(file, contactSheet(cells, { cols: 3, cellW: size, cellH: size, gap: 6 }))
+  console.log(`\n=== 瓦片预览（单格放大 ${scale} 倍，时段 ${phase}）===`)
+  console.log(`  ${kinds.length} 种地形 × 3 套变体 = ${cells.length} 格`)
+  console.log(`  行 = ${kinds.join(', ')}`)
+  report(file, '每行 3 格是同一地形的三套变体 —— 应当能看出随机差异，但不能像三种不同材质')
+  void phase
+}
+
+/**
+ * 放大对比：把同一张地图按 1× / 2× / 3× 并排输出。
+ *
+ * 为什么要并排：只看放大图会被骗（放大后细节都看得见，容易高估效果），
+ * 只看 1:1 又看不清细节。而地图逻辑分辨率就是 320×192 ——
+ * **最左边那格才是玩家实际看到的尺寸**，任何改动都要在那里站得住。
+ */
+async function cmdZoom() {
+  const M = await loadRender()
+  const arch = argVal('archetype', 'forest')
+  const phase = argVal('phase', 'day')
+  const url = M.mapDataUrl(arch, argVal('seed', 'zoom-check'), phase)
+  const { width, height, rgba } = decodePng(Buffer.from(url.slice(url.indexOf(',') + 1), 'base64'))
+
+  const SCALES = [1, 2, 3]
+  const gap = 8
+  const cols = SCALES.map(s => ({ s, w: width * s, h: height * s }))
+  const maxH = Math.max(...cols.map(c => c.h))
+  const W = cols.reduce((n, c) => n + c.w, 0) + gap * (cols.length - 1)
+  const H = maxH
+  const px = Buffer.alloc(W * H * 4)
+  for (let i = 0; i < W * H; i++) { px[i * 4] = 24; px[i * 4 + 1] = 24; px[i * 4 + 2] = 28; px[i * 4 + 3] = 255 }
+
+  let x0 = 0
+  for (const c of cols) {
+    const y0 = Math.floor((maxH - c.h) / 2)
+    for (let y = 0; y < c.h; y++) {
+      for (let x = 0; x < c.w; x++) {
+        const s = (Math.floor(y / c.s) * width + Math.floor(x / c.s)) * 4
+        const tx = x0 + x, ty = y0 + y
+        if (tx < 0 || ty < 0 || tx >= W || ty >= H) continue
+        const d = (ty * W + tx) * 4
+        px[d] = rgba[s]; px[d + 1] = rgba[s + 1]; px[d + 2] = rgba[s + 2]; px[d + 3] = 255
+      }
+    }
+    x0 += c.w + gap
+  }
+
+  const file = path.join(OUT, `zoom-${arch}.png`)
+  fs.writeFileSync(file, encodePng(W, H, px))
+  console.log(`\n=== 放大对比（${arch} / ${phase}）===`)
+  console.log(`  ${cols.map(c => `${c.s}×（${c.w}×${c.h}）`).join('  ')}`)
+  report(file, `最左 = 玩家实际看到的尺寸（地图逻辑分辨率 ${width}×${height}）`)
+}
+
+const CMDS = {
+  map: cmdMap, sprites: cmdSprites, sprite: cmdSprite,
+  selftest: cmdSelftest, xcheck: cmdXcheck, tiles: cmdTiles, zoom: cmdZoom,
+}
 
 if (!CMDS[COMMAND]) {
   console.error(`✗ 未知命令：${COMMAND}`)

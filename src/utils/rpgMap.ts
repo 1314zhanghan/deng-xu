@@ -208,18 +208,80 @@ function drawTile(kind: TileKind, p: MapPalette, rng: () => number): RgbCanvas {
       break
     }
     case 'tree': {
-      // 树冠：中间亮、边缘暗的团块，比纯色圆更像树
-      c.rect(0, 0, TILE, TILE, p.ground.mid)   // 树下的地
-      const cx = TILE / 2, cy = TILE / 2
-      for (let y = 0; y < TILE; y++) {
-        for (let x = 0; x < TILE; x++) {
-          const d = Math.hypot(x - cx + 0.5, y - cy + 0.5)
-          if (d < 3.2) c.set(x, y, r.hi)
-          else if (d < 5) c.set(x, y, r.light)
-          else if (d < 6.6) c.set(x, y, r.mid)
-          else if (d < 7.4) c.set(x, y, r.dark)
+      /*
+        树冠。
+        
+        ⚠️ 旧版是"按到中心的距离分 4 档上色" —— 画出来是一个**正圆bullseye**，
+        密铺之后整片森林像一串珠子/圆环，完全没有树的感觉
+        （这是森林场景最主要的观感短板，靠 `render-offline.mjs tiles`
+        把单格放大 7 倍才看清）。
+        
+        改成**轮廓扰动的不规则团块**：先按角度定一圈半径，再按半径分档上色，
+        这样外形是手绘感的、不是几何圆。要点：
+          · 半径差异要够大（0.60~1.0），否则扰动看不出来，还是圆
+          · 底边压暗 + 右侧偏亮 —— 与地图统一的"右上受光"一致
+          · 加树干，让"这是树"而不是"这是灌木丛"更明确
+          · 三套变体在**大小**上也要分档，否则同一地形铺出来毫无节奏
+      */
+      c.rect(0, 0, TILE, TILE, p.ground.mid)
+
+      const tier = rng()
+      /*
+        三套变体按"树形"分档，而不是只改半径 ——
+        只改半径的话三棵树看起来仍是同一棵（第一版就是这样，三种轮廓几乎重合）。
+        这里给三种明显不同的形状：圆冠小树 / 高冠大树 / 扁冠矮树。
+      */
+      const shape = tier < 0.34
+        ? { baseR: 4.4, cy: 7.0, squash: 1.0, trunkTop: 10 }
+        : tier < 0.68
+          ? { baseR: 6.2, cy: 6.6, squash: 1.0, trunkTop: 10 }
+          : { baseR: 4.8, cy: 7.8, squash: 1.35, trunkTop: 10 }
+
+      const ANG = 20
+      const raw: number[] = []
+      for (let i = 0; i < ANG; i++) raw.push(shape.baseR * (0.72 + 0.28 * rng()))
+      /*
+        平滑两轮。
+        不平滑的话每个角度独立取半径，轮廓会到处冒 1 像素的尖刺
+        （第一版就是这样：远看像毛球而不是树冠）。平滑之后是"几个圆弧拼成的团块"。
+      */
+      const radii = raw.slice()
+      for (let pass = 0; pass < 2; pass++) {
+        const prev = radii.slice()
+        for (let i = 0; i < ANG; i++) radii[i] = (prev[(i - 1 + ANG) % ANG] + prev[i] * 2 + prev[(i + 1) % ANG]) / 4
+      }
+
+      // 树下投影：统一偏右下，和地图的受光方向一致
+      c.dither(4, 12, 9, 3, p.ground.mid, p.ground.dark, 0.45)
+
+      /** 抖动边的阈值 —— 与角度分档粗细挂钩，分得越细每档越窄 */
+      const dsp = (1 - Math.cos(Math.PI / ANG)) / 3
+
+      const top = Math.max(0, Math.floor(shape.cy - shape.baseR * 1.15))
+      for (let y = top; y < shape.trunkTop + 1; y++) {
+        for (let x = 1; x < TILE - 1; x++) {
+          const dx = x - 7.5
+          const dy = (y - shape.cy) / shape.squash
+          const d = Math.hypot(dx, dy)
+          let a = Math.atan2(dy, dx)
+          if (a < 0) a += Math.PI * 2
+          const R = radii[Math.floor((a / (Math.PI * 2)) * ANG) % ANG]
+          if (d > R) continue
+          // 左侧压暗、右侧点亮，底边再压一档 —— 像素画靠这几档做出体积
+          let col: RGB
+          if (d > R - 1.25) col = r.dark
+          else if (dy > 0.9 && d > R * 0.6) col = r.dark
+          else if (d > R * 0.7) col = r.mid
+          else if (dx < -1.2) col = r.light
+          else col = (dx > 1.2 ? r.hi : r.light)
+          // 抖动边：等值线附近按 Bayer 矩阵替换成邻近色，消掉硬邦邦的边缘
+          if (d > R - 1.15 && dsp > ((x + y * 3) % 4) / 4) col = r.mid
+          c.set(x, y, col)
         }
       }
+      // 树干：树冠下缘再画 2 格深木色，让它在草地/石地上都立得住
+      c.rect(7, shape.trunkTop, 2, 3, p.wood.dark)
+      c.set(7, shape.trunkTop, p.wood.mid)
       break
     }
     case 'fence': {
@@ -691,3 +753,51 @@ export const ARCHETYPE_TO_MAP: Record<string, MapArchetype> = {
 export function timeOfDayLabel(hour: number): string {
   return phaseLabel(dayPhase(hour))
 }
+
+/** 全部地形种类（供调试工具遍历，避免工具自己维护一份可能过时的列表） */
+export const TILE_KINDS: TileKind[] = [
+  'grass', 'grass2', 'path', 'water', 'stone', 'wall',
+  'roof', 'tree', 'fence', 'floor', 'sand', 'rock',
+]
+
+/**
+ * 单格瓦片预览 —— **调试用**。
+ *
+ * 为什么需要它：地图是 320×192、一格只有 16px，在整张图上看
+ * "某块瓦片画得对不对"根本看不出来（缩略后只剩一片颜色）。
+ * 而 `drawTile()` 是逐格画的，改的正是这 16×16。
+ *
+ * 它走的是**和 `generateMap` 完全相同的绘制路径**（同一个 `drawTile`、
+ * 同一个 `variants` 数、同一个调色板），所以预览里看到的
+ * 就是真实地图里那一格的样子 —— 不是另写一份"预览专用画法"。
+ *
+ * @param kind  要预览的地形
+ * @param phase 时段
+ * @param scale 放大倍数（像素画必须整数倍）
+ * @param variant 取第几个变体（0..2，与地图里的三变体一致）
+ */
+export function renderTilePreview(
+  kind: TileKind,
+  phase: DayPhase,
+  scale = 8,
+  variant = 0
+): string {
+  const p = paletteForPhase(phase)
+  const v = ((variant % 3) + 3) % 3
+  const tile = drawTile(kind, p, makeRng(hashSeed(`${kind}#${v}`)))
+
+  const s = Math.max(1, Math.round(scale))
+  const out = new RgbCanvas(TILE * s, TILE * s)
+  for (let y = 0; y < TILE * s; y++) {
+    for (let x = 0; x < TILE * s; x++) {
+      out.set(x, y, tile.get(Math.floor(x / s), Math.floor(y / s)))
+    }
+  }
+  return out.toDataUrl()
+}
+
+/** 一次性拿到某种地形三套变体的预览（便于比较"同一地形是不是长得太像"） */
+export function renderTileVariants(kind: TileKind, phase: DayPhase, scale = 8): string[] {
+  return [0, 1, 2].map(v => renderTilePreview(kind, phase, scale, v))
+}
+
