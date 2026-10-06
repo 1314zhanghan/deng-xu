@@ -89,14 +89,25 @@ function stamp() {
 const NAME = argVal('name') || `see-${stamp()}`
 const OUT_FILE = path.join(OUT, NAME.endsWith('.png') ? NAME : `${NAME}.png`)
 
-// ── 1) 先确认 dev server 活着（这是最常见的失败原因）──
+// ── 1) 先确认目标可达 ──
+/*
+  默认目标是本地 dev server，所以先探测一下、失败时给出"怎么起 dev server"的提示
+  ——那是这个工具最常见的失败原因。
+
+  但**如果用户显式给了 --url**（例如线上站点），就不该再要求本地 5199 活着：
+  第一版没有区分这两种情况，结果 `--url=https://...` 仍然去探测 localhost，
+  硬生生报"dev server 没响应"——**探测目标和实际目标不一致**，
+  又是一个"探针本身写错"的例子。
+*/
 console.log(`\n=== 看一眼 ===\n`)
 console.log(`  目标：${SITE}${PATH_SUFFIX}`)
 console.log(`  视口：${VIEWPORT.width}×${VIEWPORT.height}${MOBILE ? '（手机模式）' : ''}`)
 
-if (!(await waitForServer(SITE, 3))) {
-  console.error(`\n✗ dev server 没响应：${SITE}`)
-  console.error(`
+const isLocalTarget = /^https?:\/\/(localhost|127\.0\.0\.1)\b/i.test(SITE)
+if (isLocalTarget) {
+  if (!(await waitForServer(SITE, 3))) {
+    console.error(`\n✗ dev server 没响应：${SITE}`)
+    console.error(`
   怎么起来（后台，端口 5199）：
     $node = "C:\\Users\\28254\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\node\\bin\\node.exe"
     Set-Location "${ROOT}"
@@ -105,9 +116,12 @@ if (!(await waitForServer(SITE, 3))) {
   ⚠️ 改完源码**必须重启 dev server** —— HMR 对通过 CDP 动态 import 的模块不生效，
      不重启就会看到改动前的旧代码，从而误判"改了没生效"。
 `)
-  process.exit(1)
+    process.exit(1)
+  }
+  console.log('  ✓ dev server 就绪')
+} else {
+  console.log('  （远端目标，跳过本地探测）')
 }
-console.log('  ✓ dev server 就绪')
 
 // ── 2) 起浏览器并导航 ──
 const url = PATH_SUFFIX
