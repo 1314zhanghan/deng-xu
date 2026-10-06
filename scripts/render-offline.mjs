@@ -478,9 +478,25 @@ async function cmdZoom() {
   report(file, `最左 = 玩家实际看到的尺寸（地图逻辑分辨率 ${width}×${height}）`)
 }
 
+/**
+ * 全量立绘审计：把**所有内置世界的角色卡**跑一遍，出对照图 + 可机检矛盾计数。
+ *
+ * 用途：玩家反馈"立绘和描述对不上"时，**不要只修他截到的那两个**——
+ * 根因通常在词表覆盖不足，只修个例还会继续冒出来。
+ * 拿全量语料跑一遍才能看出覆盖面（实现在 scripts/lib/audit-sprites.mjs）。
+ */
+async function cmdAudit() {
+  const { spawnSync } = await import('node:child_process')
+  const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'lib', 'audit-sprites.mjs')], {
+    cwd: ROOT, stdio: 'inherit',
+  })
+  process.exit(r.status ?? 1)
+}
+
 const CMDS = {
   map: cmdMap, sprites: cmdSprites, sprite: cmdSprite,
   selftest: cmdSelftest, xcheck: cmdXcheck, tiles: cmdTiles, zoom: cmdZoom,
+  audit: cmdAudit,
 }
 
 if (!CMDS[COMMAND]) {

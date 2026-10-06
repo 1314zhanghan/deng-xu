@@ -138,22 +138,36 @@ for (const [tableName, table, kindHint] of [
 }
 
 // ── 3.2 调色板名必须能解析到真实颜色 ──
-const ALL_PALETTE_NAMES = [...PALETTE_NAMES]
-for (const [tableName, table] of [
-  ['HAIR_COLORS', T.HAIR_COLORS],
-  ['SKINS', T.SKINS],
-  ['CLOTH_COLORS', T.CLOTH_COLORS],
-]) {
-  for (const [re, color] of table) {
+/*
+  ⚠️ 必须拿**每个材质各自的**调色板名去解析，不能并成一个大集合。
+  实测调色板各材质不统一：
+    hair  有 dark_gray / ash / platinum，没有 charcoal / slate
+    cloth 有 gray / slate / charcoal，没有 dark_gray / light_gray
+  并成一个集合的话，「深灰色长裙」用的 dark_gray 会因为 hair 有它而"通过"，
+  但真正落到 cloth 上时解析不到 → 静默退化成随机。
+  本轮修立绘错配时差点踩进去，所以这里按材质逐个查。
+*/
+const MATERIALS = [
+  { mat: 'hair', table: 'HAIR_COLORS' },
+  { mat: 'body', table: 'SKINS' },
+  { mat: 'cloth', table: 'CLOTH_COLORS' },
+]
+for (const { mat, table: tableName } of MATERIALS) {
+  const names = Object.keys(PALETTE_BY_MATERIAL[mat] || {})
+  if (!names.length) {
+    defect('调色板缺失', 'palettes.json', `没有 ${mat} 这一组颜色名 —— 该材质的换色会全部失效`)
+    continue
+  }
+  for (const [re, color] of T[tableName]) {
     if (typeof color !== 'string') continue
     if (/[\\^$*+?()[\]{}|]/.test(color)) continue      // 正则源，跳过
-    // 用真实调色板名集合去解析 —— 这就是运行时会走的路径
-    const resolved = resolvePaletteName(color, ALL_PALETTE_NAMES)
+    const resolved = resolvePaletteName(color, names)
     if (!resolved) {
-      defect('色名无法解析', `${tableName} /${re.source}/`,
-        `"${color}" 既不在调色板里、也走不通 ALIASES → 换色静默失效，退化成随机`)
-    } else if (resolved !== color && !PALETTE_NAMES.has(color)) {
-      warn('色名靠别名兜底', `${tableName} /${re.source}/`, `"${color}" 不在调色板里，靠别名落到 "${resolved}"`)
+      defect('色名在该材质上无法解析', `${tableName} /${re.source}/`,
+        `"${color}" 在 ${mat} 调色板（${names.length} 色）里既没有、也走不通 ALIASES → 换色静默失效`)
+    } else if (resolved !== color && !names.includes(color)) {
+      warn('色名靠别名兜底', `${tableName} /${re.source}/`,
+        `"${color}" 不在 ${mat} 调色板里，靠别名落到 "${resolved}"`)
     }
   }
 }

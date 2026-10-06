@@ -429,6 +429,24 @@ const DRESS_BY_COLOR = (() => {
 const HEADS_ADULT = HEADS.filter(h => !/_small$|_child$/.test(h))
 
 /**
+ * 按年龄过滤一池部件，剔除与年龄矛盾的款式。
+ *
+ * ⚠️ 抽成公共函数的原因：这类过滤**同一个坑在头部和鼻子上各踩了一次**。
+ *   · 头部：`young` 那一档忘了排除 elderly → 十七八岁的少年拿到老人脸
+ *   · 鼻子：`head_nose_elderly` 一直在全池里随机 → 年轻角色配一只**老人鼻子**
+ *     （眼睛下方那一块特别塌），同样的"推断为young却用老年件"
+ * 现在两处调同一个函数，"要不要排除老者"只有一处定义。
+ */
+function agePool(ids: string[], age?: AppearanceTraits['age']): string[] {
+  if (age === 'elder') {
+    const e = ids.filter(i => /elderly/.test(i))
+    return e.length ? e : ids
+  }
+  const nonElder = ids.filter(i => !/elderly/.test(i))
+  return nonElder.length ? nonElder : ids
+}
+
+/**
  * 在候选部件里按关键词优先匹配。
  *
  * 返回 undefined 表示"给了关键词但一个都没命中" —— 调用方**必须区别对待**：
@@ -545,40 +563,46 @@ function pickHead(rng: () => number, t: AppearanceTraits, isBroad: boolean): str
   const take = (pool: string[], fb: string) =>
     pool.length ? pool[Math.floor(rng() * pool.length) % pool.length] : fb
 
+  const isElder = (h: string) => /elderly/.test(h)
+  const isSmall = (h: string) => /_small$|_child$/.test(h)
+
   /*
-    ⚠️ 每个年龄分支都**必须**过一遍性别过滤。
-    原先 child 与 elder 两个分支只按年龄取头、完全没看性别，
-    于是「十五六岁的黑发少年」拿到 `heads_human_female_small`、
-    「独眼茶摊老板…男人」拿到 `heads_human_female_elderly` ——
-    玩家看到的是"男性角色长了张女人的脸"，这类错误一眼就看得出来。
-    只有成年分支当时做了过滤，属于漏改。
+    按年龄分档取头部池。
+    ⚠️ 关键是**每一档都显式声明要不要排除老者**，而不是靠各分支自己记得加过滤 ——
+    漏一次就会"十七八岁的少年拿到一张老人脸"（本轮审计抓到 3 张卡）。
+    过滤逻辑统一在 `agePool`（鼻子那边也用它）。
+
+    历史：
+      · 最初 child 与 elder 两个分支**完全没看性别** → 「十五六岁的少年」拿到女脸
+      · 后来补了性别过滤，但 `young` 这一档**没排除 elderly**，
+        而最后那个"没线索"的兜底分支却排除了 —— 同一件事写了两遍、只对了一半
+  */
+  let pool = agePool(HEADS_ADULT, t.age)
+
+  // 幼儿另有更小的一批头部件
+  /*
+    ⚠️ 这里**也要过 agePool**。`heads_human_elderly_small` 的 id 以 `_small`
+    结尾，所以它同时属于"幼儿头"和"老年头"两批 ——
+    「约莫十岁的孩童」因此会抽到一张**老年幼儿**的脸。
+    （第一版只对成年池做了年龄过滤，这里漏了，是审计 + 新增断言一起抓出来的。）
   */
   if (t.age === 'child') {
-    const kids = byGender(HEADS.filter(h => /_small$|_child$/.test(h)), t.gender)
-    if (kids.length) return take(kids, 'head_male')
+    const kids = agePool(HEADS.filter(isSmall), t.age)
+    if (kids.length) pool = kids
   }
-  if (t.age === 'elder') {
-    const elders = byGender(HEADS_ADULT.filter(h => /elderly/.test(h)), t.gender)
-    if (elders.length) return take(elders, 'head_male')
-  }
+  if (!pool.length) pool = HEADS_ADULT
 
-  // 非老者：先从候选里剔除 elderly，避免"年轻人长老年脸"
-  const adultNonElder = HEADS_ADULT.filter(h => !/elderly/.test(h))
+  const byG = byGender(pool, t.gender)
+  if (!byG.length) return take(pool, 'head_male')
 
-  if (t.gender === 'female') {
-    const f = byGender(adultNonElder, 'female')
-    return take(f, 'head_male')
+  // 体型偏壮时优先挑 plump；偏瘦时优先 gaunt。
+  // 注意这两个变体**只有男性头有**（实测 heads_human_male_gaunt / _plump），
+  // 所以不要对女性池套这个过滤，否则会退化成随机。
+  if (isBroad && !byG.some(isElder)) {
+    const plump = byG.filter(h => /plump|gaunt/.test(h))
+    if (plump.length) return take(plump, byG[0])
   }
-  if (t.gender === 'male') {
-    const m = byGender(adultNonElder, 'male')
-    if (isBroad) {
-      const plump = m.filter(h => /plump|gaunt/.test(h))
-      if (plump.length) return take(plump, 'head_male')
-    }
-    return take(m, 'head_male')
-  }
-  // 没线索就在男女之间随机，但始终避开老者
-  return take(adultNonElder.length ? adultNonElder : HEADS_ADULT, 'head_male')
+  return take(byG, 'head_male')
 }
 
 /**
@@ -717,8 +741,13 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     legs = pick(rng, LEGS.length ? LEGS : ['legs_pants'])
   }
   const shoes = pick(rng, FEET.length ? FEET : ['feet_shoes_basic'])
-  const nose = pick(rng, NOSES.length ? NOSES : ['head_nose_straight'])
-  const brows = pick(rng, BROWS.length ? BROWS : ['eyebrows_thick'])
+  /*
+    鼻子与眉毛也要**跟着年龄走**。
+    `head_nose_elderly` 原先一直在全池里随机 —— 一个十七八岁的少年配上一只
+    老人鼻子（鼻头特别大、位置偏低），同样是"推断为young却用老年件"。
+  */
+  const nose = pick(rng, agePool(NOSES, traits.age).length ? agePool(NOSES, traits.age) : ['head_nose_straight'])
+  const brows = pick(rng, agePool(BROWS, traits.age).length ? agePool(BROWS, traits.age) : ['eyebrows_thick'])
 
   // —— 可选部件：只在描述明确提到、且**素材库里真的有对应件**时才加 ——
   const optional: string[] = []

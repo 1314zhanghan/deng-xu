@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { inferTraits, resolvePaletteName } from '@/utils/appearance'
+import { recipeFor } from '@/utils/lpcSprite'
 
 /**
  * 外貌推断。
@@ -7,6 +8,156 @@ import { inferTraits, resolvePaletteName } from '@/utils/appearance'
  * 这是「立绘和角色描述对不上」的修复核心，所以断言要贴着真实角色卡写 ——
  * 下面这些描述都是这个项目里会真实出现的样子（含管家、守卫队长这类具体身份）。
  */
+describe('外貌推断 · 性别（立绘错配的头号来源）', () => {
+  /*
+    玩家截图反馈：「约莫四十出头的**妇人**」的立绘是一张**留胡子的男脸**。
+    根因是 GENDERS 表里根本没有「妇人」，推断不出性别 → 头部从男女混合池随机抽。
+
+    这一组用例把"实际角色卡里会出现的说法"逐个固化。
+    注意**不能放"王/国王/皇帝"**这类称谓：它们会命中姓氏「王」和
+    "老国王的侄女"这种指别人的表述（「静水堡的伊瑟琳」曾因此被判成男性）。
+  */
+  const cases: [string, 'male' | 'female'][] = [
+    ['约莫四十出头的妇人，魏斯家当家主母。深灰色素面长裙堆在腰侧。', 'female'],
+    ['约莫十七八岁的少年，魏斯家独子，月谷城法师塔学徒。', 'male'],
+    ['老国王的侄女，三十岁上下，寡居。', 'female'],
+    ['一位年轻的寡妇，带着两个孩子', 'female'],
+    ['头发花白的老妇人', 'female'],
+    ['镇上的接生婆', 'female'],
+    ['十六岁的少女，扎着双马尾', 'female'],
+    ['五十岁上下的老汉', 'male'],
+    ['一名年轻的修士', 'male'],
+  ]
+  for (const [text, want] of cases) {
+    it(`「${text.slice(0, 20)}…」→ ${want}`, () => {
+      expect(inferTraits({ description: text }).gender, text).toBe(want)
+    })
+  }
+
+  it('称谓不参与性别判断（避免命中姓氏「王」）', () => {
+    // 「王」是常见姓氏，绝不能因为描述里出现"王"就判成男性
+    expect(inferTraits({ description: '王掌柜的女儿，十七岁' }).gender).toBe('female')
+    // 「国王」是指别人：伊瑟琳是老国王的侄女
+    expect(inferTraits({ description: '老国王的侄女，寡居多年' }).gender).toBe('female')
+  })
+
+  it('代词指别人时不误判', () => {
+    // "他的母亲"里的"他"不是被描述者
+    const t = inferTraits({ description: '一个沉默的男人。他的母亲站在旁边。' })
+    expect(t.gender).toBe('male')
+  })
+
+  it('完全没有性别线索时**不假定**某一性别', () => {
+    // 旧版有 `if (age === 'elder' && !gender) gender = 'male'` —— 硬编码的男性偏见
+    expect(inferTraits({ description: '上了年纪的老者' }).gender).toBe(undefined)
+  })
+})
+
+describe('外貌推断 · 年龄（中文数字是普遍写法）', () => {
+  /*
+    ⚠️ 实测**内置角色卡里的岁数全部是中文数字**，一个阿拉伯数字都没有。
+    旧版只写了 `\b\d+\s*岁`，于是 20 张卡只有 2 张推断出年龄；
+    推断不出年龄的年轻人会从成年池随机抽头，**抽到老人脸**
+    （「十七八岁的少年」被画成老头，审计抓到 3 张卡）。
+
+    另一条坑：「老」原先裸写在 elder 规则里，于是「**老**板」「**老**师」
+    全被判成老者 —— 酒馆老板随机拿到老年脸。
+  */
+  const cases: [string, 'child' | 'young' | 'adult' | 'elder'][] = [
+    ['十九岁，宫廷文书的最低一级', 'young'],
+    ['十四岁，出生在灾后第二年', 'child'],
+    ['三十四岁，潮务处第七稽查组的组长', 'young'],
+    ['四十岁上下，拾音人行的资深成员', 'adult'],
+    ['五十多岁，慢钟旅店的老板', 'adult'],
+    ['五十岁上下，在望江路加油站上夜班', 'adult'],
+    ['六十岁上下，两只手都在抖', 'elder'],
+    ['十七八岁的少年，魏斯家独子', 'young'],
+    ['四十出头，把"账要对得上"当信条', 'adult'],
+    ['约莫七八岁的小女孩', 'child'],
+  ]
+  for (const [text, want] of cases) {
+    it(`「${text.slice(0, 22)}…」→ ${want}`, () => {
+      expect(inferTraits({ description: text }).age, text).toBe(want)
+    })
+  }
+
+  it('职业名里的「老」不算年龄线索', () => {
+    // 老板/老师/老陈 里的"老"与年龄无关
+    expect(inferTraits({ description: '酒馆的老板，围着皮围裙' }).age).not.toBe('elder')
+    expect(inferTraits({ description: '加油站的老陈，夜班群里说话最多的人' }).age).not.toBe('elder')
+  })
+})
+
+describe('外貌推断 · 衣色（颜色与衣物之间常夹布料词）', () => {
+  /*
+    玩家截图：「深灰色**素面**长裙」推断不出衣色。
+    因为 GARMENT 只能跳过"的长短厚薄"，夹一个"素面"整条就匹配失败。
+    现在用 CLOTH_MOD 覆盖常见布料/质地词。
+  */
+  const cases: [string, string][] = [
+    ['深灰色素面长裙堆在腰侧', 'dark_gray'],
+    ['穿着一件素色白色长袍', 'white'],
+    ['墨色丝质长衫', 'black'],
+    ['青色官袍', 'teal'],
+    ['浅灰色麻布外衣', 'light_gray'],
+    ['深蓝色绒面披风', 'navy'],
+  ]
+  for (const [text, want] of cases) {
+    it(`「${text}」→ ${want}`, () => {
+      expect(inferTraits({ description: text }).cloth, text).toBe(want)
+    })
+  }
+
+  it('布料词不会让「灰色眼睛」被误判成衣物', () => {
+    // 灰色是瞳色，不是衣色
+    const t = inferTraits({ description: '一双灰色眼睛，穿着白色长袍' })
+    expect(t.cloth, '衣色应是白袍').toBe('white')
+  })
+})
+
+describe('立绘配方 · 年龄一致性（机检矛盾必须为 0）', () => {
+  /*
+    审计脚本（`pnpm check:sprites-audit`）在真实角色卡上抓到 3 张卡
+    "推断为 young 却用了老年部件" —— 部件是 `head_nose_elderly`
+    （鼻子！不是头）。根因有两处，各踩一次同一个坑：
+      · pickHead 的 young 档忘了排除 elderly
+      · 鼻子的池子一直是全池随机，`head_nose_elderly` 谁都能抽到
+    现在两者都过 `agePool()`。这里把"年轻角色不得出现老年件"固化成断言。
+  */
+  const AGES: ['child' | 'young', string][] = [
+    ['child', '约莫十岁的孩童'],
+    ['young', '十九岁的少年，宫廷文书'],
+    ['young', '十七八岁的少女，学徒'],
+  ]
+  for (const [age, desc] of AGES) {
+    it(`${age}「${desc}」不得出现任何 elderly 部件`, () => {
+      for (let i = 0; i < 30; i++) {
+        const r = recipeFor(`age-check-${age}-${i}`, { profile: { description: desc } })
+        const elders = r.parts.filter(p => /elderly/i.test(p))
+        expect(elders, `${desc} 抽到了老年部件`).toHaveLength(0)
+      }
+    })
+  }
+
+  it('老者仍然拿得到老年部件（别把上面那条修成"永远不给"）', () => {
+    let sawElderly = false
+    for (let i = 0; i < 40; i++) {
+      const r = recipeFor(`elder-check-${i}`, { profile: { description: '白发苍苍的老者，拄着拐杖' } })
+      if (r.parts.some(p => /elderly/i.test(p))) { sawElderly = true; break }
+    }
+    expect(sawElderly, '老者应当能拿到 elderly 部件').toBe(true)
+  })
+
+  it('推断为女性时不得配胡须、不得只给男脸', () => {
+    for (let i = 0; i < 30; i++) {
+      const r = recipeFor(`fem-check-${i}`, { profile: { description: '约莫四十出头的妇人，穿着长裙' } })
+      expect(r.parts.filter(p => /beards_/.test(p)), '女性配了胡须').toHaveLength(0)
+      expect(r.parts.some(p => /heads_human_female/.test(p)), '女性应当拿到 female 头').toBe(true)
+      expect(r.parts.some(p => /heads_human_male/.test(p)), '女性不该拿到 male 头').toBe(false)
+    }
+  })
+})
+
 describe('外貌推断 · 发色', () => {
   const cases: [string, string][] = [
     ['星夜堡的管家，黑发束成笔直的马尾，戴单片眼镜', 'black'],
@@ -187,8 +338,17 @@ describe('外貌推断 · 性别', () => {
   it('没有字段时从代词推断', () => {
     expect(inferTraits({ description: '她推开门' }).gender).toBe('female')
   })
-  it('年长者默认按男性取头部部件（避免抽到少女脸）', () => {
-    expect(inferTraits({ description: '年迈的老者' }).gender).toBe('male')
+  it('性别中立的年长表述不假定性别（旧版硬编码成男性）', () => {
+    /*
+      ⚠️ 这条断言**推翻了旧版行为**。
+      旧版是 `if (age === 'elder' && !gender) gender = 'male'`，理由是
+      "避免年长者抽到少女脸"。但那是个**用偏见治症状**的补丁：
+        · 它把「四十出头的妇人」直接变成男脸（玩家截图反馈的就是这个）
+        · 它并没有解决"抽到不合适的脸"，只是把不合适的方向固定成了男性
+      正确做法是**不猜性别**，而让 pickHead 在性别未知时只从
+      "年龄相符的池子"里挑（见 lpcSprite.test 的年龄一致性用例）。
+    */
+    expect(inferTraits({ description: '年迈的老者' }).gender).toBeUndefined()
   })
 })
 

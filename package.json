@@ -35,6 +35,7 @@
     "check:keywords": "node scripts/check-keywords.mjs",
     "check:encoding": "node scripts/check-encoding.mjs",
     "check:tools": "node scripts/check-tools-selftest.mjs",
+    "check:sprites-audit": "node scripts/lib/audit-sprites.mjs",
     "see": "node scripts/see.mjs"
   },
   "dependencies": {

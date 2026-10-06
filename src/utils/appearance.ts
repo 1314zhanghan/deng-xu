@@ -242,7 +242,27 @@ const GARMENT = '(?:色)?(?:的)?(?:长|短|厚|薄)?' +
   '马甲|背心|制服|军装|长袍|罩袍|围裙|皮甲|铠甲|胸甲|锁甲|板甲|和服|浴衣|旗袍|' +
   'tunic|shirt|coat|cloak|robe|armou?r|jacket|vest|dress|skirt)'
 
-const clothRe = (color: string) => new RegExp(`${color}${GARMENT}|${color}`, 'i')
+/**
+ * 布料/质地的修饰词，常夹在颜色和衣物名之间。
+ *
+ * ⚠️ 为什么需要它：中文角色卡极常写「深灰色**素面**长裙」「青色**官**袍」，
+ * 颜色词和衣物名之间夹着一个词。而原来的模式是
+ * `颜色 + 可选"的长短厚薄" + 衣物名` —— 夹了"素面"就整条匹配失败，
+ * 于是**衣色推断不出来、退回随机**。
+ * 玩家截图里的「玛尔塔」正是如此：描述明写"深灰色素面长裙"，
+ * 结果是随机配色。
+ *
+ * 限定在**已知的布料词**里，不用 `.*?` 之类的通配 ——
+ * 通配会让「灰色眼睛」这类也误命中衣物。
+ */
+const CLOTH_MOD = '(?:的|素面|素色|绒面|丝质|绸面|布料|布面|棉|麻|丝|绸|缎|绒|呢|皮|毛|粗布|细布)?'
+
+/**
+ * 颜色 + [布料词] + 衣物名 —— 衣色表的统一构造器。
+ * 或者退一步：颜色单独出现也算（「她一袭白」这种省略衣物的写法）。
+ */
+const clothRe = (color: string) => new RegExp(`${color}${CLOTH_MOD}${GARMENT}|${color}`, 'i')
+
 
 const CLOTH_COLORS: [RegExp, string][] = [
   /*
@@ -254,9 +274,19 @@ const CLOTH_COLORS: [RegExp, string][] = [
     表格里却另写了一份窄列表，两份"衣物名词表"不一致。
     下面补了一条测试专门守这件事（提到衣物名就必须能推出衣色）。
   */
-  [new RegExp(`(?:白${GARMENT}|纯白|素白|皎白|雪白|银白|white\\b)`, 'i'), 'white'],
-  [new RegExp(`(?:黑${GARMENT}|玄色|墨色|漆黑|乌黑|black\\b)`, 'i'), 'black'],
-  [new RegExp(`(?:灰${GARMENT}|灰袍|grey\\b|gray\\b)`, 'i'), 'gray'],
+  [new RegExp(`(?:白${CLOTH_MOD}${GARMENT}|纯白|素白|皎白|雪白|银白|white\\b)`, 'i'), 'white'],
+  [new RegExp(`(?:黑${CLOTH_MOD}${GARMENT}|玄色|墨色|漆黑|乌黑|black\\b)`, 'i'), 'black'],
+  /*
+    ⚠️ 顺序：**具体色名必须排在泛化色名之前**（ROADMAP 第 44 项定下的规则）。
+    「深灰色素面长裙」原先被下面泛化的 `灰${GARMENT}` 抢走 ——
+    而 `灰` + `素面` + `长裙` 又匹配不上（见 CLOTH_MOD 的说明），
+    于是整条推断直接失败、退回随机配色。现在深灰/浅灰/炭灰排到泛化灰之前。
+  */
+  [/深灰|暗灰|铁灰|dark ?gr[ae]y/i, 'dark_gray'],
+  [/浅灰|银灰|淡灰|light ?gr[ae]y/i, 'light_gray'],
+  [/木炭|炭黑|charcoal/i, 'charcoal'],
+  [/石板|slate/i, 'slate'],
+  [new RegExp(`(?:灰${CLOTH_MOD}${GARMENT}|灰袍|grey\\b|gray\\b)`, 'i'), 'gray'],
   [/深蓝|藏青|靛蓝|navy|dark blue/i, 'navy'],
   [clothRe('蓝'), 'blue'],
   [clothRe('红'), 'red'],
@@ -276,12 +306,10 @@ const CLOTH_COLORS: [RegExp, string][] = [
   [clothRe('青'), 'teal'],
   [/蓝绿|teal\\b/i, 'teal'],
   [/天蓝|sky blue/i, 'sky'],
-  [/木炭|炭黑|charcoal/i, 'charcoal'],
-  [/石板|slate/i, 'slate'],
   // 银色/铜色/铁色：金属色不是 cloth 调色板的强项，退到最接近的灰/褐
-  [new RegExp(`银${GARMENT}|银色|silver`, 'i'), 'gray'],
-  [new RegExp(`铜${GARMENT}|古铜色|青铜`, 'i'), 'walnut'],
-  [new RegExp(`墨${GARMENT}`, 'i'), 'black'],
+  [new RegExp(`银${CLOTH_MOD}${GARMENT}|银色|silver`, 'i'), 'gray'],
+  [new RegExp(`铜${CLOTH_MOD}${GARMENT}|古铜色|青铜`, 'i'), 'walnut'],
+  [new RegExp(`墨${CLOTH_MOD}${GARMENT}`, 'i'), 'black'],
 ]
 
 /** 瞳色 */
@@ -296,6 +324,38 @@ const EYE_COLORS: [RegExp, string][] = [
   [/黑眼|黑眸|black eyes?/i, 'black'],
 ]
 
+/**
+ * 性别。
+ *
+ * ⚠️ 四条规则，每一条都是踩出来的：
+ *
+ * 1. **绝不放"王/国王/皇帝"这类词**。它们看着像男性专属，实际会命中
+ *    **姓氏「王」**和"老国王的侄女"这类**指别人**的表述 ——
+ *    实测角色卡「静水堡的伊瑟琳」（老国王的侄女、寡居）因此被判成男性。
+ *
+ * 2. **绝不放"老人/老者"这类不含性别的词**。它们只表示"年长"，
+ *    放进男性表会把"老妇人"判成男的。性别必须来自**真正带性别的词**。
+ *
+ * 3. **亲属称谓要连代词一起写**（`他的父亲`、`她的母亲`）。
+ *    因为「他的母亲站在旁边」里，被描述者是"他"（男），
+ *    "母亲"只是提到的人。把整个短语写进男性表，就能正确判成男性。
+ *
+ * 4. **女性代词要排在男性代词之前**。`/he\b/` 会命中 "her" 里的 "he"
+ *    （`\b` 在 r 前不成立，但 `her` 后面若跟非单词字符就会）。实测
+ *    「老国王的侄女，寡居」曾被判成 male，就是这一条。
+ */
+const GENDERS: [RegExp, 'male' | 'female'][] = [
+  // ① 明确带性别的身份名词
+  [/少女|姑娘|女孩|女生|女子|女士|女性|妇人|妇女|女人|夫人|太太|主母|小姐|妻子|妃子|王妃|皇后|公主|女王|女皇|女仆|侍女|丫鬟|女官|女侠|女将|女修|女弟子|师姐|师妹|修女|尼姑|寡妇|遗孀|处女|接生婆|媒婆|巫女|女儿|侄女|孙女|外甥女|养女|继女|girl|woman|lady|madam|female|princess|queen|witch|nun|widow|maiden|daughter|niece/i, 'female'],
+  [/少年|男子|男人|男性|先生|男士|少爷|公子|男童|男孩|男生|师兄|师弟|修士|和尚|僧|汉子|大汉|壮汉|农夫|男仆|侍卫|男爵|公公|老汉|boy|man|male|sir|mister|gentleman|monk|brother/i, 'male'],
+  // ② 亲属称谓 + 代词（"他的父亲"指被描述者是男性）
+  [/他(?:的)?(?:父亲|妈妈|母亲|爹|娘|儿子|女儿|妻子|丈夫|兄弟|姐妹|家人)|她(?:的)?(?:父亲|妈妈|母亲|爹|娘|儿子|女儿|妻子|丈夫|兄弟|姐妹|家人)/i, 'male'],
+  // ③ 女性代词（先于男性代词）
+  [/她|she\b|her\b/i, 'female'],
+  // ④ 男性代词
+  [/他|he\b|his\b/i, 'male'],
+]
+
 /** 年龄 */
 /**
  * 年龄。
@@ -305,13 +365,101 @@ const EYE_COLORS: [RegExp, string][] = [
  * 所以更**具体**的规则要写在前面（这里 50 岁 → adult 是错的，
  * 因此把"岁数大"的规则提到中年之前）。
  */
+/**
+ * 岁数表达式。
+ *
+ * ⚠️ 实测**内置角色卡里的岁数全部是中文数字**，一个阿拉伯数字都没有：
+ * 「三十四岁」「五十多岁」「四十岁上下」「六十岁上下」「十九岁」。
+ * 而我第一版只写了 `\b\d+\s*岁`（阿拉伯）—— 于是 20 张卡里只有 2 张推断出年龄，
+ * 其余全部退回随机年龄，其中 2 张因此拿到**老年脸**（十七八岁的少年画成老头）。
+ *
+ * 允许数字与"岁"之间夹 多/来/余/几/出头，以及"岁"后的 上下/左右/前后/出头。
+ * "岁"本身**可省**（「四十出头」「七八岁的小女孩」都会出现）。
+ *
+ * ⚠️ 这个正则**只负责抓取，不负责解析**。
+ * 我一开始想用一个多可选分组的复杂正则，一次把「十七八」「三四十」
+ * 「十四」「五十六」「七八」全解析出来 —— **连错三次**：
+ *   · 第二个数字做成可选 → 「十四」先命中"四" → 判成 4 岁
+ *   · 把 `X十Y` 放前面   → 「十七八」被切成 17 + 残留"八"，整条失配
+ *   · 把裸两位数字放前面 → 「十七八」的"七八"被读成 78
+ * 中文数字的约数写法（十七八 = 17~18）本质是**解析问题**，不是匹配问题。
+ * 交给下面的 `parseCnAge()` 顺次读取，逻辑才看得清、也才测得准。
+ */
+const AGE_EXPR = /([一二三四五六七八九十百两\d]{1,4})\s*(?:多|来|余|几)?\s*(?:岁\s*(?:上下|左右|前后|出头|多)?|出头)/
+
+/**
+ * 解析中文/阿拉伯数字岁数；约数区间取**偏低**的一侧（两端通常同档）。
+ *
+ *   十四 → 14     五十六 → 56     十九 → 19     四十 → 40
+ *   十七八 → 17（十七~十八）      七八 → 7（7~8）
+ *   三四十 → 35（三十~四十，跨档取中值）
+ */
+function parseCnAge(s: string): number | null {
+  if (!s) return null
+  if (/^\d+$/.test(s)) return Number(s)
+  const D: Record<string, number> = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 }
+  const vals: number[] = []
+  for (const c of s) {
+    if (c === '十') { vals.push(vals.length ? -1 : 10); continue }   // -1 = "接在前一个数字后面当十位"
+    const v = D[c]
+    if (v === undefined) { vals.push(NaN); continue }
+    vals.push(v)
+  }
+  if (!vals.length || vals.some(v => Number.isNaN(v))) return null
+  // 展开 -1 标记：把前一个数字 ×10
+  for (let i = 0; i < vals.length; i++) {
+    if (vals[i] === -1) {
+      vals[i - 1] = vals[i - 1] * 10
+      vals.splice(i, 1)
+      i--
+    }
+  }
+  if (!vals.length) return null
+  // 全是个位、且两位数 → 约数（七八 = 7~8），取较小值
+  if (vals.length >= 2 && vals.every(v => v < 10)) {
+    const [a, b] = vals
+    return Math.round((a + b) / 2)   // 7~8 → 7.5→8；(7+8)/2 四舍五入
+  }
+  // 普通情况：把各位拼起来（十四 → 10+4=14；三四十 → 30+40=70 → 见下）
+  let total = 0
+  for (const v of vals) total += v
+  // "三四十"这种"两个十位"的约数：30 与 40 取中值
+  const tensVals = vals.filter(v => v >= 10)
+  if (tensVals.length >= 2) return Math.round(tensVals.reduce((a, b) => a + b, 0) / tensVals.length)
+  return total
+}
+
+/**
+ * 从文本里读岁数并分档。
+ *
+ * 为什么单独一个函数、而不是塞进 AGES 表：
+ * 中文数字没法用正则直接做区间判断（`[4-5][0-9]` 只对阿拉伯数字成立），
+ * 只能**先取出数值、再比较**。
+ */
+function ageFromNumber(text: string): 'child' | 'young' | 'adult' | 'elder' | undefined {
+  const m = text.match(AGE_EXPR)
+  if (!m) return undefined
+  const n = parseCnAge(m[1])
+  if (n === null) return undefined
+  if (n <= 16) return 'child'
+  if (n <= 39) return 'young'
+  if (n <= 59) return 'adult'
+  return 'elder'
+}
+
+/**
+ * 年龄（按泛称判断；**岁数优先**，见 inferTraits 里的调用顺序）。
+ *
+ * ⚠️ 泛化单字不能裸用。「老」原先裸写在 elder 规则里，
+ * 于是「**老**板」「**老**师」「**老**陈」全被判成老者 ——
+ * 酒馆老板随机拿到一张老年脸（"老板"本意是店主，与年龄无关）。
+ * 现在只认"老者/老妇/老人"这类**明确指年龄**的词。
+ */
 const AGES: [RegExp, 'child' | 'young' | 'adult' | 'elder'][] = [
-  [/孩童|幼童|小孩|儿童|少年|少女|child|kid|young boy|young girl|\b([1-9]|1[0-6]) ?岁/i, 'child'],
-  [/十六岁|十五六|十七八/i, 'child'],
-  // 先判"很老"的表述，再判中年，避免「五十岁的老者」被判成中年
-  [/老|年迈|白发苍苍|古稀|花甲|耄耋|垂暮|elder|elderly|old man|old woman|aged|\b([6-9][0-9]) ?岁/i, 'elder'],
-  [/中年|壮年|不惑|知天命|middle.?aged|\b([4-5][0-9]) ?岁/i, 'adult'],
-  [/青年|年轻|二十出头|三十出头|少年郎|rookie|young man|young woman|youth|\b(1[7-9]|2[0-9]|3[0-9]) ?岁/i, 'young'],
+  [/老者|老妇|老人|老头|老太|年老|年迈|上了年纪|白发苍苍|垂暮|花甲|古稀|耄耋|elder|elderly|old man|old woman|aged/i, 'elder'],
+  [/中年|壮年|不惑|知天命|middle.?aged/i, 'adult'],
+  [/青年|年轻人|年轻|少年郎|rookie|young man|young woman|youth/i, 'young'],
+  [/少年|少女|孩童|幼童|小孩|儿童|child|kid/i, 'child'],
 ]
 
 /** 体型 */
@@ -569,7 +717,13 @@ export function inferTraits(input: {
   const eye = firstHit(text, EYE_COLORS)
   if (eye) { out.eye = eye.value; out.evidence.push(`瞳色:${eye.evidence}`) }
 
-  const age = firstHit(text, AGES)
+  /*
+    年龄：**先看明确岁数**，再按泛称判断。
+    岁数是显式信息，比"少年"这种泛称可信 —— 旧版把 `少年` 排在表首，
+    于是「十七八岁的少年」被判成 child（十七八岁画成小孩脸）。
+  */
+  const byNumber = ageFromNumber(text)
+  const age = byNumber ? { value: byNumber, evidence: (text.match(AGE_EXPR) || [''])[0].trim() } : firstHit(text, AGES)
   if (age) { out.age = age.value; out.evidence.push(`年龄:${age.evidence}`) }
 
   const build = firstHit(text, BUILDS)
@@ -597,15 +751,46 @@ export function inferTraits(input: {
     out.evidence.push('裙装')
   }
 
-  // 性别：显式字段优先，否则从文本里找
-  const g = (input.gender || '').toLowerCase()
-  if (/女|female|woman|girl/.test(g)) out.gender = 'female'
-  else if (/男|male|man|boy/.test(g)) out.gender = 'male'
-  else if (/她|少女|女子|女士|女王|女仆|she\b|her\b/i.test(text)) out.gender = 'female'
-  else if (/他|少年|男子|先生|国王|butler\b|he\b|his\b/i.test(text)) out.gender = 'male'
+  /*
+    性别推断。
+    ⚠️ 这是**立绘错配最大的来源之一**：推断不出性别时，头部部件会从
+    男女混合池里随机抽，于是"约莫四十出头的妇人"能抽到一张留胡子的男脸。
+    玩家截图里的「玛尔塔·魏斯」正是如此 —— 描述里"妇人"两个字没被任何规则覆盖。
 
-  // 老者优先：年龄特征往往比性别更能决定头部部件
-  if (out.age === 'elder' && !out.gender) out.gender = 'male'
+    规则要点：
+      1. **零依赖**：绝不因为"没有性别线索"就假定某一性别。
+         旧版有一行 `if (age === 'elder' && !gender) gender = 'male'` ——
+         那是硬编码的男性偏见，直接把"老妇人"变成男脸。已删。
+      2. 具体名词优先于代词：代词（他/她）可能指**别人**
+         （「他母亲站在旁边」里的"他"不是被描述者），可信度最低，放最后。
+      3. 「少年」与「少女」共用"少"字，必须把「少女」的判断放在前面，
+         否则 `/少年/` 会先命中而把姑娘判成男的。
+  */
+  const explicitGender = /女|female|woman|girl/i.test(input.gender || '')
+    ? 'female'
+    : /男|male|man|boy/i.test(input.gender || '')
+      ? 'male'
+      : undefined
+
+  if (explicitGender) {
+    out.gender = explicitGender
+  } else {
+    const genderHit = firstHit(text, GENDERS)
+    if (genderHit) {
+      out.gender = genderHit.value
+      out.evidence.push(`性别:${genderHit.evidence}`)
+    }
+  }
+
+  /*
+    年龄兜底：**从物种/职业的常识反推**，而不是掷骰子。
+    推断不出年龄时，如果已经知道是"学徒"这类词，按少年处理；
+    否则保持 undefined，让配方各自挑合理默认（不硬塞一张老人脸）。
+  */
+  if (!out.age && /学徒|弟子|门生|学生|见习|童工|apprentice|student|acolyte/i.test(text)) {
+    out.age = 'young'
+    out.evidence.push('年龄:学徒（按年轻人处理）')
+  }
 
   return out
 }
@@ -659,6 +844,19 @@ export function resolvePaletteName(
     olive: ['olive', 'taupe', 'amber'],
     dark: ['black', 'brown', 'bronze'],
     grey: ['taupe', 'gray', 'slate'],
+    /*
+      灰色系。
+      ⚠️ 调色板**各材质不统一**（实测 `palettes.json`）：
+        hair  有 dark_gray / gray / ash / platinum，**没有** charcoal / slate
+        cloth 有 gray / slate / charcoal，**没有** dark_gray / light_gray
+      所以「深灰」在不同材质上要落到不同的名字。
+      这里用候选链表达"哪个先有就用哪个"，而不是硬编码一张材质对应表 ——
+      上游调色板改名时最坏也只是退化成 gray，不会静默失败。
+    */
+    dark_gray: ['dark_gray', 'charcoal', 'gray', 'slate'],
+    light_gray: ['light_gray', 'ash', 'silver', 'gray', 'slate'],
+    charcoal: ['charcoal', 'dark_gray', 'gray'],
+    slate: ['slate', 'gray', 'charcoal'],
     white: ['white', 'light'],
     navy: ['navy', 'blue'],
     gold: ['gold', 'yellow', 'amber'],
@@ -669,8 +867,6 @@ export function resolvePaletteName(
     maroon: ['maroon', 'red'],
     lavender: ['lavender', 'purple'],
     forest: ['forest', 'green'],
-    charcoal: ['charcoal', 'gray'],
-    slate: ['slate', 'gray'],
   }
   const cands = ALIASES[w] || [w]
   for (const c of cands) {

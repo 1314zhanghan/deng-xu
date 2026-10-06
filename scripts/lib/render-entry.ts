@@ -65,8 +65,13 @@ export async function spriteDataUrl(key, description, opts = {}) {
   })
 }
 
-/** 立绘详情：配方 + 推断结果，供"为什么画成这样"的诊断 */
-export async function spriteDetail(key, description, opts = {}) {
+/** 直接暴露配方函数，供诊断脚本对比"推断结果 → 实际部件" */
+export { recipeFor as recipeForDiag }
+
+/** 全部内置世界（含各自的角色卡）—— 供"全量立绘审计"遍历真实语料 */
+export { BUILTIN_WORLDS } from '@/data/builtinWorlds'
+
+/** 立绘详情：配方 + 推断结果，供"为什么画成这样"的诊断 */export async function spriteDetail(key, description, opts = {}) {
   const profile = { description, gender: opts.gender }
   const recipe = recipeFor(key, { profile, gender: opts.gender })
   const traits = inferTraits({ description })
