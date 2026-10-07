@@ -1,4 +1,5 @@
 /** 验证存档导出/导入：真实取一次存档 → 校验 → 写入 → 读回一致 */
+import './_ws-shim.mjs'
 import { spawn } from 'node:child_process'
 import http from 'node:http'
 import path from 'node:path'

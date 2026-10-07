@@ -5,6 +5,7 @@
  *   标题页 → 世界包/存档入口 → 开局 → 游戏中 → 立绘面板 → 场景 → 错误提示 → 移动端布局
  * 目标是发现"各自能跑但连起来有问题"的地方。
  */
+import './_ws-shim.mjs'
 import { spawn } from 'node:child_process'
 import http from 'node:http'
 import fs from 'node:fs'

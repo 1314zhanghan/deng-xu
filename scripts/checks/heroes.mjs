@@ -15,6 +15,14 @@
  *   4. 开新局时快捷条出现该预设，**点一下把档案填进表单**
  *   5. 换一个世界开局，预设仍能套用（预设不绑世界）
  */
+/*
+  ⚠️ `_ws-shim.mjs` 必须是**第一个** import。
+  Node 的全局 `WebSocket` 到 Node 21 才有，而 CI 用的是 Node 20 ——
+  漏了这一行，本地（Node 24）全绿、CI 一上去就
+  `ReferenceError: WebSocket is not defined`，整份走查直接挂。
+  我第一版就是漏了它，CI #51 因此在「我的主角」这一步失败。
+*/
+import './_ws-shim.mjs'
 import { launch, sleep, outDir, profileDir, removeProfile } from './_browser.mjs'
 
 const SITE = process.env.SITE || 'http://localhost:5199/'
