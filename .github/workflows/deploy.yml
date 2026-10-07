@@ -70,6 +70,15 @@ jobs:
         # 只退化成随机（"铁匠穿工装裤""管家戴野蛮人头盔"）。
         run: pnpm check:keywords
 
+      - name: Check built-in worlds
+        # 三个内置世界的**内容契约**：每世界 ≥5 万字、worldLore ≥3 万、
+        # startingItems / attributeBonus 等引用是否指向真实 id、题材禁用词、
+        # 角色卡是否写清性别线索（否则立绘随机长脸），
+        # 以及沙盒要求：地图 / 势力范围 / 生活气息各 ≥3000 字、
+        # 长期目标有没有被写成任务书、rules 里有没有明确的沙盒条款。
+        # 这一项拦的是"内容悄悄退化"——编译器和单元测试都看不见那类问题。
+        run: pnpm check:worlds
+
       - name: Self-test the guards
         # 用**污染测试**证明上面两个守卫真的会报警 ——
         # 一个只会打印"全部通过"的检测器毫无价值。
