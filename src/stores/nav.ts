@@ -21,9 +21,24 @@ import { create } from 'zustand'
  */
 export type View =
   | { name: 'menu' }
-  | { name: 'library'; worldbookMode?: boolean }
+  /*
+    ── 为什么 library 需要 `intent` ──
+    原先主菜单的「开始新游戏」「世界书」「卡片库」三个入口
+    都 push 了同一个 `{ name: 'library' }`，于是**点哪个进去都一模一样**，
+    三个入口等于一个。`intent` 把"进来做什么"显式化：
+
+      · play      —— 开始新游戏：卡片墙是**选世界**用的，
+                     每张卡上给"用这个世界开始"
+      · worldbook —— 世界书：只读地翻内置世界的设定集，不给"开始游戏"入口
+      · library   —— 卡片库：管理/导入导出/编辑，重点是维护而不是开局
+
+    `worldbookMode` 保留以兼容既有调用（等价于 intent === 'worldbook'）。
+  */
+  | { name: 'library'; worldbookMode?: boolean; intent?: 'play' | 'worldbook' | 'library' }
   | { name: 'worldbook'; worldId: string }
   | { name: 'setup'; worldId: string }
+  /** 主角预设管理页（「提前设定主角」） */
+  | { name: 'heroes' }
   | { name: 'game' }
 
 interface NavState {

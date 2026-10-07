@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Play, BookOpen, Library, Settings, ChevronRight, ScrollText, Sparkles, Clock, X,
+  Play, BookOpen, Library, Settings, ChevronRight, ScrollText, Sparkles, Clock, X, UserRound,
 } from 'lucide-react'
 import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
@@ -25,13 +25,15 @@ export interface MainMenuProps {
   onNewGame: () => void
   onWorldbook: () => void
   onLibrary: () => void
+  /** 打开「我的主角」——提前设定主角，开局直接选用 */
+  onHeroes: () => void
   onOpenSettings: () => void
   /** 点「最近玩过」里的某一条 → 直接用它开局 */
   onPickWorld: (worldId: string) => void
 }
 
 export function MainMenu({
-  onContinue, onNewGame, onWorldbook, onLibrary, onOpenSettings, onPickWorld,
+  onContinue, onNewGame, onWorldbook, onLibrary, onHeroes, onOpenSettings, onPickWorld,
 }: MainMenuProps) {
   const world = useSessionStore(s => s.world)
   const history = useGameStore(s => s.history)
@@ -44,6 +46,18 @@ export function MainMenu({
   const needsKey = !llm.apiKey && llm.provider !== 'ollama'
   const hasProgress = history.length > 0
   const canContinue = !!world && (hasProgress || characters.length > 0)
+
+  /**
+   * 「我的主角」副标题要**如实反映有没有预设** ——
+   * 一个空功能的入口写着"管理你的主角"会让人点进去发现什么都没有。
+   * 所以没有预设时直接把它当成"去设一个"的邀请。
+   */
+  const presets = useLibraryStore(s => s.heroPresets)
+  const heroDesc = !loaded
+    ? '载入中…'
+    : presets.length === 0
+      ? '还没有设定过主角，点这里先设一个'
+      : `${presets.length} 位主角，开新局可直接选用`
 
   /**
    * 「最近玩过」。
@@ -146,7 +160,14 @@ export function MainMenu({
         </motion.button>
       )}
 
-      {/* 主要入口 */}
+      {/*
+        四个入口，各自**职责不同**（原先「开始新游戏/世界书/卡片库」三个
+        点进去是同一个卡片墙，等于三个入口一个功能）：
+          · 开始新游戏 —— 选世界 → 直接进选角（选角里可一键套用主角预设）
+          · 我的主角   —— 提前把主角设好、存成预设，开局不必重填
+          · 世界书     —— 只读地翻内置世界的设定集
+          · 卡片库     —— 管理/导入导出/编辑你自己的卡
+      */}
       <div className="grid sm:grid-cols-2 gap-3 mb-3">
         <MenuCard
           icon={<Sparkles size={18} className="text-accent-lantern" />}
@@ -157,29 +178,39 @@ export function MainMenu({
           delay={0.1}
         />
         <MenuCard
-          icon={<BookOpen size={18} className="text-accent-lantern" />}
-          title="世界书"
-          desc={`${loaded ? worlds.length : '…'} 个世界可预览、导入、导出`}
-          onClick={onWorldbook}
+          icon={<UserRound size={18} className="text-accent-lantern" />}
+          title="我的主角"
+          desc={heroDesc}
+          onClick={onHeroes}
           delay={0.15}
         />
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3">
         <MenuCard
+          icon={<BookOpen size={18} className="text-text-muted" />}
+          title="世界书"
+          desc={`${loaded ? worlds.filter(w => w.builtin).length : '…'} 个内置世界，翻设定、看地图与势力`}
+          onClick={onWorldbook}
+          delay={0.2}
+        />
+        <MenuCard
           icon={<Library size={18} className="text-text-muted" />}
           title="卡片库"
           desc="管理世界卡与角色卡，导入导出与备份"
           onClick={onLibrary}
-          delay={0.2}
+          delay={0.25}
         />
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-3">
         <MenuCard
           icon={<Settings size={18} className="text-text-muted" />}
           title="模型设置"
           desc={needsKey ? '尚未配置，点此填写' : `${llm.narrativeModel}`}
           onClick={onOpenSettings}
           warn={needsKey}
-          delay={0.25}
+          delay={0.3}
         />
       </div>
 

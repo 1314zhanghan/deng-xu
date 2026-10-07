@@ -1,10 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Play, Users, Check, Compass } from 'lucide-react'
-import type { PlayerCard, WorldCard } from '@/types/cards'
+import { ArrowLeft, ArrowRight, Play, Users, Check, Compass, UserRound, BookmarkPlus } from 'lucide-react'
+import type { HeroPreset, PlayerCard, WorldCard } from '@/types/cards'
 import { useSessionStore } from '@/stores/session'
 import { useGameStore } from '@/stores/game'
 import { useUIStore } from '@/stores/ui'
+import { useLibraryStore } from '@/stores/library'
+import { useNavStore } from '@/stores/nav'
 
 /**
  * 开局配置
@@ -34,6 +36,61 @@ const inputCls =
 
 const areaCls = `${inputCls} resize-y leading-relaxed font-serif`
 
+/**
+ * 把 pendingSetup 里的种子（可能来自"我的主角"预设）解析成
+ * **在当前世界合法**的开局初值。
+ *
+ * ⚠️ 为什么必须过滤，不能直接照抄：
+ * 预设里记的 `backgroundChoices` 的 key 是**槽位 label**、value 是**选项 id**，
+ * 而这两样都是**每个世界自己在世界卡里定义的**。
+ * 拿 A 世界记下的选择去开 B 世界，轻则整个槽位对不上、重则选中一个不存在的
+ * 选项 id → 后面的属性加成与开局物品都会取空。
+ * 所以这里逐槽校验：槽位名要对得上，选项 id 也要在本世界里真实存在，
+ * 对不上就退回该槽的默认（第一个选项）。
+ *
+ * 属性点同理：只保留本世界确实定义过的属性 id，其余丢弃。
+ */
+function resolveSeed(world: WorldCard) {
+  const seed = useUIStore.getState().pendingSetup
+
+  const player: PlayerCard = {
+    name: seed?.player?.name || '',
+    gender: seed?.player?.gender || '',
+    age: seed?.player?.age || '',
+    appearance: seed?.player?.appearance || '',
+    personality: seed?.player?.personality || '',
+    background: seed?.player?.background || '',
+    extra: seed?.player?.extra || '',
+    ...(seed?.player?.avatar ? { avatar: seed.player.avatar } : {}),
+  }
+
+  // 背景：默认每槽第一个，再用预设里"对得上"的选择覆盖
+  const backgroundChoices: Record<string, string> = {}
+  for (const slot of world.backgrounds) {
+    if (slot.options[0]) backgroundChoices[slot.label] = slot.options[0].id
+  }
+  for (const [label, optId] of Object.entries(seed?.backgroundChoices || {})) {
+    const slot = world.backgrounds.find(s => s.label === label)
+    if (slot && slot.options.some(o => o.id === optId)) {
+      backgroundChoices[label] = optId
+    }
+  }
+
+  // 属性点：只认本世界定义过的属性，且不得超过该世界的点数额度
+  const allocation: Record<string, number> = {}
+  for (const a of world.attributes) allocation[a.id] = 0
+  let budget = world.attributePoints
+  for (const [id, n] of Object.entries(seed?.attributeAllocation || {})) {
+    if (!(id in allocation)) continue
+    const v = Math.max(0, Math.floor(Number(n) || 0))
+    const take = Math.min(v, budget)
+    allocation[id] = take
+    budget -= take
+  }
+
+  return { player, backgroundChoices, allocation }
+}
+
 export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
   const setSession = useSessionStore(s => s.setSession)
   const initFromWorld = useGameStore(s => s.initFromWorld)
@@ -50,20 +107,12 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
    * 而 isGameStarted 尚未置位、SessionSetup 仍是当前视图 ——
    * 组件重挂载后 useState 初值被重新求值，用户刚填的名字就丢了。
    * 症状正是"主角叫未命名"。ref 不随重挂载重置，所以读它才可靠。
+   *
+   * `resolveSeed` 在这里被调用一次，之后不再变 —— 重挂载会重新求值，
+   * 但那时 pendingSetup 还是同一份，结果一致（幂等）。
    */
-  const [player, setPlayerState] = useState<PlayerCard>(() => {
-    const seed = useUIStore.getState().pendingSetup?.player
-    return {
-      name: seed?.name || '',
-      gender: seed?.gender || '',
-      age: seed?.age || '',
-      appearance: seed?.appearance || '',
-      personality: seed?.personality || '',
-      background: seed?.background || '',
-      extra: seed?.extra || '',
-      ...(seed?.avatar ? { avatar: seed.avatar } : {}),
-    }
-  })
+  const seedInit = resolveSeed(world)
+  const [player, setPlayerState] = useState<PlayerCard>(() => seedInit.player)
 
   /**
    * player 的 ref 镜像 + 一个不会丢的 setter。
@@ -83,22 +132,89 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
     () => world.characters.filter(c => c.present).map(c => c.id)
   )
 
-  // 每个背景槽位默认选第一个；没有槽位时为空对象
-  const [backgroundChoices, setBackgroundChoices] = useState<Record<string, string>>(() => {
-    const init: Record<string, string> = {}
-    world.backgrounds.forEach(slot => {
-      if (slot.options[0]) init[slot.label] = slot.options[0].id
-    })
-    return init
-  })
+  // 每个背景槽位默认选第一个；带预设时用预设里对得上的选择覆盖（见 resolveSeed）
+  const [backgroundChoices, setBackgroundChoices] = useState<Record<string, string>>(
+    () => seedInit.backgroundChoices
+  )
 
-  const [allocation, setAllocation] = useState<Record<string, number>>(() => {
-    const init: Record<string, number> = {}
-    world.attributes.forEach(a => { init[a.id] = 0 })
-    return init
-  })
+  const [allocation, setAllocation] = useState<Record<string, number>>(
+    () => seedInit.allocation
+  )
 
   // patchPlayer 已在上面定义（同时写 ref 与 state，见那里的注释）
+
+  /** 预设快捷条用到的库状态与动作 */
+  const heroPresets = useLibraryStore(s => s.heroPresets)
+  const saveHeroPreset = useLibraryStore(s => s.saveHeroPreset)
+  const createHeroPreset = useLibraryStore(s => s.createHeroPreset)
+  const navPush = useNavStore(s => s.push)
+  /** 套用/保存后的轻提示（两秒后自己消失，不打断填写） */
+  const [presetFlash, setPresetFlash] = useState<string | null>(null)
+
+  /*
+    ── 主角预设：套用 / 保存 ──
+    两个方向都要有，缺一个这功能就不成立：
+      · applyPreset  —— 把预设灌进当前表单（含本世界的出身与加点）
+      · saveAsPreset —— 把当前表单存成预设，下次不必重填
+    套用只负责"填好初值"，填完仍可继续改，不做任何锁定。
+  */
+  const applyPreset = (preset: HeroPreset) => {
+    patchPlayer({ ...preset.player })
+    // 背景选择：只认本世界真实存在的槽位与选项（理由见 resolveSeed 的注释）
+    const byWorldBg = preset.choices?.byWorld?.[world.id]?.backgroundChoices
+    const defBg = preset.choices?.default?.backgroundChoices
+    const merged = { ...(defBg || {}), ...(byWorldBg || {}) }
+    const nextBg: Record<string, string> = { ...backgroundChoices }
+    for (const [label, optId] of Object.entries(merged)) {
+      const slot = world.backgrounds.find(s => s.label === label)
+      if (slot && slot.options.some(o => o.id === optId)) nextBg[label] = optId
+    }
+    setBackgroundChoices(nextBg)
+
+    // 属性点同理：只认本世界的属性 id，且不超额度
+    const byWorldAlloc = preset.choices?.byWorld?.[world.id]?.attributeAllocation
+    const defAlloc = preset.choices?.default?.attributeAllocation
+    const mergedAlloc = { ...(defAlloc || {}), ...(byWorldAlloc || {}) }
+    const nextAlloc: Record<string, number> = {}
+    for (const a of world.attributes) nextAlloc[a.id] = 0
+    let budget = world.attributePoints
+    for (const [id, n] of Object.entries(mergedAlloc)) {
+      if (!(id in nextAlloc)) continue
+      const take = Math.min(Math.max(0, Math.floor(Number(n) || 0)), budget)
+      nextAlloc[id] = take
+      budget -= take
+    }
+    setAllocation(nextAlloc)
+    setPresetFlash(`已套用「${preset.label}」`)
+    setTimeout(() => setPresetFlash(null), 2000)
+  }
+
+  /**
+   * 把当前表单存成预设。
+   *
+   * 同名则更新（并把"这个世界的出身与加点"记进去），否则新建 ——
+   * 这样玩家在同一世界里反复开局，第二次起连出身都不必重选。
+   */
+  const saveAsPreset = async () => {
+    const me = currentPlayer()
+    const label = (me.name || '').trim() || '我的主角'
+    const existing = heroPresets.find(p => p.label === label)
+    const choices = {
+      ...(existing?.choices || {}),
+      byWorld: {
+        ...(existing?.choices?.byWorld || {}),
+        [world.id]: { backgroundChoices, attributeAllocation: allocation },
+      },
+    }
+    if (existing) {
+      await saveHeroPreset({ ...existing, label, player: me, choices })
+    } else {
+      const created = await createHeroPreset(label, me)
+      await saveHeroPreset({ ...created, choices })
+    }
+    setPresetFlash(`已存为预设「${label}」，下次开局可直接套用`)
+    setTimeout(() => setPresetFlash(null), 2200)
+  }
 
   const totalAllocated = useMemo(
     () => Object.values(allocation).reduce((a, b) => a + b, 0),
@@ -282,6 +398,43 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                     </p>
                   </div>
 
+                  {/*
+                    ── 主角预设快捷条 ──
+                    这里是"提前设定主角"落地的地方：设过一次之后再开新局，
+                    点一下就把整份档案（名字/性别/年龄/外貌/性格/背景）填好，
+                    连同**在同一个世界里**记过的出身与加点一起套上。
+                    没有预设时不显示这一条，避免给新玩家一个空功能的干扰。
+                  */}
+                  {heroPresets.length > 0 && (
+                    <div className="rounded border border-text-muted/25 bg-black/15 px-3 py-2.5 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <UserRound size={13} className="text-accent-lantern" />
+                        <span className="text-xs text-text-secondary">用已设好的主角</span>
+                        <span className="text-[10px] text-text-muted">（点一下套用，仍可继续改）</span>
+                        <button
+                          onClick={() => navPush({ name: 'heroes' })}
+                          className="ml-auto text-[10px] text-text-muted hover:text-accent-lantern transition-colors"
+                        >
+                          管理我的主角
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {heroPresets.map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => applyPreset(p)}
+                            className="px-2.5 py-1 text-[11px] rounded border border-text-muted/35
+                              hover:border-accent-lantern/60 hover:text-accent-lantern transition-colors
+                              max-w-[14rem] truncate"
+                            title={`${p.label}　${p.player.name || '未命名'}${p.player.gender ? ' · ' + p.player.gender : ''}`}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid md:grid-cols-[10rem_1fr] gap-6">
                     {/*
                       主角**不生成立绘、也不上传头像**。
@@ -347,6 +500,36 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                           onChange={e => patchPlayer({ extra: e.target.value })}
                           placeholder="任何希望 AI 知道的事。" />
                       </label>
+
+                      {/*
+                        存为预设 —— 填好之后就地存下来，
+                        下次开新局（任何世界）点一下就能套用，不必再填一遍。
+                      */}
+                      <div className="flex items-center gap-3 flex-wrap pt-1">
+                        <button
+                          onClick={saveAsPreset}
+                          disabled={!player.name.trim()}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded border
+                            border-text-muted/40 text-text-secondary hover:border-accent-lantern/60
+                            hover:text-accent-lantern transition-colors disabled:opacity-40
+                            disabled:cursor-not-allowed"
+                          title={player.name.trim() ? '把这份档案存下来，下次开局可直接套用' : '先填个名字再存'}
+                        >
+                          <BookmarkPlus size={13} />
+                          存为我的主角
+                        </button>
+                        <span className="text-[10px] text-text-muted">
+                          存下后，下一个世界开新局时点一下就能套用这份档案
+                        </span>
+                      </div>
+
+                      {presetFlash && (
+                        <div className="flex items-center gap-1.5 text-[11px] text-accent-lantern
+                          bg-accent-lantern/10 border border-accent-lantern/30 rounded px-2.5 py-1.5">
+                          <Check size={12} />
+                          {presetFlash}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </>

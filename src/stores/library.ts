@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { WorldCard } from '@/types/cards';
+import type { WorldCard, HeroPreset, PlayerCard } from '@/types/cards';
 import { makeId } from '@/utils/files';
 import { createKVStore, isIdbAvailable } from '@/utils/idb';
 
@@ -12,6 +12,13 @@ import { createKVStore, isIdbAvailable } from '@/utils/idb';
 
 /** 整个卡片库存成一个 JSON 字符串：单键写入天然原子，不会读到写了一半的数组 */
 const WORLDS_KEY = 'worlds';
+/**
+ * 主角预设**单独一个键**，不塞进 WORLDS_KEY。
+ *
+ * 为什么分开：两者的生命周期完全不同 —— 世界卡可能被整批导入/删除/覆盖，
+ * 而玩家精心设定的主角不该因为"清空卡片库"就一起消失。
+ */
+const PRESETS_KEY = 'heroPresets';
 
 const kv = createKVStore('pale-notes', 'kv');
 
@@ -62,6 +69,22 @@ export interface LibraryState {
   loaded: boolean;
   loadError: string | null;
 
+  /**
+   * 主角预设（「提前设定主角」）。与世界卡一起在首次载入时读出，
+   * 但存在**另一个 kv 键**里，互不影响。
+   */
+  heroPresets: HeroPreset[];
+  /** 保存（按 id 新增或替换，新卡排最前） */
+  saveHeroPreset: (preset: HeroPreset) => Promise<void>;
+  /** 更新预设内嵌的主角档案 */
+  updateHeroPresetPlayer: (id: string, player: PlayerCard) => Promise<void>;
+  deleteHeroPreset: (id: string) => Promise<void>;
+  /** 复制一份预设（改个名字再存，便于派生） */
+  duplicateHeroPreset: (id: string, label?: string) => Promise<HeroPreset | null>;
+  getHeroPreset: (id: string) => HeroPreset | undefined;
+  /** 以现有资料新建一个预设（不开游戏也能先设主角） */
+  createHeroPreset: (label: string, player: PlayerCard) => Promise<HeroPreset>;
+
   /** 从 IndexedDB 载入全部世界卡；首次运行会写入内置示例卡 */
   loadWorlds: () => Promise<void>;
   /** 新增或整体替换（按 id 匹配） */
@@ -104,6 +127,51 @@ export const useLibraryStore = create<LibraryState>()((set, get) => {
     return writeChain;
   }
 
+  /**
+   * 主角预设的写回，和 persist() 共用同一条 writeChain。
+   *
+   * ⚠️ 必须共用：预设与世界卡存在**两个键**里，但写入是异步排队的。
+   * 若各写各的链，两次写入可能交错，导致后写的那次覆盖掉先写的内容
+   * （"刚存的主角下次打开不见了"）。串在一条链上就天然有序。
+   */
+  async function persistPresets(): Promise<void> {
+    const wasAvailable = isIdbAvailable();
+    try {
+      await kv.set(PRESETS_KEY, JSON.stringify(get().heroPresets));
+      if (!isIdbAvailable()) {
+        set({ loadError: idbDownMessage(wasAvailable) });
+      } else if (get().loadError) {
+        set({ loadError: null });
+      }
+    } catch (err) {
+      set({ loadError: `主角预设写回失败：${describeError(err)}` });
+    }
+  }
+
+  function queuePersistPresets(): Promise<void> {
+    writeChain = writeChain.then(persistPresets);
+    return writeChain;
+  }
+
+  /** 预设改动统一入口：先同步改内存，再排队写回 */
+  async function commitPresets(presets: HeroPreset[]): Promise<void> {
+    set({ heroPresets: presets });
+    await queuePersistPresets();
+  }
+
+  /** 新增或就地替换一份预设；新的排最前（列表天然按最近保存排序） */
+  async function commitPreset(next: HeroPreset): Promise<void> {
+    const current = get().heroPresets;
+    const index = current.findIndex((p) => p.id === next.id);
+    if (index === -1) {
+      await commitPresets([next, ...current]);
+      return;
+    }
+    const presets = current.slice();
+    presets[index] = next;
+    await commitPresets(presets);
+  }
+
   /** 所有改动都走这里：先同步改内存（UI 立刻响应），再异步写回 */
   async function commitWorlds(worlds: WorldCard[]): Promise<void> {
     set({ worlds });
@@ -125,6 +193,7 @@ export const useLibraryStore = create<LibraryState>()((set, get) => {
 
   return {
     worlds: [],
+    heroPresets: [],
     loaded: false,
     loadError: null,
 
@@ -134,6 +203,24 @@ export const useLibraryStore = create<LibraryState>()((set, get) => {
       loadInFlight = (async () => {
         let worlds: WorldCard[] | null = null;
         let error: string | null = null;
+        /*
+          主角预设顺手一起读出。它**不参与**下面的"首次运行播入内置卡"逻辑 ——
+          预设的初始值就是空数组（没有人天生有一个预设好的主角），
+          空数组是合法状态，不需要 seed，也不能因为空就报错。
+        */
+        let presets: HeroPreset[] = [];
+        try {
+          const rawP = await kv.get<unknown>(PRESETS_KEY);
+          if (typeof rawP === 'string' && rawP.trim()) {
+            const parsedP: unknown = JSON.parse(rawP);
+            if (Array.isArray(parsedP)) presets = parsedP as HeroPreset[];
+          } else if (Array.isArray(rawP)) {
+            presets = rawP as HeroPreset[];
+          }
+        } catch {
+          // 预设读失败不该影响世界卡可用性：当作"还没有预设"，不覆盖 error
+        }
+
         try {
           const raw = await kv.get<unknown>(WORLDS_KEY);
           if (typeof raw === 'string' && raw.trim()) {
@@ -170,7 +257,7 @@ export const useLibraryStore = create<LibraryState>()((set, get) => {
           needSeed = true;
         }
 
-        set({ worlds, loaded: true, loadError: error });
+        set({ worlds, heroPresets: presets, loaded: true, loadError: error });
         if (needSeed) await queuePersist();
       })();
 
@@ -259,6 +346,63 @@ export const useLibraryStore = create<LibraryState>()((set, get) => {
       if (imported.length === 0) return [];
       await commitWorlds([...imported, ...get().worlds]);
       return imported.map((card) => deepClone(card));
+    },
+
+    // ── 主角预设（「提前设定主角」）────────────────────────────────
+    /*
+      这些操作都**只动 PRESETS_KEY**，不碰世界卡 ——
+      玩家清理卡片库、导入别人的世界包，都不该弄丢自己设好的主角。
+    */
+    saveHeroPreset: async (preset) => {
+      const now = Date.now();
+      // 深拷贝：调用方通常是组件的 state，直接存引用会让后续编辑连带改到库里
+      await commitPreset({
+        ...deepClone(preset),
+        id: preset.id || makeId('hero'),
+        createdAt: preset.createdAt || now,
+        updatedAt: now,
+      });
+    },
+
+    updateHeroPresetPlayer: async (id, player) => {
+      const cur = get().heroPresets.find((p) => p.id === id);
+      if (!cur) return;
+      await commitPreset({ ...cur, player: deepClone(player), updatedAt: Date.now() });
+    },
+
+    deleteHeroPreset: async (id) => {
+      await commitPresets(get().heroPresets.filter((p) => p.id !== id));
+    },
+
+    duplicateHeroPreset: async (id, label) => {
+      const cur = get().heroPresets.find((p) => p.id === id);
+      if (!cur) return null;
+      const now = Date.now();
+      const copy: HeroPreset = {
+        ...deepClone(cur),
+        id: makeId('hero'),
+        label: label || `${cur.label} 副本`,
+        createdAt: now,
+        updatedAt: now,
+      };
+      await commitPreset(copy);
+      return copy;
+    },
+
+    /** 同 getWorld：返回库内引用，请当只读用 */
+    getHeroPreset: (id) => get().heroPresets.find((p) => p.id === id),
+
+    createHeroPreset: async (label, player) => {
+      const now = Date.now();
+      const preset: HeroPreset = {
+        id: makeId('hero'),
+        label: label.trim() || player.name.trim() || '未命名主角',
+        player: deepClone(player),
+        createdAt: now,
+        updatedAt: now,
+      };
+      await commitPreset(preset);
+      return preset;
     },
   };
 });

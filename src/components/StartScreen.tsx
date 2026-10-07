@@ -16,6 +16,7 @@ import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SaveManager } from '@/components/SaveManager'
 import { WorldPackManager } from '@/components/WorldPackManager'
 import { MainMenu } from '@/components/MainMenu'
+import { HeroPresets } from '@/components/HeroPresets'
 import { useNavStore } from '@/stores/nav'
 import { WorldbookPreview } from '@/components/WorldbookPreview'
 
@@ -65,8 +66,17 @@ export function StartScreen() {
   const view = useNavStore(s => s.view)
   const navPush = useNavStore(s => s.push)
   const navBack = useNavStore(s => s.back)
-  /** 卡片墙是否只展示内置世界（从「世界书」进来时为真） */
-  const worldbookMode = view.name === 'library' ? !!view.worldbookMode : false
+  /**
+   * 卡片墙的**用途**。三个入口原先都 push 同一个 `{ name: 'library' }`，
+   * 所以点哪个进去都一样、三个入口等于一个。现在由 intent 决定这一屏做什么：
+   *   play / worldbook / library
+   * `worldbookMode` 仍兼容（等价于 intent === 'worldbook'）。
+   */
+  const libraryIntent: 'play' | 'worldbook' | 'library' =
+    view.name === 'library'
+      ? (view.intent ?? (view.worldbookMode ? 'worldbook' : 'library'))
+      : 'library'
+  const worldbookMode = libraryIntent === 'worldbook'
   /** 正在预览的世界卡 id —— 就是 worldbook 这一层本身携带的 */
   const previewId = view.name === 'worldbook' ? view.worldId : null
   /**
@@ -332,7 +342,16 @@ export function StartScreen() {
     )
   }
 
-  /** 主菜单视图：不渲染卡片墙，只有五个入口 */
+  /*
+    「我的主角」独立一屏。放在选角之前而不是塞进选角里：
+    它的定位是"提前设好"，与"这一局怎么开"是两件事，
+    混在一起会让选角页更长、也更难找。
+  */
+  if (view.name === 'heroes') {
+    return <HeroPresets onBack={() => navBack()} />
+  }
+
+  /** 主菜单视图：不渲染卡片墙，只有若干入口 */
   if (view.name === 'menu') {
     return (
       <div className="min-h-screen min-h-[100dvh] w-full bg-background text-text-primary flex flex-col relative">
@@ -352,9 +371,10 @@ export function StartScreen() {
         <main className="relative z-10 flex-1 overflow-y-auto">
           <MainMenu
             onContinue={handleResume}
-            onNewGame={() => navPush({ name: 'library', worldbookMode: false })}
-            onWorldbook={() => navPush({ name: 'library', worldbookMode: true })}
-            onLibrary={() => navPush({ name: 'library', worldbookMode: false })}
+            onNewGame={() => navPush({ name: 'library', intent: 'play' })}
+            onWorldbook={() => navPush({ name: 'library', intent: 'worldbook' })}
+            onLibrary={() => navPush({ name: 'library', intent: 'library' })}
+            onHeroes={() => navPush({ name: 'heroes' })}
             onOpenSettings={() => setApiKeyModalOpen(true)}
             onPickWorld={id => beginSetup(id)}
           />
@@ -413,16 +433,18 @@ export function StartScreen() {
           <div className="min-w-0">
             <div className="flex items-center gap-2 min-w-0">
               <h1 className="font-serif font-bold tracking-widest text-accent-lantern truncate">
-                {worldbookMode ? '世界书' : '卡片库'}
+                {libraryIntent === 'play' ? '开始新游戏' : libraryIntent === 'worldbook' ? '世界书' : '卡片库'}
               </h1>
               <span className="text-[10px] px-1.5 py-0.5 rounded border border-accent-forge/50 text-accent-forge whitespace-nowrap flex-shrink-0">
                 Z测试版
               </span>
             </div>
             <p className="text-[10px] text-text-muted font-mono truncate">
-              {worldbookMode
-                ? (loaded ? `${worlds.filter(w => w.builtin).length} 个内置世界，点卡片看详情` : '正在载入世界书…')
-                : (loaded ? `${worlds.length} 张世界卡` : '正在载入卡库…')}
+              {libraryIntent === 'play'
+                ? (loaded ? `选一个世界开局 · 共 ${worlds.length} 张卡` : '正在载入世界卡…')
+                : libraryIntent === 'worldbook'
+                  ? (loaded ? `${worlds.filter(w => w.builtin).length} 个内置世界，点卡片看详情` : '正在载入世界书…')
+                  : (loaded ? `${worlds.length} 张世界卡，可编辑与导入导出` : '正在载入卡库…')}
             </p>
           </div>
         </div>
@@ -688,20 +710,38 @@ export function StartScreen() {
                   </div>
 
                   <div className="mt-auto flex items-center gap-1.5 pt-2 border-t border-text-muted/10">
-                    <button
-                      onClick={() => beginSetup(world.id)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
-                    >
-                      <Play size={12} /> 开始
-                    </button>
+                    {/*
+                      主操作**随用途变化**：
+                        · play      —— 主按钮就是"开始"（进来就是为了开局）
+                        · worldbook —— 主按钮是"看详情"，这里不给开局入口（它是设定集，不是开局器）
+                        · library   —— 主按钮也是"看详情"，重点在维护而不是开局
+                      这样三个入口点进来才是三件不同的事。
+                    */}
+                    {libraryIntent === 'play' ? (
+                      <button
+                        onClick={() => beginSetup(world.id)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
+                      >
+                        <Play size={12} /> 用这个世界开始
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => navPush({ name: 'worldbook', worldId: world.id })}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs bg-accent-lantern/15 border border-accent-lantern/40 text-accent-lantern rounded hover:bg-accent-lantern/25 transition-colors"
+                      >
+                        <Eye size={12} /> 看详情
+                      </button>
+                    )}
 
-                    <button
-                      onClick={() => navPush({ name: 'worldbook', worldId: world.id })}
-                      title="查看世界书详情（只读）"
-                      className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40 transition-colors"
-                    >
-                      <Eye size={13} />
-                    </button>
+                    {libraryIntent === 'play' && (
+                      <button
+                        onClick={() => navPush({ name: 'worldbook', worldId: world.id })}
+                        title="先看看这个世界写了什么"
+                        className="p-1.5 border border-text-muted/30 rounded text-text-muted hover:text-accent-lantern hover:border-accent-lantern/40 transition-colors"
+                      >
+                        <Eye size={13} />
+                      </button>
+                    )}
 
                     {world.builtin ? (
                       <button

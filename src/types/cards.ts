@@ -264,5 +264,50 @@ export interface CardBundle {
 export interface SetupSeed {
   world: WorldCard;
   player?: PlayerCard;
+  /**
+   * 各背景槽位选中的 option id（key 为槽位 label）。
+   *
+   * 用于"提前设定主角"：预设里存了上次选过的出身/际遇等，
+   * 开局时直接覆盖掉默认值，玩家就不必再逐槽重选。
+   *
+   * ⚠️ 选项 id 是**世界相关**的 —— 换了世界就选不中，
+   * 所以 SessionSetup 里必须只认「本世界确实存在的选项」，
+   * 对不上的槽位退回默认值（见 SessionSetup 的初始化逻辑）。
+   */
+  backgroundChoices?: Record<string, string>;
+  /** 玩家分配好的属性点（skill id → 点数），同样要按本世界的属性表过滤 */
+  attributeAllocation?: Record<string, number>;
+}
+
+/**
+ * 主角预设 —— 「提前设定主角」功能的核心数据结构。
+ *
+ * 玩家可以把一套主角档案（名字/性别/年龄/外貌/性格/出身/头像）
+ * 连同常用的开局选择存下来，下次开新游戏时一键套用，
+ * 不必每次重新手填。
+ *
+ * 与 `PlayerCard` 的关系：预设**内嵌**一张 PlayerCard，
+ * 这样套用时直接把它当 pendingSetup.player 用，不需要转换。
+ */
+export interface HeroPreset {
+  id: string;
+  /** 预设名（列表里显示，如「我的惯用主角」「沈砚」） */
+  label: string;
+  /** 主角档案本体 */
+  player: PlayerCard;
+  /**
+   * 记住的开局选择。分两层：
+   *  · `default` —— 不分世界，任何世界都先套这一份
+   *  · `byWorld` —— 按世界 id 覆盖，用来记住"在这个世界我选了哪个出身"
+   *
+   * 为什么分两层：背景选项 id 是每个世界自己定义的，
+   * 一套"通用"选择只能对同世界可靠；分世界存才能既通用又不串味。
+   */
+  choices?: {
+    default?: { backgroundChoices?: Record<string, string>; attributeAllocation?: Record<string, number> };
+    byWorld?: Record<string, { backgroundChoices?: Record<string, string>; attributeAllocation?: Record<string, number> }>;
+  };
+  createdAt: number;
+  updatedAt: number;
 }
 

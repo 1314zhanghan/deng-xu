@@ -150,9 +150,39 @@ check('有「开始新游戏」入口', m1.menuEntries.some(x => /开始新游�
 check('有「世界书」入口', m1.menuEntries.some(x => /世界书/.test(x)))
 check('有「卡片库」入口', m1.menuEntries.some(x => /卡片库/.test(x)))
 check('有「模型设置」入口', m1.menuEntries.some(x => /模型设置/.test(x)))
+// 「我的主角」是"提前设定主角"的入口，用户明确要求过
+check('有「我的主角」入口', m1.menuEntries.some(x => /我的主角/.test(x)))
 await shot('menu-01-main')
 
+/*
+  ── 三个入口必须是三件不同的事 ──
+  用户反馈过：原先「开始新游戏 / 世界书 / 卡片库」点进去**一模一样**。
+  根因是三者都 push 同一个 `{ name: 'library' }`。
+  现在各自带 intent，标题应当各不相同 —— 这里就把这条钉住。
+*/
+console.log('\n=== 1b) 三个入口进去应当是三个不同的页面 ===')
+const entryTitles = {}
+for (const [key, re] of [['开始新游戏', '/^开始新游戏/'], ['世界书', '/^世界书/'], ['卡片库', '/^卡片库/']]) {
+  // 每次都先回主菜单，保证是从主菜单进去的
+  await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/^主菜单$/.test((x.textContent||'').trim()));if(b)b.click();return 1})()`)
+  await sleep(900)
+  const clicked = await clickRe(re)
+  await sleep(1400)
+  const h = await ev(`(()=>{const t=document.querySelector('h1');return t?t.textContent.trim():''})()`)
+  entryTitles[key] = h
+  console.log(`  点「${key}」→ 标题「${h}」  (${clicked})`)
+}
+check('「开始新游戏」进入的是选世界页', entryTitles['开始新游戏'] === '开始新游戏', entryTitles['开始新游戏'])
+check('「世界书」进入的是世界书', entryTitles['世界书'] === '世界书', entryTitles['世界书'])
+check('「卡片库」进入的是卡片库', entryTitles['卡片库'] === '卡片库', entryTitles['卡片库'])
+check('三个入口标题互不相同（不再是一个功能）',
+  new Set(Object.values(entryTitles)).size === 3,
+  JSON.stringify(entryTitles))
+
 console.log('\n=== 2) 世界书：进入列表 → 打开详情（不进编辑器）===')
+// 回到主菜单再点世界书，保证状态干净
+await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/^主菜单$/.test((x.textContent||'').trim()));if(b)b.click();return 1})()`)
+await sleep(900)
 console.log('  点世界书:', await clickRe('/^世界书/'))
 // 等"世界卡列表真的渲染出来"，而不是死等 2500ms
 /*
