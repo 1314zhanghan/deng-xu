@@ -126,8 +126,14 @@ export function WorldbookPreview({
       {tab === 'overview' && (
         <div className="space-y-6">
           {world.story?.mainQuest && (
-            <Panel icon={<Swords size={14} />} title="主线目标">
-              <p className="text-xs text-text-secondary leading-relaxed">{world.story.mainQuest}</p>
+            /*
+              ⚠️ 标签不能叫「主线目标」。
+              内置的三个世界是**沙盒**：这些内容是"若干宏大宽泛的可选方向"，
+              不是必须推进的主线。叫"主线目标"会让玩家以为有通关路线，
+              也会让作者照着"写一个任务"来填这个字段。
+            */
+            <Panel icon={<Swords size={14} />} title="长期目标（可选）" hint="沙盒里可以追求的方向，不是必须做的事">
+              <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap">{world.story.mainQuest}</p>
             </Panel>
           )}
 

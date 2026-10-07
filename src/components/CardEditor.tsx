@@ -509,10 +509,15 @@ export function CardEditor() {
               </Field>
 
               <div className="grid md:grid-cols-2 gap-4">
-                <Field label="主线目标（可留空）" hint="留空即纯沙盒，由玩家自己找方向">
+                {/*
+                  ⚠️ 标签从「主线目标」改为「长期目标（可选）」。
+                  这个字段在沙盒世界里是"几个宏大宽泛的方向"，
+                  不是必须推进的主线；叫"主线目标"会引导作者写成任务书。
+                */}
+                <Field label="长期目标（可选，可留空）" hint="写几个宽泛的方向即可，不要写成任务书；留空则完全由玩家自己找方向">
                   <textarea className={`${areaCls} h-28`} value={draft.story.mainQuest}
                     onChange={e => patchStory({ mainQuest: e.target.value })}
-                    placeholder="例如：查清铜铃里录下了谁的最后时刻。" />
+                    placeholder={'**以下都是可选的。** 你可以在镇上当一辈子伙计，把日子过下去，这不算玩错。若想往大处走：\n· 挣一份自己的家业\n· 查清那件事的真相\n· 成为某一方离不开的人'} />
                 </Field>
                 <Field label="开场设定（可留空）" hint="留空则由 AI 自行设计一个有张力的开场">
                   <textarea className={`${areaCls} h-28`} value={draft.story.opening}

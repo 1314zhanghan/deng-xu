@@ -89,6 +89,15 @@ const GATE = {
   rulesCjk: 3000,
   customStyleCjk: 500,
   openingCjk: 1200,
+  /* ── 沙盒改造（2026-10）追加的门槛 ── */
+  // 长期目标必须是"若干宏大宽泛的可选项"，不是一句话任务书
+  mainQuestCjk: 700,
+  // 明确写出"这是沙盒"的规则块必须存在
+  sandboxRuleCjk: 300,
+  // 地理/势力/生活三类内容必须**都**在 worldLore 里真的写到一定篇幅
+  geoCjk: 3000,
+  factionCjk: 3000,
+  lifeCjk: 3000,
   charDescCjk: 80,
   minChars: 6,
   minPresent: 3,
@@ -96,6 +105,19 @@ const GATE = {
   minLores: 8,
   minBackgroundSlots: 2,
   minOptionsPerSlot: 3,
+}
+
+/**
+ * 沙盒内容的识别正则。
+ *
+ * ⚠️ 判据只能看**章节标题**，不能去正文里全文搜关键词 ——
+ * 正文里出现"地图"两个字不代表真的写了地图（很可能是"没有地图"）。
+ * 所以这里匹配 `**...**` 形式的标题，要求标题本身点明该主题。
+ */
+const SANDBOX_SECTIONS = {
+  geo: /舆图|地图|地理|疆域|行旅|层志|区域|方位|交通|路线|坊市|城内|街/,
+  faction: /势力|派系|党争|阵营|家族|行会|地盘|控制|藩镇|部族|范围/,
+  life: /日常|生活|物价|饮食|市井|民生|作息|婚|娱乐|闲暇|风俗|语言|称谓/,
 }
 
 if (WORLDS.length !== EXPECTED.length) {
@@ -158,6 +180,83 @@ for (const exp of EXPECTED) {
     }
   }
 
+  /*
+    ②.5 沙盒要求（2026-10 用户反馈："要像等待探索的沙盒，不要太拘泥于详细目标"）
+    这三项都是"声称做了"和"真的做了"很容易混淆的地方，所以逐项量化：
+      · 地理 / 势力 / 生活 三类内容必须各有**足够篇幅**（按命中标题下的正文算）
+      · 长期目标必须是"若干宽泛选项"（字数下限），而不是一句话任务书
+      · rules 里必须有明确的"这是沙盒"条款
+  */
+  {
+    /*
+      ⚠️ 只把**行首的** `**第X章 标题**` 当成章节标题。
+      第一版我按"任意成对星号"切段 —— 于是正文里任何
+      **加粗强调**都会被当成一个"标题"，章节索引整体错位，
+      统计出来的三类内容字数全是错的（地理 260 / 势力 210 / 生活 340）。
+      作者为了迁就这个 bug，被迫把 worldLore 正文里的加粗**全部删掉** ——
+      **校验器的缺陷反过来破坏了内容质量**，这是最不该发生的一类问题。
+      现在改成逐行扫描、只认行首的章节标题。
+    */
+    const lines = String(w.worldLore).split('\n')
+    const HEAD_RE = /^\s*\*\*(.+?)\*\*\s*$/
+    /** 收集所有 (标题, 标题下正文) 段 */
+    const segs = []
+    let cur = null
+    for (const ln of lines) {
+      const m = ln.match(HEAD_RE)
+      if (m) {
+        cur = { title: m[1], body: [] }
+        segs.push(cur)
+      } else if (cur) {
+        cur.body.push(ln)
+      }
+    }
+    const sectionCjk = (re) => {
+      let n = 0, hits = 0
+      for (const s of segs) {
+        if (!re.test(s.title)) continue
+        hits++
+        n += cjk(s.body.join('\n'))
+      }
+      return { n, hits }
+    }
+    const geo = sectionCjk(SANDBOX_SECTIONS.geo)
+    const fac = sectionCjk(SANDBOX_SECTIONS.faction)
+    const life = sectionCjk(SANDBOX_SECTIONS.life)
+    row.geo = geo.n; row.faction = fac.n; row.life = life.n; row.sections = segs.length
+    if (geo.n < GATE.geoCjk) fail(exp.label, '地理/地图内容不足', `命中标题下共 ${geo.n} 字（${geo.hits} 节）< ${GATE.geoCjk}`)
+    if (fac.n < GATE.factionCjk) fail(exp.label, '势力范围内容不足', `命中标题下共 ${fac.n} 字（${fac.hits} 节）< ${GATE.factionCjk}`)
+    if (life.n < GATE.lifeCjk) fail(exp.label, '生活气息内容不足', `命中标题下共 ${life.n} 字（${life.hits} 节）< ${GATE.lifeCjk}`)
+
+    const mqCjk = cjk(w.story?.mainQuest)
+    row.mqCjk = mqCjk
+    if (mqCjk < GATE.mainQuestCjk) {
+      fail(exp.label, '长期目标太窄', `mainQuest ${mqCjk} 字 < ${GATE.mainQuestCjk}（沙盒里应是"几个宽泛的可选方向"）`)
+    }
+    // 目标里不该出现硬期限/命令式措辞
+    const mq = String(w.story?.mainQuest || '')
+    for (const bad of [/硬期限/, /\d+\s*天[内之]/, /必须完成/, /任务书/]) {
+      if (bad.test(mq)) fail(exp.label, '长期目标写得像任务书', `匹配到 ${bad}`)
+    }
+
+    // rules 里必须有一**条**明确的沙盒定性（这是让 AI 不把沙盒玩成单线的关键约束）。
+    // 不能只搜关键词 —— "探索"这种词本来就会散落在别处，那样等于没检查。
+    // 所以要求：某一条（按编号/换行切分）同时提到"沙盒/可选/不是任务"这类定性
+    // 与"不要催/没有必须"这类行为约束，且有一定长度。
+    const ruleBlocks = String(w.rules || '')
+      .split(/\n(?=\s*(?:\d+[.、]|[一二三四五六七八九十]+[、.]))/)
+      .map(s => s.trim())
+    const sandboxClause = ruleBlocks.find(b =>
+      /沙盒|不是任务|可选/.test(b) && /不要催|没有必须|不必|不要强行|自由/.test(b) && cjk(b) >= GATE.sandboxRuleCjk
+    )
+    if (!sandboxClause) {
+      fail(exp.label, 'rules 缺少沙盒条款',
+        `需要一条独立规则（≥${GATE.sandboxRuleCjk} 字）同时说明"这是沙盒/目标可选"与"不要催进度/没有必须做的事"`)
+    } else {
+      row.sandboxRule = cjk(sandboxClause)
+    }
+  }
+
   // ③ 引用完整性 —— 这类错误**不报错、只静默失效**
   const itemIds = new Set((w.items || []).map(i => i.id))
   const attrIds = new Set((w.attributes || []).map(a => a.id))
@@ -211,14 +310,26 @@ if (AS_JSON) {
 
 console.log('\n=== 内置世界书验收 ===\n')
 console.log(`  世界数量：${WORLDS.length}\n`)
-console.log('  ' + '世界'.padEnd(34) + '中文字数'.padStart(9) + 'worldLore'.padStart(11)
-  + 'rules'.padStart(8) + '角色'.padStart(6) + '物品'.padStart(6) + 'lore'.padStart(6))
+console.log('  ' + '世界'.padEnd(30) + '中文字数'.padStart(9) + 'worldLore'.padStart(10)
+  + 'rules'.padStart(7) + '角色'.padStart(5) + '物品'.padStart(5) + 'lore'.padStart(5))
 for (const r of report) {
   const ok = r.cjkTotal >= GATE.worldCjk && r.loreCjk >= GATE.worldLoreCjk
-  console.log('  ' + (ok ? '✓ ' : '✗ ') + r.title.padEnd(32)
-    + String(r.cjkTotal).padStart(9) + String(r.loreCjk).padStart(11)
-    + String(r.rulesCjk).padStart(8) + String(r.chars).padStart(6)
-    + String(r.items).padStart(6) + String(r.lores).padStart(6))
+  console.log('  ' + (ok ? '✓ ' : '✗ ') + r.title.padEnd(28)
+    + String(r.cjkTotal).padStart(9) + String(r.loreCjk).padStart(10)
+    + String(r.rulesCjk).padStart(7) + String(r.chars).padStart(5)
+    + String(r.items).padStart(5) + String(r.lores).padStart(5))
+}
+
+console.log('\n  —— 沙盒内容（用户要求：地图 / 势力范围 / 生活气息 / 可选目标）——')
+console.log('  ' + '世界'.padEnd(30) + '地理'.padStart(8) + '势力'.padStart(8)
+  + '生活'.padStart(8) + '长期目标'.padStart(10) + '沙盒条款'.padStart(10))
+for (const r of report) {
+  const ok = (r.geo || 0) >= GATE.geoCjk && (r.faction || 0) >= GATE.factionCjk
+    && (r.life || 0) >= GATE.lifeCjk && (r.mqCjk || 0) >= GATE.mainQuestCjk
+  console.log('  ' + (ok ? '✓ ' : '✗ ') + r.title.padEnd(28)
+    + String(r.geo ?? '-').padStart(8) + String(r.faction ?? '-').padStart(8)
+    + String(r.life ?? '-').padStart(8) + String(r.mqCjk ?? '-').padStart(10)
+    + String(r.sandboxRule ?? '缺失').padStart(10))
 }
 
 if (problems.length) {

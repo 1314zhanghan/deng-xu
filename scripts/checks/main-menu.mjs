@@ -191,8 +191,12 @@ const m3 = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
     hasStartBtn: tabs.some(x=>/用这个世界开始/.test(x)),
     hasEditBtn: tabs.some(x=>/^编辑$/.test(x)),
     hasBack: tabs.some(x=>/返回/.test(x)),
-    // 关键：不进编辑器也能看到设定
-    showsLore: /世界观|主线目标|世界规则/.test(T),
+    // 关键：不进编辑器也能看到设定。
+    // ⚠️ 这里曾断言「主线目标」这个词，但那个 UI 标签已改名为「长期目标（可选）」——
+    // 沙盒世界里它不是必须推进的主线（见 WorldbookPreview 的说明）。
+    // 注意：本字符串是模板字符串，注释里**不要出现反引号或美元花括号**，
+    // 否则会提前结束模板字符串导致 ReferenceError（已犯过两次）。
+    showsLore: /世界观|长期目标|世界规则/.test(T),
     showsAttributes: /属性/.test(T),
     showsCanonical: /机制向|纯叙事/.test(T),
     bodyLen: T.length,
@@ -214,7 +218,7 @@ console.log('\n=== 3) 详情页的各页签 ===')
 for (const [label, tabRe, contentRe] of [
   ['人物', '/^人物/', '/性格|角色卡|NPC|没有内置角色卡/'],
   ['设定', '/^设定/', '/世界观|世界规则|知识条目/'],
-  ['概览', '/^概览/', '/主线目标|属性|资源|开局背景|开场/'],
+  ['概览', '/^概览/', '/长期目标|属性|资源|开局背景|开场/'],
 ]) {
   const r = await clickRe(tabRe)
   if (r !== 'ok') { check(`${label} 页签可点`, false, String(r)); continue }
