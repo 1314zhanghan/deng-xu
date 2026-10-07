@@ -112,8 +112,10 @@ console.log('\n=== 2) 选角 ===')
 // 主菜单 → 开始新游戏 → 卡片列表
 await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/开始新游戏/.test((x.textContent||'').trim()));if(b)b.click();return 1})()`)
 await sleep(2200)
-// 卡片列表 → 点第一张卡的「开始」
-await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>(x.textContent||'').trim()==='开始');if(b)b.click();return 1})()`)
+// 卡片列表 → 点第一张卡的开局按钮。
+// 文案从「开始」改成了「用这个世界开始」（主页三个入口区分开之后，
+// "开始"这个词在同一屏里有歧义），所以两种写法都要认。
+await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/^用这个世界开始$|^开始$/.test((x.textContent||'').trim()));if(b)b.click();return 1})()`)
 await sleep(2500)
 const setup = JSON.parse(await ev(`(()=>{
   const T=document.body.innerText;

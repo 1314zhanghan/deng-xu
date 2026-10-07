@@ -165,7 +165,9 @@ await ev(`__uiStore.getState().setShowTutorial(false)`)
 await sleep(600)
 await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/开始新游戏/.test(x.textContent||''));b&&b.click();return 1})()`)
 await sleep(1400)
-await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>(x.textContent||'').trim()==='开始');b&&b.click();return 1})()`)
+// 卡片墙上的开局按钮。文案从「开始」改成了「用这个世界开始」
+// （三个入口区分开之后，"开始"太含糊），所以这里同时认两种写法。
+await ev(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/^用这个世界开始$|^开始$/.test((x.textContent||'').trim()));b&&b.click();return 1})()`)
 await sleep(1800)
 // 直接在 store 里起一局（跳过填表）
 await ev(`(()=>{

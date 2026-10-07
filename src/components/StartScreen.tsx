@@ -70,12 +70,19 @@ export function StartScreen() {
    * 卡片墙的**用途**。三个入口原先都 push 同一个 `{ name: 'library' }`，
    * 所以点哪个进去都一样、三个入口等于一个。现在由 intent 决定这一屏做什么：
    *   play / worldbook / library
-   * `worldbookMode` 仍兼容（等价于 intent === 'worldbook'）。
+   *
+   * ⚠️ 还要认 `setup` 那一层带的 intent。
+   * 从选角按「返回卡库」时 `nav.back()` 是异步的（history.back()），
+   * 而清空选角状态是同步的 —— 中间那一下 DOM 已经回到卡片墙，
+   * 但 `view` 仍是 setup。若此时只认 library，标题会从
+   * 「开始新游戏」错闪成「卡片库」（实测就是这个现象）。
    */
   const libraryIntent: 'play' | 'worldbook' | 'library' =
     view.name === 'library'
       ? (view.intent ?? (view.worldbookMode ? 'worldbook' : 'library'))
-      : 'library'
+      : view.name === 'setup'
+        ? (view.intent ?? 'play')
+        : 'library'
   const worldbookMode = libraryIntent === 'worldbook'
   /** 正在预览的世界卡 id —— 就是 worldbook 这一层本身携带的 */
   const previewId = view.name === 'worldbook' ? view.worldId : null
@@ -298,8 +305,10 @@ export function StartScreen() {
     resetGame()
     setPendingSetup(null)
     setSetupWorldId(worldId)
-    // 把"选角"也记成一个层级，返回键才能从选角退回上一级
-    navPush({ name: 'setup', worldId })
+    // 把"选角"也记成一个层级，返回键才能从选角退回上一级。
+    // 带上 intent：返回时那一瞬间 view 还是 setup，靠它才不至于把
+    // 标题错闪成「卡片库」（见 libraryIntent 的注释）。
+    navPush({ name: 'setup', worldId, intent: libraryIntent === 'worldbook' ? 'worldbook' : 'play' })
   }
 
   const handleLaunch = () => {
@@ -396,7 +405,12 @@ export function StartScreen() {
             isBuiltin={previewWorld.builtin}
             onBack={navBack}
             onEdit={() => { setEditingWorldId(previewWorld.id); setCardEditorOpen(true) }}
-            onStart={() => { setSetupWorldId(previewWorld.id); navPush({ name: 'setup', worldId: previewWorld.id }) }}
+            onStart={() => {
+              setSetupWorldId(previewWorld.id)
+              // 从详情页起局：详情页可能是从「开始新游戏」或「世界书」进来的，
+              // 把来源原样透传给选角，返回时才回得去该去的那一屏
+              navPush({ name: 'setup', worldId: previewWorld.id, intent: libraryIntent })
+            }}
           />
         </main>
       </div>

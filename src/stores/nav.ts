@@ -36,7 +36,16 @@ export type View =
   */
   | { name: 'library'; worldbookMode?: boolean; intent?: 'play' | 'worldbook' | 'library' }
   | { name: 'worldbook'; worldId: string }
-  | { name: 'setup'; worldId: string }
+  /*
+    setup 也要带上"是从哪进来的"。
+    ⚠️ 为什么不能只靠 library 那一层：从选角按「返回卡库」时走的是
+    `nav.back()` → `history.back()`，那是**异步**的；而 `setSetupWorldId(null)`
+    是同步的。于是会有一瞬间 DOM 已经渲染成卡片墙、而 `nav.view` 还停在 setup ——
+    这时若读 `view.name === 'library'` 判断用途，就会拿到默认值，
+    标题从「开始新游戏」错闪成「卡片库」。
+    把 intent 存在 setup 自己身上，就不依赖异步回退的时序了。
+  */
+  | { name: 'setup'; worldId: string; intent?: 'play' | 'worldbook' | 'library' }
   /** 主角预设管理页（「提前设定主角」） */
   | { name: 'heroes' }
   | { name: 'game' }

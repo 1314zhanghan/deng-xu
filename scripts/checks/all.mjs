@@ -40,6 +40,8 @@ const CHECKS = [
   { name: '地图昼夜', file: 'map-gallery.mjs', port: 9875 },
   { name: 'NPC 贴合度', file: 'npc-fidelity.mjs', port: 9876 },
   { name: 'NPC 词表覆盖', file: 'npc-coverage.mjs', port: 9877 },
+  // 主角预设（提前设定主角）：建成后能在开局时一键套用
+  { name: '我的主角', file: 'heroes.mjs', port: 9878 },
 ]
 
 // ── 参数解析 ──

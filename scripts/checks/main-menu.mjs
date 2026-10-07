@@ -74,8 +74,14 @@ const snap = () => ev(`(()=>{
   const T = document.body.innerText;
   return JSON.stringify({
     hasMenuTitle: /灯叙/.test(T),
+    /*
+      ⚠️ 这个白名单必须跟着主菜单的入口一起更新。
+      我曾忘记把新的「我的主角」加进来，于是它被过滤掉、
+      后面"有「我的主角」入口"那条断言就假失败了 ——
+      实现是对的，是探针的词表漏了。
+    */
     menuEntries: [...document.querySelectorAll('button')].map(b=>(b.textContent||'').trim())
-      .filter(x=>/开始新游戏|世界书|卡片库|模型设置|继续游戏|回到这一局/.test(x)),
+      .filter(x=>/开始新游戏|我的主角|世界书|卡片库|模型设置|继续游戏|回到这一局/.test(x)),
     header: (T.match(/灯叙|卡片库|世界书/)||[])[0],
     bodyLen: T.length,
   });})()`)
