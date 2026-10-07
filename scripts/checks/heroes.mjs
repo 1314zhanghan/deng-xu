@@ -72,30 +72,49 @@ await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 950, dev
   走查要验的是"我的主角"这个功能，不该被那个缺陷拖累，
   所以这里把存储先写进同一个源、再导航过去。
 */
-await send('Page.navigate', { url: SITE }); await sleep(2000)
+await send('Page.navigate', { url: SITE }); await sleep(1500)
 await ev(`(()=>{const k='pale-notes-ui';let v={};try{v=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){}
   v.state=v.state||{};v.state.llm=Object.assign({provider:'deepseek',baseUrl:'https://api.deepseek.com/v1',narrativeModel:'deepseek-chat',analysisModel:'deepseek-chat',temperature:0.8},v.state.llm||{},{apiKey:'sk-heroes'});
   v.state.isApiKeyModalOpen=false;v.state.showTutorial=false;localStorage.setItem(k,JSON.stringify(v));return 1})()`)
 // 关掉当前这次加载里的弹窗（只改 store，不动历史），让界面可交互
 await ev(`(()=>{const u=__uiStore.getState();u.setApiKeyModalOpen(false);
   if(u.setShowTutorial)u.setShowTutorial(false);return 1})()`)
-await sleep(1200)
+
+/*
+  ⚠️ 从这里开始**一律等条件，不要等时间**。
+  第一版用的是固定 sleep，本地（快）全绿、CI（慢机器）挂了 18 项 ——
+  因为卡片库要从 IndexedDB 读出来，"主菜单有我的主角入口"这类断言
+  在还没载入完时就跑了。这类"本地好、CI 挂"的假失败很难猜，
+  所以统一改成轮询等待**界面真的到位**。
+*/
+await waitFor(`/开始新游戏/.test(document.body.innerText)`, 15000)
+await waitFor(`/我的主角/.test(document.body.innerText)`, 15000)
 
 console.log('\n=== 1) 主菜单入口 ===')
+// 主菜单那张卡的副标题会随"有没有预设"变化，所以要等它不再是"载入中…"
+await waitFor(`!!document.querySelector('button') &&
+  [...document.querySelectorAll('button')].some(b=>/我的主角/.test(b.textContent||'') && !/载入中/.test(b.textContent||''))`, 15000)
 const menu = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
     hasHeroEntry: /我的主角/.test(T),
-    hint: (T.match(/还没有设定过主角[^\\n]*/)||[''])[0],
+    /*
+      取那张卡的整段文字（标题+副标题），而不是全文匹配 ——
+      全文里"还没有设定过主角"也可能来自别处，那样断言就失去意义。
+    */
+    cardText: (()=>{const b=[...document.querySelectorAll('button')]
+      .find(x=>/我的主角/.test(x.textContent||''));
+      return b ? (b.textContent||'').trim() : ''})(),
   });})()`))
 check('主菜单有「我的主角」入口', menu.hasHeroEntry)
-check('未设定过时给出引导文案', /还没有设定过主角/.test(menu.hint), menu.hint || '(无)')
+check('未设定过时给出引导文案', /还没有设定过主角/.test(menu.cardText), menu.cardText || '(无)')
 
 console.log('\n=== 2) 进入「我的主角」并新建一位 ===')
 check('点入口', await clickText('/我的主角/') === 'ok')
-await sleep(1800)
+// 等这一页真的渲染出来（标题 + 新建按钮），而不是等 1.8 秒
+await waitFor(`/我的主角/.test((document.querySelector('h1')||{}).textContent||'')`, 12000)
 const emptyState = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
-    onPage: /我的主角/.test(T),
+    onPage: /我的主角/.test((document.querySelector('h1')||{}).textContent||''),
     empty: /还没有设定过主角/.test(T),
     hasNewBtn: [...document.querySelectorAll('button')].some(b=>/新建主角|设定第一位主角/.test(b.textContent||'')),
   });})()`))
@@ -105,8 +124,7 @@ check('有新建按钮', emptyState.hasNewBtn)
 await shot('heroes-01-empty')
 
 check('点新建', await clickText('/新建主角|设定第一位主角/') === 'ok')
-await sleep(1200)
-check('出现了表单', await waitFor(`!!document.querySelector('input[placeholder="例如「我的惯用主角」"]')`))
+check('出现了表单', await waitFor(`!!document.querySelector('input[placeholder="例如「我的惯用主角」"]')`, 10000))
 
 // 填一份完整档案
 await ev(`(()=>{
@@ -122,10 +140,12 @@ await ev(`(()=>{
     gender: set('可留空','男'),
     appearance: setArea('AI 会在动作描写里呼应这些特征；也会据此生成立绘。','瘦削，眉骨高，惯穿青灰直裰'),
   });})()`)
-await sleep(600)
+// 填完之后不要盲等：直接等 React 把值提交上去（保存按钮解除 disabled）
+await waitFor(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>/^保存$/.test((x.textContent||'').trim()));return !!(b && !b.disabled)})()`, 8000)
 
 check('保存', await clickText('/^保存$|保存/') === 'ok')
-await sleep(1600)
+// 等保存真的落到列表（写回是异步的：先同步改内存、再排队写 IndexedDB）
+await waitFor(`/走查用主角/.test(document.body.innerText)`, 10000)
 const afterSave = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
     listed: /走查用主角/.test(T),
@@ -146,15 +166,17 @@ console.log('\n=== 3) 刷新后仍在（真的落盘）===')
   返回键的问题单独记录，不在这里混进来。
 */
 await send('Page.reload', { ignoreCache: false })
-await sleep(5000)
+// 等主菜单载入完（CI 上这一步比本地慢得多，不能写死秒数）
+await waitFor(`/开始新游戏/.test(document.body.innerText)`, 20000)
+// 等那张卡反映"有 N 位主角" —— 它同时证明预设**从 IndexedDB 读回来了**
+await waitFor(`/位主角，开新局可直接选用/.test(document.body.innerText)`, 15000)
 const afterReload = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
     onMenu: /开始新游戏/.test(T),
     heroHint: (T.match(/位主角，开新局可直接选用/)||[''])[0],
-    stored: (()=>{try{const s=localStorage.getItem('pale-notes-ui');return !!s}catch(e){return false}})(),
   });})()`))
 check('刷新后回到主菜单', afterReload.onMenu)
-check('主菜单提示里已计入该主角', !!afterReload.heroHint, afterReload.heroHint || '(没找到提示)')
+check('刷新后预设已从磁盘读回（提示里计入了该主角）', !!afterReload.heroHint, afterReload.heroHint || '(没找到提示)')
 
 console.log('\n=== 4) 开新局时可一键套用（刷新后直接开，不经返回键）===')
 check('点开始新游戏', await clickText('/开始新游戏/') === 'ok')
@@ -162,6 +184,14 @@ check('等到卡片墙（出现开局按钮）',
   await waitFor(`[...document.querySelectorAll('button')].some(b=>/^用这个世界开始$/.test((b.textContent||'').trim()))`))
 check('点世界卡的开局按钮', await clickText('/^用这个世界开始$/') === 'ok')
 check('进入了选角界面', await waitFor(`/你要扮演谁/.test(document.body.innerText)`))
+/*
+  ⚠️ 还要等**表单本身渲染完**（姓名输入框出现），再等快捷条出现。
+  只等"你要扮演谁"是不够的：那时 persona 面板可能还没挂上，
+  于是后面点 chip 点空、或读不到外貌框 ——
+  CI 上就是这么挂的（本地快，抢在渲染前就把断言跑完了）。
+*/
+check('选角表单已渲染', await waitFor(`!!document.querySelector('input[placeholder="你的名字"]')`, 12000))
+check('快捷条已出现', await waitFor(`/用已设好的主角/.test(document.body.innerText)`, 12000))
 
 const chips = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
@@ -174,9 +204,9 @@ check('快捷条里有刚存的预设', chips.chip)
 check('套用前名字是空的（确认是套用带来的）', chips.nameEmpty)
 await shot('heroes-03-setup-before')
 
-// 点那个 chip（用精确文案，避免点到别处）
+// 点那个 chip（用精确文案，避免点到别处），然后**等"已套用"反馈出现**再断言
 check('点预设 chip', await clickText('/^走查用主角$/') === 'ok')
-await sleep(900)
+await waitFor(`/已套用/.test(document.body.innerText)`, 8000)
 const applied = JSON.parse(await ev(`(()=>{
   const g=(ph)=>{const el=document.querySelector('input[placeholder="'+ph+'"]');return el?el.value:null};
   /*
@@ -235,7 +265,10 @@ const secondWorld = await ev(`(()=>{const bs=[...document.querySelectorAll('butt
   .filter(b=>/^用这个世界开始$/.test((b.textContent||'').trim()));
   if(bs.length<2)return 'only-one:'+bs.length;bs[1].click();return 'ok'})()`)
 check('点了第二个世界的开局按钮', secondWorld === 'ok', String(secondWorld))
-await waitFor(`/你要扮演谁/.test(document.body.innerText)`, 8000)
+// 同样要等**表单渲染完**再断言/点击，不能只等标题
+await waitFor(`/你要扮演谁/.test(document.body.innerText)`, 10000)
+await waitFor(`!!document.querySelector('input[placeholder="你的名字"]')`, 12000)
+await waitFor(`/用已设好的主角/.test(document.body.innerText)`, 12000)
 const crossWorld = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
   return JSON.stringify({
     inSetup: /你要扮演谁/.test(T),
@@ -245,7 +278,7 @@ check('换世界后进入选角', crossWorld.inSetup)
 check('换世界后预设仍出现在快捷条里', crossWorld.chip)
 if (crossWorld.inSetup && crossWorld.chip) {
   await clickText('/^走查用主角$/')
-  await sleep(900)
+  await waitFor(`/已套用/.test(document.body.innerText)`, 8000)
   const reused = await ev(`(()=>{const el=document.querySelector('input[placeholder="你的名字"]');return el?el.value:''})()`)
   check('换世界后仍能套用同一份档案', reused === '谢无咎', JSON.stringify(reused))
 }
