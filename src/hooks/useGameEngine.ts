@@ -671,7 +671,18 @@ export function useGameEngine(): GameEngineReturn {
       // 开场第一幕
       const isOpening = actionType === 'init' || updatedStore.history.filter(h => h.role === 'assistant').length === 0
       if (isOpening && !activeEvent) {
-        const opening = buildOpeningInstruction(activeWorld, player, activeCharacters)
+        /*
+          ⚠️ 必须把**玩家选定的背景**传进去。
+          原先这里只传 (世界, 主角, 在场角色)，于是选角页挑的
+          出身/际遇/秘密一个字都没进开场提示词 —— 不管选哪个背景，
+          第一幕都是同一段，玩家会说"选了半天背景发现开场一模一样"。
+        */
+        const opening = buildOpeningInstruction(
+          activeWorld,
+          player,
+          activeCharacters,
+          useSessionStore.getState().backgroundChoices,
+        )
         currentStoryContext = currentStoryContext ? `${currentStoryContext}\n\n${opening}` : opening
       }
 

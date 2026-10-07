@@ -217,10 +217,57 @@ export function WorldbookPreview({
           )}
 
           {world.story?.opening && (
-            <Panel icon={<BookOpen size={14} />} title="开场">
+            <Panel
+              icon={<BookOpen size={14} />}
+              title="开场"
+              hint={
+                // 有"按背景变化"的指引时要说清楚，否则玩家会以为开场是写死的
+                world.story.openingByBackground &&
+                Object.keys(world.story.openingByBackground).length > 0
+                  ? '舞台固定，但主角的处境会随你选的背景变化'
+                  : undefined
+              }
+            >
               <Prose text={world.story.opening} />
             </Panel>
           )}
+
+          {/*
+            背景如何改变开场 —— 把"每个背景各自的第一幕切入点"摊开。
+            这不只是展示，它直接回答玩家最关心的问题：
+            "我选这个背景，开场真的会不一样吗？"
+          */}
+          {(() => {
+            const byBg = world.story?.openingByBackground
+            if (!byBg) return null
+            const rows: { slot: string; title: string; text: string }[] = []
+            for (const slot of world.backgrounds || []) {
+              const map = byBg[slot.label]
+              if (!map) continue
+              for (const opt of slot.options) {
+                const text = map[opt.id] ?? map[opt.title]
+                if (text) rows.push({ slot: slot.label, title: opt.title, text })
+              }
+            }
+            if (!rows.length) return null
+            return (
+              <Panel icon={<Sparkles size={14} />} title={`开场会随背景变（${rows.length} 种切入点）`}>
+                <div className="space-y-3">
+                  {rows.map(r => (
+                    <div key={r.slot + r.title} className="border-l-2 border-accent-lantern/30 pl-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/10 text-accent-lantern border border-accent-lantern/30">
+                          {r.slot}
+                        </span>
+                        <span className="text-xs text-text-primary font-serif">{r.title}</span>
+                      </div>
+                      <p className="text-[11px] text-text-secondary leading-relaxed">{r.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+            )
+          })()}
         </div>
       )}
 

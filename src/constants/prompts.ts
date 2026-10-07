@@ -341,17 +341,113 @@ ${world.story.enableChoices ? `生成 3~4 个下一步行动选项。
   return sections.join('\n\n');
 }
 
+/**
+ * 把玩家在选角页选定的背景槽位，解析成**可以直接写进提示词的一段话**。
+ *
+ * 为什么要有这个函数：`opening` 原先是一段写死的场景，而玩家花时间挑的
+ * 出身/际遇/秘密**完全没有进入开场提示词** —— 不管选哪个背景，第一幕都一样。
+ * 这里把选择还原成"分类：选项名 —— 说明"，并带上开局携带物，
+ * 让 AI 有具体的东西可写。
+ *
+ * 返回空数组表示玩家没有选任何背景（例如世界卡里没定义槽位）。
+ */
+export function describeBackgroundChoices(
+  world: WorldCard,
+  choices: Record<string, string>,
+): { label: string; id: string; title: string; description: string; items: string[] }[] {
+  if (!world?.backgrounds?.length) return []
+  const out: { label: string; id: string; title: string; description: string; items: string[] }[] = []
+  for (const slot of world.backgrounds) {
+    const opt = slot.options.find(o => o.id === choices?.[slot.label])
+    if (!opt) continue
+    out.push({
+      label: slot.label,
+      id: opt.id,
+      title: opt.title,
+      description: opt.description || '',
+      // 开局携带物是"背景影响开场"最硬的抓手：手上有撬棍的人
+      // 和一个手上有账本的人，进同一扇门的方式必然不同
+      items: (opt.startingItems || [])
+        .map(id => world.items?.find(i => i.id === id)?.name)
+        .filter((x): x is string => !!x),
+    })
+  }
+  return out
+}
+
 /** 第一幕的额外指令 */
-export function buildOpeningInstruction(world: WorldCard, player: PlayerCard, activeCharacters: CharacterCard[]): string {
+export function buildOpeningInstruction(
+  world: WorldCard,
+  player: PlayerCard,
+  activeCharacters: CharacterCard[],
+  backgroundChoices: Record<string, string> = {},
+): string {
   const parts: string[] = [];
   const opening = world.story.opening.trim();
+  const picks = describeBackgroundChoices(world, backgroundChoices);
 
+  /*
+    ── 场景骨架 ──
+    注意措辞：这是**场景与局势**，不是逐字照抄的剧本。
+    原先这里直接写"请据此写出开场第一幕"，等于让模型复述同一段文字 ——
+    背景换与不换都是它。
+  */
   if (opening) {
-    parts.push(`请据此写出**开场第一幕**：
+    parts.push(`下面是本世界开场要用的**场景与局势**（时间、地点、在场的人、正在发生什么）。
+请以它为舞台，写出属于**这一位主角**的第一幕 —— 舞台不变，但主角的处境要随他的背景而不同：
 
 ${opening}`);
   } else {
     parts.push(`本世界没有预设开场。请根据世界观、主角设定与在场角色，自行设计一个**有张力、能立刻勾起行动欲望**的开场场景，把主角放进一个必须做出回应的处境里。`);
+  }
+
+  /*
+    ── 背景如何决定开场（本次修复的核心）──
+    这一段必须写得足够具体，否则模型会礼貌地点一下背景然后照旧写同一个开场。
+    所以给出**逐项该落到哪些细节上**，并明确禁止"同一段换个词"。
+  */
+  /*
+    ── 世界卡为这些具体选项写好的开场指引 ──
+    作者的原文往往比引擎通用说辞贴得多，命中就附上。
+    没写也不报错（`openingByBackground` 是可选的）。
+  */
+  const byBg = world.story.openingByBackground
+  if (byBg) {
+    const guides: string[] = []
+    for (const p of picks) {
+      const slotMap = byBg[p.label]
+      // 优先按选项 id 找；找不到再退回按标题找（作者两种写法都认）
+      const text = slotMap?.[p.id] ?? slotMap?.[p.title]
+      if (text) guides.push(`【${p.label}：${p.title}】${text}`)
+    }
+    if (guides.length) {
+      parts.push(`世界作者为这些背景写好了开场切入点，**优先照它写**：
+
+${guides.join('\n\n')}`)
+    }
+  }
+
+  if (picks.length) {
+    const lines = picks.map(p => {
+      const bits = [`【${p.label}】${p.title}`]
+      if (p.description) bits.push(`　（${p.description}）`)
+      if (p.items.length) bits.push(`　开局随身：${p.items.join('、')}`)
+      return bits.join('')
+    })
+    parts.push(`主角开局选定的背景如下 —— 这些选择**必须决定第一幕的具体内容**，而不只是被提一句：
+
+${lines.join('\n')}
+
+请让上面的每一项都落到**可看见的东西**上：
+- **他为什么此刻在这个场景里**：是被派来的、逃来的、回来收账的、还是本来就在这儿当班？同一处战场、同一间酒馆，不同背景的人出现在那里的理由完全不同。
+- **他手上有什么**：开局随身物要真的出现在第一幕里（拿在手里、揣着、藏在靴筒里），并成为他行动的依据。
+- **谁认识他**：在场的人里，谁会因为他的背景而多看他一眼、少说一句话、或者干脆装作不认识。
+- **他第一眼会注意到什么**：外行看热闹、内行看门道 —— 让他的背景决定他先看见什么、先忽略什么。
+- **别人对他的称呼与态度**：一个乡绅和一个逃奴走进同一间衙门，被对待的方式不该一样。
+
+⚠️ **绝对不要**只把背景当成一段自我介绍塞进旁白（"你出身于……"），
+也不要让不同背景产生"同一段话换了几个词"的效果。
+如果两个背景写出来的第一幕读起来差不多，那就是没做到。`);
   }
 
   if (activeCharacters.length) {
@@ -359,7 +455,7 @@ ${opening}`);
   }
 
   parts.push(`要求：
-- 交代清楚时间、地点、以及主角此刻正在做什么。
+- 交代清楚时间、地点、以及主角此刻正在做什么（"正在做什么"要由他的背景推出来）。
 - 在结尾留一个明确的、需要玩家回应的钩子。
 - 这是第一幕，不要信息过载，先让玩家站稳。
 - 主角姓名：${player.name || '（未命名）'}。`);

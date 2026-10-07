@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Play, Users, Check, Compass, UserRound, BookmarkPlus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Play, Users, Check, Compass, UserRound, BookmarkPlus, Sparkles } from 'lucide-react'
 import type { HeroPreset, PlayerCard, WorldCard } from '@/types/cards'
 import { useSessionStore } from '@/stores/session'
 import { useGameStore } from '@/stores/game'
@@ -799,6 +799,53 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                       <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
                         {world.story.opening}
                       </p>
+
+                      {/*
+                        ── 你的背景会怎样改变这一幕 ──
+                        这一段是本次修复的"可见部分"：玩家在选角页挑了背景，
+                        却看不到它有任何影响，自然会觉得白选了。
+                        所以把**当前所选背景**对应的开场切入点摊在他眼前。
+                      */}
+                      {(() => {
+                        const byBg = world.story.openingByBackground
+                        if (!byBg) return null
+                        const hits: { slot: string; title: string; text: string; items: string[] }[] = []
+                        for (const slot of world.backgrounds) {
+                          const chosenId = backgroundChoices[slot.label]
+                          const opt = slot.options.find(o => o.id === chosenId)
+                          if (!opt) continue
+                          const map = byBg[slot.label]
+                          const text = map?.[opt.id] ?? map?.[opt.title]
+                          if (!text) continue
+                          hits.push({
+                            slot: slot.label,
+                            title: opt.title,
+                            text,
+                            items: (opt.startingItems || [])
+                              .map(id => world.items.find(i => i.id === id)?.name)
+                              .filter((x): x is string => !!x),
+                          })
+                        }
+                        if (!hits.length) return null
+                        return (
+                          <div className="rounded border border-accent-lantern/25 bg-accent-lantern/[0.04] p-3 space-y-2">
+                            <div className="flex items-center gap-1.5 text-[11px] text-accent-lantern">
+                              <Sparkles size={12} />
+                              你的背景会这样改变这一幕
+                            </div>
+                            {hits.map(h => (
+                              <div key={h.slot + h.title} className="text-[11px] leading-relaxed">
+                                <span className="text-text-muted">{h.slot}｜</span>
+                                <span className="text-text-primary">{h.title}</span>
+                                <span className="text-text-secondary"> —— {h.text}</span>
+                                {h.items.length > 0 && (
+                                  <span className="text-text-muted">（随身：{h.items.join('、')}）</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      })()}
                     </div>
                   )}
                 </>

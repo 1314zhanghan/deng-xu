@@ -519,12 +519,66 @@ export function CardEditor() {
                     onChange={e => patchStory({ mainQuest: e.target.value })}
                     placeholder={'**以下都是可选的。** 你可以在镇上当一辈子伙计，把日子过下去，这不算玩错。若想往大处走：\n· 挣一份自己的家业\n· 查清那件事的真相\n· 成为某一方离不开的人'} />
                 </Field>
-                <Field label="开场设定（可留空）" hint="留空则由 AI 自行设计一个有张力的开场">
+                {/*
+                  ⚠️ 开场的措辞要强调"这是**场景骨架**，不是逐字剧本"。
+                  玩家反馈过"选了半天背景，开场一模一样" —— 根因是引擎原先
+                  把这段当固定剧本发下去，背景选择根本没进去。
+                  现在引擎会连同所选背景一起交给 AI（见 openingByBackground），
+                  所以作者这里应当只写**舞台与局势**，
+                  把"主角此刻为什么在这里"留给背景去决定。
+                */}
+                <Field
+                  label="开场设定（可留空）"
+                  hint="写场景与局势（时间/地点/在场的人/正在发生什么）；主角的具体处境由他选的背景决定，不必在这里写死"
+                >
                   <textarea className={`${areaCls} h-28`} value={draft.story.opening}
                     onChange={e => patchStory({ opening: e.target.value })}
-                    placeholder="描述第一幕的场景、时间、主角正在做什么，以及结尾要留什么钩子。" />
+                    placeholder={'黄昏，桥头的客栈。桥下有兵在收过桥粮。\n（写"舞台"就够：谁在场、正在发生什么、结尾留什么钩子。\n不要写死主角正在做什么 —— 那应该随他选的背景而不同。）'} />
                 </Field>
               </div>
+
+              {/*
+                背景如何改变开场 —— 只读展示。
+                这是 `openingByBackground` 的编辑入口：它按「槽位 → 选项」组织，
+                用 textarea 硬编不现实（几十条），所以编辑器把它**列出来给作者看**，
+                正文由作者在数据文件里写。对内置世界足够，也避免了
+                一个没人会用的复杂表单。
+              */}
+              {(() => {
+                const byBg = draft.story.openingByBackground
+                const slots = draft.backgrounds || []
+                if (!byBg || !Object.keys(byBg).length) return null
+                const rows = slots.flatMap(slot =>
+                  slot.options.map(o => ({
+                    slot: slot.label,
+                    title: o.title,
+                    text: byBg[slot.label]?.[o.id] ?? byBg[slot.label]?.[o.title] ?? '',
+                  })),
+                )
+                const covered = rows.filter(r => r.text.trim()).length
+                return (
+                  <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-2">
+                    <SectionTitle>
+                      开场随背景变化
+                      <span className="ml-2 text-[10px] font-normal text-text-muted">
+                        {covered} / {rows.length} 个背景选项已有各自的开场切入点
+                        {covered < rows.length ? '（缺的那些会退回通用开场）' : ''}
+                      </span>
+                    </SectionTitle>
+                    <div className="max-h-56 overflow-y-auto space-y-1.5">
+                      {rows.map(r => (
+                        <div key={r.slot + r.title} className="text-[11px] leading-relaxed">
+                          <span className="text-text-muted">{r.slot}｜</span>
+                          <span className="text-text-primary">{r.title}</span>
+                          {r.text.trim()
+                            ? <span className="text-text-secondary"> —— {r.text}</span>
+                            : <span className="text-accent-forge"> —— 未写（会退回通用开场）</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
 
               <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-3">
                 <SectionTitle

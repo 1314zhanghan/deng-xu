@@ -171,8 +171,20 @@ const GATE = {
   minPresent: 3,
   minItems: 15,
   minLores: 8,
-  minBackgroundSlots: 2,
-  minOptionsPerSlot: 3,
+  /*
+    ── 背景槽位多元化 + 开场随背景变（2026-10 用户反馈）──
+    用户原话：「选了半天背景，发现还是一模一样的开场」
+    「背景槽位也得像游戏目标一样多元化」。
+    这两件事以前**完全没人校验**，所以现在钉成硬指标。
+
+    以往门槛是 2 槽 / 每槽 3 个 —— 那等于没约束（随便点两下都能过），
+    而"背景槽位是玩家投入注意力最多的地方"，值不值得点进去全看这里的多样性。
+  */
+  minBackgroundSlots: 4,
+  minOptionsPerSlot: 8,
+  bgOptionDescCjk: 100,
+  // 开场指引：每个槽位的每个选项都必须有一条，且要写得够具体
+  openingGuideCjk: 80,
 }
 
 /**
@@ -225,6 +237,8 @@ for (const exp of EXPECTED) {
     ...(w.items || []).map(i => i.name + i.description),
     ...(w.lores || []).map(l => l.name + l.description),
     ...(w.backgrounds || []).flatMap(b => b.options.map(o => o.title + (o.description || ''))),
+    // 开场指引也是实打实的内容，计入全卡字数
+    ...Object.values(w.story?.openingByBackground || {}).flatMap(m => Object.values(m || {})),
     ...(w.characters || []).map(c => c.name + c.description + c.personality + c.relationship),
   ].join('\n')
 
@@ -342,6 +356,82 @@ for (const exp of EXPECTED) {
         `需要一条独立规则（≥${GATE.sandboxRuleCjk} 字）同时说明"这是沙盒/目标可选"与"不要催进度/没有必须做的事"`)
     } else {
       row.sandboxRule = cjk(sandboxClause)
+    }
+
+    /*
+      ②.6 背景槽位与开场（2026-10 用户反馈）
+      ────────────────────────────────────────
+      两件事以前完全没人管：
+        · 背景槽位太窄（2 槽 × 3 选项也能过），玩家"选了半天没得选"；
+        · `opening` 是写死的一段，背景**根本没进开场提示词**——
+          选哪个背景，第一幕都一模一样。
+      现在分别钉住：槽位与选项的**数量**、选项描述的**长度**、
+      以及 `openingByBackground` 对每个选项的**覆盖率**。
+    */
+    {
+      const slots = w.backgrounds || []
+      row.bgSlots = slots.length
+      row.bgOptions = slots.reduce((n, s) => n + s.options.length, 0)
+
+      /*
+        ⚠️ 槽位 label 必须唯一。
+        `backgroundChoices` 与 `openingByBackground` 都是**按 label 做 key 的对象**，
+        两个槽位同名就会互相覆盖 —— 不报错，只是其中一个槽位的选择与开场指引
+        永远取不到（静默失效）。
+      */
+      const labels = slots.map(s => s.label)
+      const dupLabels = labels.filter((l, i) => labels.indexOf(l) !== i)
+      if (dupLabels.length) {
+        fail(exp.label, '背景槽位 label 重复', `${[...new Set(dupLabels)].join('、')} —— 会互相覆盖`)
+      }
+      // 选项 id 在同世界内必须唯一，否则选中哪一个都会命中同一个 map 条目
+      const optIds = slots.flatMap(s => s.options.map(o => o.id))
+      const dupOpts = optIds.filter((l, i) => optIds.indexOf(l) !== i)
+      if (dupOpts.length) {
+        fail(exp.label, '背景选项 id 重复', `${[...new Set(dupOpts)].join('、')}`)
+      }
+
+      if (slots.length < GATE.minBackgroundSlots) {
+        fail(exp.label, '背景槽位太少',
+          `${slots.length} 槽 < ${GATE.minBackgroundSlots}（用户要求"像游戏目标一样多元"）`)
+      }
+      for (const slot of slots) {
+        if (slot.options.length < GATE.minOptionsPerSlot) {
+          fail(exp.label, '背景槽选项太少',
+            `「${slot.label}」只有 ${slot.options.length} 个 < ${GATE.minOptionsPerSlot}`)
+        }
+        for (const o of slot.options) {
+          const n = cjk(o.description)
+          if (n < GATE.bgOptionDescCjk) {
+            fail(exp.label, '背景选项描述太短', `「${slot.label}／${o.title}」${n} < ${GATE.bgOptionDescCjk} 字`)
+          }
+        }
+      }
+
+      // 开场指引覆盖率：每个槽位的每个选项都应有一条
+      const byBg = w.story?.openingByBackground || {}
+      const missing = []
+      let covered = 0
+      for (const slot of slots) {
+        const map = byBg[slot.label]
+        for (const o of slot.options) {
+          const text = map?.[o.id] ?? map?.[o.title]
+          if (!text || cjk(text) < GATE.openingGuideCjk) {
+            missing.push(`${slot.label}／${o.title}`)
+          } else {
+            covered++
+          }
+        }
+      }
+      row.bgCovered = covered
+      if (!Object.keys(byBg).length) {
+        fail(exp.label, '缺少 openingByBackground',
+          '开场必须随背景变化 —— 否则玩家"选了半天背景，开场一模一样"')
+      } else if (missing.length) {
+        fail(exp.label, '开场指引没覆盖全部背景选项',
+          `${covered}/${row.bgOptions} 已覆盖；缺 ${missing.length} 条（每条需 ≥${GATE.openingGuideCjk} 字）：` +
+          missing.slice(0, 8).join('、') + (missing.length > 8 ? ' …' : ''))
+      }
     }
   }
 
