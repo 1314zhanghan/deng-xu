@@ -171,6 +171,27 @@ console.log('\n=== 5) 游戏内操作可达性（**趁游戏还开着**检查）
 const mid = JSON.parse(await ev(`(()=>{
   const bs=[...document.querySelectorAll('button')].map(b=>(b.textContent||'').trim());
   const T=document.body.innerText;
+  /*
+    ⚠️ 属性/资源名**必须从当前世界卡里读**，不能写死。
+    原先这里写死的正则匹配的是 体魄 / 洞察 / 共鸣 与 生命 —— 那是旧内置世界的属性名。
+    2026-10 把 9 个世界整合成 3 个深度世界后，属性改成了
+    武力/智识/魅力/意志/权限（地渊）等**完全不同的名字**，
+    于是那条断言变成"永远为假"，报"状态栏不显示属性" —— 而界面其实是对的。
+    探针写死内容词，内容一改就必然假失败。
+  */
+  let attrNames = [], resNames = [];
+  try {
+    const st = window.__gameStore ? window.__gameStore.getState() : null;
+    const lib = window.__libraryStore ? window.__libraryStore.getState() : null;
+    if (lib && Array.isArray(lib.worlds) && lib.worlds.length) {
+      // 优先取当前世界；取不到时回退到"卡库里的第一个世界"——
+      // 这条断言的意图是"状态栏画出了属性名"，不必依赖具体是哪一张卡。
+      const w = (st && st.currentWorldId && lib.worlds.find(x => x.id === st.currentWorldId)) || lib.worlds[0];
+      attrNames = (w.attributes || []).map(a => a.name);
+      resNames = (w.resources || []).map(r => r.name);
+    }
+  } catch (e) { /* 探针失败不该让断言炸掉 */ }
+  const hasAny = (names) => names.length > 0 && names.some(n => T.includes(n));
   return JSON.stringify({
     settings: bs.some(x=>/模型设置/.test(x)),
     returnBtn: bs.some(x=>/返回标题/.test(x)),
@@ -180,8 +201,9 @@ const mid = JSON.parse(await ev(`(()=>{
     castTab: bs.some(x=>x==='人物') || bs.some(x=>x==='关系'),
     // 状态栏要能看出自己是谁、有什么
     showsName: T.includes('体验测试者'),
-    showsResources: /生命/.test(T),
-    showsAttributes: /体魄|洞察|共鸣/.test(T),
+    showsResources: hasAny(resNames),
+    showsAttributes: hasAny(attrNames),
+    attrNames, resNames,
   });})()`))
 console.log('  ' + JSON.stringify(mid))
 check('游戏内有模型设置入口', mid.settings)

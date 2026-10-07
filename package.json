@@ -36,6 +36,7 @@
     "check:encoding": "node scripts/check-encoding.mjs",
     "check:tools": "node scripts/check-tools-selftest.mjs",
     "check:sprites-audit": "node scripts/lib/audit-sprites.mjs",
+    "check:worlds": "node scripts/check-worlds.mjs",
     "see": "node scripts/see.mjs"
   },
   "dependencies": {

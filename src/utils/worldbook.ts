@@ -2,8 +2,8 @@
  * 世界书（Worldbook）
  *
  * 解决的问题：
- *  内置的三个世界原本是**硬编码在 TypeScript 里的对象**（builtinWorlds.ts /
- *  builtinWorldsExtra.ts，合计约 60 KB 源码）。这带来两个限制：
+ *  内置世界原本是**硬编码在 TypeScript 里的对象**（现为 `src/data/worlds/*.ts`，
+ *  三个深度世界合计约 580 KB 源码）。这带来两个限制：
  *   1. 想扩充或替换内置世界必须改代码、重新构建；
  *   2. 内置世界长得像"程序的一部分"，而不是"一份可以拿走的设定集"。
  *

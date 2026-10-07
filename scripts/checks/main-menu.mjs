@@ -155,8 +155,15 @@ await shot('menu-01-main')
 console.log('\n=== 2) 世界书：进入列表 → 打开详情（不进编辑器）===')
 console.log('  点世界书:', await clickRe('/^世界书/'))
 // 等"世界卡列表真的渲染出来"，而不是死等 2500ms
+/*
+  ⚠️ 数量门槛从 5 降到 3。
+  2026-10 把原先 9 个"广而浅"的内置世界整合成 **3 个深度世界**，
+  "至少列出 5 张卡"这条断言本身失效了 —— 不是页面坏了。
+  阈值跟着内置世界数量走，别再写死一个会随内容变动而失效的数字。
+*/
+const EXPECTED_BUILTIN = 3
 {
-  const w = await waitFor(`document.querySelectorAll('button[title="查看世界书详情"]').length >= 5`)
+  const w = await waitFor(`document.querySelectorAll('button[title="查看世界书详情"]').length >= ${EXPECTED_BUILTIN}`)
   console.log(`  等世界卡出现：${w.ok ? '已就绪' : '超时'}（${w.ms}ms）`)
 }
 const m2 = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
@@ -165,7 +172,7 @@ const m2 = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
     builtinHint: /内置世界/.test(T) });})()`))
 console.log('  ' + JSON.stringify(m2))
 check('进入世界书列表（标题变成世界书）', m2.header === '世界书')
-check('列出了世界卡', m2.cards >= 5, `${m2.cards} 张`)
+check(`列出了全部 ${EXPECTED_BUILTIN} 张内置世界卡`, m2.cards >= EXPECTED_BUILTIN, `${m2.cards} 张`)
 check('提示了点卡片看详情', m2.builtinHint)
 await shot('menu-02-worldbook-list')
 

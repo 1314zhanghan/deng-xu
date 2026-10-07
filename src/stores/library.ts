@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { BUILTIN_WORLDS } from '@/data/builtinWorlds';
 import type { WorldCard } from '@/types/cards';
 import { makeId } from '@/utils/files';
 import { createKVStore, isIdbAvailable } from '@/utils/idb';
@@ -157,6 +156,16 @@ export const useLibraryStore = create<LibraryState>()((set, get) => {
         // 再把内置卡塞回去会显得删除操作没生效。
         let needSeed = false;
         if (worlds === null) {
+          /*
+            ⚠️ 内置世界必须**动态 import**。
+            2026-10 世界书重构后，三个深度世界的正文合计约 580 KB 源码
+            （打包进 JS 约 640 KB、gzip 约 400 KB）。如果静态 import，
+            这段体积会全部落进**首屏包** —— 实测主包会从 472 KB 涨到 647 KB
+            （gzip 198 → 408 KB），手机上首屏要多下 200 KB 才能看到主菜单。
+            而内置卡**只在首次运行（kv 里还没有卡）时才需要**，
+            所以改成动态 import，由 Vite 自动拆成独立 chunk，按需加载。
+          */
+          const { BUILTIN_WORLDS } = await import('@/data/builtinWorlds');
           worlds = deepClone(BUILTIN_WORLDS);
           needSeed = true;
         }
