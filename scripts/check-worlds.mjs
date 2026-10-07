@@ -33,21 +33,60 @@ import { spawnSync } from 'node:child_process'
 const ROOT = path.resolve(import.meta.dirname, '..')
 const AS_JSON = process.argv.includes('--json')
 
-// ── 打包内置世界，拿到运行时真实数据 ──
+/*
+  ── 打包内置世界，拿到运行时真实数据 ──
+
+  两种拿到 bundle 的方式，**优先复用已存在的产物**：
+    1. 若 `.check/worlds-check.mjs` 比所有源文件都新，直接 import 它；
+    2. 否则调 esbuild 重新打包。
+
+  ⚠️ 为什么要先看有没有现成的：
+  某些受限环境下 `spawnSync` 捕获子进程输出会失败
+  （**命名管道被禁** → EPERM），症状是 esbuild 明明能跑，
+  经本脚本调用却报"打包失败"且 stderr 为空。
+  这时先由外部把 bundle 打好（或由 `pnpm gen:worldbook` 顺带产出），
+  本脚本直接复用，就不必依赖管道。
+*/
 const BUNDLE = path.join(ROOT, '.check', 'worlds-check.mjs')
 fs.mkdirSync(path.dirname(BUNDLE), { recursive: true })
-const build = spawnSync(process.execPath, [
-  path.join(ROOT, 'node_modules', 'esbuild', 'bin', 'esbuild'),
-  'src/data/builtinWorlds.ts',
-  '--bundle', '--platform=node', '--format=esm',
-  `--outfile=${BUNDLE}`,
-  '--alias:@=./src',
-  '--log-level=error',
-], { cwd: ROOT, encoding: 'utf8' })
-if (build.status !== 0) {
-  console.error('✗ 打包 builtinWorlds 失败：')
-  console.error(build.stderr || build.stdout)
-  process.exit(1)
+
+/** bundle 是否比它的输入都新（inputs 里任一文件更新就需要重打） */
+function bundleIsFresh() {
+  if (!fs.existsSync(BUNDLE)) return false
+  const bTime = fs.statSync(BUNDLE).mtimeMs
+  const SRC = ['src/data/builtinWorlds.ts', 'src/data/worlds', 'src/types/cards.ts']
+  for (const p of SRC) {
+    const full = path.join(ROOT, p)
+    if (!fs.existsSync(full)) continue
+    const st = fs.statSync(full)
+    if (st.isDirectory()) {
+      for (const f of fs.readdirSync(full)) {
+        const fp = path.join(full, f)
+        if (fs.statSync(fp).isFile() && fs.statSync(fp).mtimeMs > bTime) return false
+      }
+    } else if (st.mtimeMs > bTime) return false
+  }
+  return true
+}
+
+if (!bundleIsFresh()) {
+  const build = spawnSync(process.execPath, [
+    path.join(ROOT, 'node_modules', 'esbuild', 'bin', 'esbuild'),
+    'src/data/builtinWorlds.ts',
+    '--bundle', '--platform=node', '--format=esm',
+    `--outfile=${BUNDLE}`,
+    '--alias:@=./src',
+    '--log-level=error',
+  ], { cwd: ROOT, encoding: 'utf8', stdio: 'inherit' })
+  if (build.status !== 0) {
+    // stdio:'inherit' 时 stderr 不经过管道，错误已直接打在终端上
+    console.error('\n✗ 打包 builtinWorlds 失败。')
+    console.error('  若上面看不到编译错误，可能是本环境禁止子进程管道（EPERM）。')
+    console.error('  绕过办法：先手动打好 bundle，再重跑本脚本 ——')
+    console.error('    node node_modules/esbuild/bin/esbuild src/data/builtinWorlds.ts \\')
+    console.error(`      --bundle --platform=node --format=esm --outfile=${path.relative(ROOT, BUNDLE)} --alias:@=./src`)
+    process.exit(1)
+  }
 }
 const mod = await import('file://' + BUNDLE.replace(/\\/g, '/'))
 const WORLDS = mod.BUILTIN_WORLDS
