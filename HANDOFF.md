@@ -3,7 +3,7 @@
 > **给下一个会话的 AI**：这份文档是自包含的。读完它你应当能直接继续开发，
 > 不需要回看任何历史对话。所有路径都是绝对路径，所有命令都可直接粘贴执行。
 >
-> 最后更新：2026-01（当前 HEAD `11f3ed0`，CI #33 成功，线上已部署）
+> 最后更新：2026-10-06（当前 HEAD `55ee31c`，工作区含本次未提交的走查工具修复）
 
 ---
 
@@ -80,9 +80,12 @@ src/
 │  ├─ PortraitPanel.tsx       # 立绘详情（四方向）
 │  └─ RelationshipPanel.tsx   # 人物关系（列表里是全身立绘）
 ├─ data/
-│  ├─ builtinWorlds.ts        # 内置世界卡聚合（9 个）
-│  ├─ builtinWorldsExtra.ts   # 原有 2 个（霓虹雨季、星海拾遗）
-│  └─ builtinWorldsThemed.ts  # 题材包 6 个
+│  ├─ builtinWorlds.ts        # 内置世界**聚合入口**（只做 import + 头像风格映射）
+│  └─ worlds/                 # 三个深度世界（每个 ≥5 万字，见第 4.5 节）
+│     ├─ _shared.ts           # char() 角色卡工厂 + 时间戳常量
+│     ├─ deepcore.ts          # 深核集团·地渊之下
+│     ├─ greatchen.ts         # 大晟会典
+│     └─ westfantasy.ts       # 三邦纪年
 └─ assets/lpc/
    ├─ runtime.json            # 246 个部件的元数据（由脚本生成，勿手改）
    ├─ palettes.json           # LPC 官方调色板
@@ -224,45 +227,87 @@ BEARD_RE / SKIRT_RE
 - 夜间会**点亮窗户与路灯**（暖色光晕）—— 这是"时间感"的主要来源
 - 瓦片贴图有缓存（`bank`），逐个格子现画会慢十几倍
 
-### 4.5 内置世界（9 个）
+### 4.5 内置世界（**3 个深度世界** —— 2026-10 重构）
 
-| id | 标题 | 题材 | 机制 |
-|---|---|---|---|
-| `builtin_ashen_echo` | 灰烬回响 | 暗黑奇幻 | 开 |
-| `builtin_neon_rain` | 霓虹雨季 | 赛博朋克 | 开 |
-| `builtin_star_drifter` | 星海拾遗 | 太空歌剧 | **关**（纯叙事范例） |
-| `builtin_silver_crown` | 银冠之下 | 经典西幻 | 开 |
-| `builtin_seventh_day` | 被召唤的第七天 | 日式异世界 | 开 |
-| `builtin_asking_sword` | 问剑帖 | 中式仙侠 | 开 |
-| `builtin_three_am` | 凌晨三点的便利店 | 现代都市 | 开 |
-| `builtin_changan_twelve` | 长安十二年 | 架空历史 | 开 |
-| `builtin_rain_never_stopped` | 雨没有停过 | 后末日 | 开 |
+> 原先是 **9 个"广而浅"**的世界，每张世界观正文只有 444～1382 字。
+> AI 拿到一千字设定撑不住二十轮，很快就会自己编世界 —— 玩起来"太空、太杂"。
+> 现已整合为 **3 个深度世界**，每个世界观正文 ≥3 万字、全卡 ≥5 万字。
 
-每个世界卡都有：**术语表 + 禁止词汇 + 与题材匹配的机制 + 2-3 张角色卡**。
-「写清什么不可能」比堆形容词更能防跑题。
+| id | 标题 | 题材 | 世界观正文 | 全卡中文字 | 角色 |
+|---|---|---|---|---|---|
+| `builtin_deepcore` | 深核集团·地渊之下 | 后末日反乌托邦巨型企业 | 32,041 | **50,605** | 9 |
+| `builtin_greatchen` | 大晟会典 | 虚构中式古风王朝（**无超自然力量**） | 32,608 | **51,751** | 10 |
+| `builtin_westfantasy` | 三邦纪年 | 经典西幻（帝国/王国/联邦 + 人/精灵/矮人/兽人/龙） | 33,358 | **50,645** | 13 |
 
-**角色卡工厂**：`builtinWorldsThemed.ts` 里的 `char()` 函数补默认值 ——
+**源码布局**（`src/data/worlds/`）：
+
+```
+_shared.ts        # char() 角色卡工厂 + BUILTIN_TIMESTAMP（三世界共用）
+deepcore.ts       # 深核集团·地渊之下
+greatchen.ts      # 大晟会典
+westfantasy.ts    # 三邦纪年
+```
+聚合入口仍是 `src/data/builtinWorlds.ts`（只做 import + 头像风格映射）。
+
+**验收脚本**：`pnpm check:worlds` —— 客观核对每世界中文字数、worldLore 字数、
+结构完整性、`startingItems`/`attributeBonus` 等**引用是否指向真实 id**、
+题材禁用词、以及**角色卡是否写清性别线索**（引擎靠它推断立绘性别）。
+门槛写死在脚本里，改内容后跑一遍就知道有没有退化。
+
+**⚠️ 动态 import 是硬要求**：三个世界的正文合计约 580 KB 源码。
+`src/stores/library.ts` 里**必须**用
+`await import('@/data/builtinWorlds')`（而不是静态 import）——
+静态 import 会让主包从 472 KB 涨到 647 KB（gzip 198 → 408 KB），
+手机上首屏要多下 200 KB。改成动态 import 后 Vite 自动拆成独立 chunk，
+主包反而更小（431 KB / gzip 152 KB），且内置卡**只在首次运行时才需要**。
+
+**每个世界都必须有**：术语表 + 禁止词汇 + 与题材匹配的机制 + 6 张以上角色卡
++ `startingItems` 指向真实物品 id。「写清什么不可能」比堆形容词更能防跑题。
+
+**角色卡工厂**：`src/data/worlds/_shared.ts` 里的 `char()` 函数补默认值 ——
 `CharacterCard` 有 9 个必填字段，手写 14 遍必然漏。
 
 ---
 
-## 5. 测试体系（8 套走查 154 项 + 239 单元测试）
+## 5. 测试体系（8 套走查 154 项 + **353** 单元测试 + 5 个独立工具）
 
 ```
-scripts/checks/
-├─ _browser.mjs        # 公共工具（Edge 自动探测、CDP 封装）
-├─ _ws-shim.mjs        # Node 20 的 WebSocket 兜底（CI 用它）
-├─ all.mjs             # 总入口，一次跑全部
-├─ main-menu.mjs       # 29 项
-├─ playtest.mjs        # 34 项（新玩家首次游玩路径）
-├─ error-paths.mjs     # 21 项（自带支持 CORS 的假服务商）
-├─ mobile.mjs          # 19 项（真实手机视口 390×844）
-├─ back-nav.mjs        # 21 项（返回键层级）
-├─ map-gallery.mjs     # 7 项（地形×时段×布局 + 亮度递减）
-├─ npc-fidelity.mjs    # 10 项（真实角色描述 → 对照图）
-├─ npc-coverage.mjs    # 13 项（词表覆盖率诊断）
-└─ sprite-gallery.mjs  # 立绘对照图
+scripts/
+├─ see.mjs               # 【工具1】看一眼：一条命令截图 + 打印可读路径
+├─ check-keywords.mjs    # 【工具3】词表 × 真实资源 全量校验（查静默失效）
+├─ check-encoding.mjs    # 【工具5】乱码 / 非法 UTF-8 守卫
+├─ check-tools-selftest.mjs  # 上面两个守卫的**污染测试**（证明它们真的会报警）
+├─ render-offline.mjs    # 【工具4】离线渲染：不经浏览器直接出 PNG
+│  └─ lib/
+│     ├─ canvas-shim.mjs   # 最小 canvas + PNG 编解码（Node 用）
+│     ├─ render-entry.ts   # 给 esbuild 的打包入口
+│     └─ xcheck-offline.mjs # 离线 vs 浏览器 配方一致性对比
+└─ checks/
+   ├─ _browser.mjs        # 公共工具（Edge 自动探测、CDP 封装、outDir/profileDir）
+   ├─ _ws-shim.mjs        # Node 20 的 WebSocket 兜底（CI 用它）
+   ├─ all.mjs             # 【工具2】总入口：全套 / --only-failed / --list / 按名筛选
+   ├─ main-menu.mjs       # 29 项
+   ├─ playtest.mjs        # 34 项（新玩家首次游玩路径）
+   ├─ error-paths.mjs     # 21 项（自带支持 CORS 的假服务商）
+   ├─ mobile.mjs          # 19 项（真实手机视口 390×844）
+   ├─ back-nav.mjs        # 21 项（返回键层级）
+   ├─ map-gallery.mjs     # 7 项（地形×时段×布局 + 亮度递减）
+   ├─ npc-fidelity.mjs    # 10 项（真实角色描述 → 对照图）
+   ├─ npc-coverage.mjs    # 13 项（词表覆盖率诊断）
+   └─ sprite-gallery.mjs  # 立绘对照图
 ```
+
+### 五个工具怎么用（详见第 10.5 节）
+
+| 命令 | 用途 |
+|---|---|
+| `pnpm see` | 截一张图并打印路径；`--fresh` 清存储、`--mobile` 手机视口 |
+| `pnpm check:failed` | 只重跑上次失败的走查（实测 206s → 13.5s） |
+| `pnpm check:keywords` | 查"关键词指向不存在的部件"这类**静默失效** |
+| `pnpm check:encoding` | 查乱码与非法 UTF-8 |
+| `pnpm check:tools` | 证明上面两个守卫**不会假阴性也不会假阳性** |
+| `node scripts/render-offline.mjs map` | **不用浏览器**出地图/立绘对照图（几秒） |
+| `node scripts/render-offline.mjs xcheck` | 离线与浏览器渲染结果一致性（需 dev server） |
 
 ### 走查写在"画廊"里的部分
 
@@ -275,13 +320,20 @@ scripts/checks/
 `.github/workflows/deploy.yml`，`windows-latest`（预装 Edge）：
 
 ```
-typecheck → test → build
+typecheck → test
+  → check:encoding   （乱码 / 非法 UTF-8）
+  → check:keywords   （词表指向不存在的部件）
+  → check:tools      （用污染测试证明上面两个守卫真会报警）
+  → build
   → 在 preview 上跑 main-menu（产物冒烟）
   → 在 dev server 上跑全套（功能验证）
   → 部署 GitHub Pages
 ```
 
-**为什么分两步**：走查需要用 `__gameStore` 之类的调试钩子准备游戏状态，
+**三道新增的静态守卫都很快**（各一两秒、不需要浏览器），
+拦住的正是"编译通过、测试通过、只有玩家看得出来"的那一类缺陷。
+
+**为什么走查要分两步**：走查需要用 `__gameStore` 之类的调试钩子准备游戏状态，
 而这些钩子在生产构建里被 `import.meta.env.DEV` 守卫剔除了（有意为之）。
 全套只能在 dev 上跑。
 
@@ -341,6 +393,18 @@ typecheck → test → build
     不报错，只是悄悄失效。
 11. **React StrictMode 会双挂载 effect** → 重复绑定 `popstate` 监听器。
     用模块级标志位去重（且卸载时**不要**摘监听器，否则重新挂载又绑一个）。
+12. **`--user-data-dir` 必须是绝对路径** —— 传相对路径时 Chromium **静默失败**：
+    进程照常起来（PID 有效、`exitCode` 为 null），但既不创建 profile 目录、
+    也不绑定调试端口，脚本只能看到「端口未就绪」，完全猜不到是路径问题。
+    **只有单独跑某一套走查时才会踩到**：`all.mjs` 传给子进程的 `AUDIT_OUT`
+    本来就是绝对路径，所以 CI 一直是绿的，而 `pnpm check:map` / `check:npc`
+    这类直接调用**全部必挂**（本地实测 7 套全挂）。
+    已修：`scripts/checks/_browser.mjs` 新增 `outDir()` 统一解析成绝对路径。
+    **教训同 6.2 节 —— 「端口未就绪」先怀疑路径，别去查 Edge 装没装。**
+13. **`Get-Content -Raw` 会按 ANSI 解码 UTF-8**（本机 PowerShell 5.1 默认 GBK），
+    中文注释全变乱码，写回去就把文件永久弄坏。
+    `scripts/verify-render.mjs` 现在就是一堆乱码注释（**注释部分，能正常跑**）。
+    **不只是"别用 PowerShell 改源码"，读取也一样 —— 一律用 read/edit/write 工具。**
 
 ---
 
@@ -457,10 +521,161 @@ game → setup → worldbook → library → menu
 
 ---
 
+## 10.5 工具建设（**已全部完成** —— 2026-10-06）
+
+这一节原本是"还缺哪些工具 / 怎么减少工作量"的分析。
+**五个工具都已实现并验证**，所以下面既是清单也是使用说明。
+
+### 核心判断（这次被验证了）
+
+上一轮的结论是"提升空间在美术"，但**真正的瓶颈不在美术，而在缺少反馈回路**：
+这个项目**一半以上的工作量花在「确认现象是真的」而不是「修」上**
+（交接文档自述误报 15+ 次，ROADMAP 另记 9 次）。
+
+这次动手时又验证了一遍 —— 下面每个工具都当场抓到了真问题。
+
+### 已交付的五个工具
+
+| 工具 | 命令 | 作用 | 当场抓到的问题 |
+|---|---|---|---|
+| **1. 看一眼** | `pnpm see` / `node scripts/see.mjs` | 一条命令截图 + 打印可读路径；`--fresh` 清存储、`--mobile` 手机视口、`--wait=<选择器>`、`--action=<js>`、`--full` 整页 | 截图立刻暴露「首屏被模型设置弹窗占满」（见下方待确认项） |
+| **2. 只重跑失败** | `pnpm check:failed` | `all.mjs --only-failed` / `--list` / 按名筛选，失败清单落盘 `.check/last-failed.json` | 实测把迭代从 **206s 降到 13.5s** |
+| **3. 关键词校验** | `pnpm check:keywords` | 用真实 `runtime.json` + `palettes.json` 反查**每一张词表** | **3 处真实静默失效**（见下） |
+| **4. 离线渲染** | `node scripts/render-offline.mjs map\|sprites\|sprite\|selftest\|xcheck` | **不依赖浏览器**直接出 PNG（自带 PNG 编解码 + canvas 垫片） | LPC 素材其实是 **4 种格式混用**（见下） |
+| **5. 编码守卫** | `pnpm check:encoding` | 抓 UTF-8→GBK / Latin-1 乱码与非法字节 | 证明 `verify-render.mjs` **并没有坏**（见下） |
+
+### 工具 3 当场查出的三处静默失效（已修）
+
+| 位置 | 问题 | 后果 |
+|---|---|---|
+| `HAIR_STYLES` 的 `/莫西干\|mohawk/` | 值写成 `['mohawk']`，而库里的莫西干部件叫 **`hair_shorthawk`** | 唯一候选是空气 →「莫西干头」**退化成随机发型**。已改成 `['shorthawk','spiked']` |
+| `ROLES` 的「学生」 | 含 `'torso_clothes_vest'`，**库里没有 vest 类部件** | 靠前一个片段兜住，行为正确但死片段永远轮不到。已删 |
+| `HAIR_STYLES` 的 `/发髻\|bun\|updo/` | `bun` / `updo` 库里都没有 | 同上。已删 |
+
+**并补了 CI 级回归**：`spritePool.test.ts` 新增「整张词表不得有指向空气的片段」，
+逐条逐片段核对（原来只测"至少命中一个"，正好漏掉这类缺陷）。
+单测从 239 条涨到 **353 条**。
+
+### 工具 4 当场查出的问题
+
+**LPC 素材是 4 种 PNG 格式混用**：
+
+```
+位深8/类型6（RGBA）×175   位深4/类型3（索引色）×54
+位深2/类型3（索引色）×7   位深8/类型3（索引色）×10
+```
+
+第一版 PNG 解码器只支持 8 位，于是**索引色 2/4 位的 61 张全解不了**
+（胡须、部分腿部件），而失败被包装成一句"部件图加载失败"，
+完全看不出是位深问题。已支持全部四种。
+
+另外：`torso_clothes_shortsleeve_cardigan.png` 是 **128×320**
+（其余 245 张都是 128×256，`runtime.json` 也如实标注了）。
+合成器只取前 4 行方向帧，多出的行不参与，**不是缺陷**。
+
+**离线结果与浏览器的一致性已客观验证**（`render-offline.mjs xcheck`）：
+8 个角色的 `recipeFor` 部件与配色 **8/8 完全一致**。
+
+### 工具 5 的一个反直觉结论
+
+`scripts/verify-render.mjs` 的注释在 PowerShell 里显示成乱码，但
+**文件本身是干净的** —— 那是 PowerShell 控制台按 GBK 解码 UTF-8 的显示问题。
+用统计判据实测：真乱码的生僻字占比 **0.84~0.90**，而该文件只有 **0.015**。
+**「控制台显示乱码」≠「文件坏了」**，别急着"修"。
+
+### 判据是怎么定的（方法论，值得复用）
+
+第一版编码守卫我用"手挑乱码特征字 + 一行出现 2 个就报警"，
+结果**误报了 3 个文件**（`official-worldbook.json` 里的「澪汀」、
+`src/data/worlds/deepcore.ts` 里的正常汉字）。教训：
+
+> **逐字查表天生不可靠** —— 正常中文里也会出现同形字。
+
+改成统计判据后分离度极大，因为：正常中文只用约两千个常用字，
+而乱码的 CJK 字符在整个 U+4E00–U+9FFF 上近似均匀分布。
+**仓库自己就是最好的中文语料**，不需要外部字典。
+
+同理，校验器写错会**制造假缺陷**：我第一版把 `palettes.json` 的嵌套结构
+（`{palettes:{hair:{...}}}`）当成平铺，于是把 `grey` 这类其实能正常解析的
+色名报成"不存在"。**校验器本身也要被校验** —— 这就是
+`scripts/check-tools-selftest.mjs` 存在的原因：它用**污染测试**证明
+守卫"看见坏东西会报警、看见好东西不误报"。
+
+### 待确认的产品问题（截图发现的）
+
+**新玩家首屏被「模型设置」弹窗占满**，看不到主菜单。
+
+`ApiKeyModal.tsx:22`：`shouldShow = isApiKeyModalOpen || (!llm.apiKey && llm.provider !== 'ollama')`
+—— 没配 Key 就**无条件强制显示**，且 `canDismiss` 为 false 时**连右上角的 ✕ 都不渲染**。
+
+也就是说 ROADMAP 第 21 项写的"未配置模型时在最显眼处提示"，
+实际实现成了一个**必须先填 Key 才能进入**的门。
+对一个"挑一张世界卡就能看设定"的应用，这可能挡住新玩家。
+**这是产品取向，不是 bug，所以留给用户决定**（见 ROADMAP 待办 0.1）。
+
+### 另外记一笔：沙箱与浏览器
+
+受限沙箱下 Chromium **无法创建 mojo 命名管道**，Edge 起来即崩
+（`FATAL: platform_channel.cc Check failed: 拒绝访问`），表现为"端口未就绪"。
+放开为 `danger-full-access` 后一切正常。
+**这也正是离线渲染器（工具 4）的价值** —— 它完全不碰浏览器。
+
+---
+
+### 顺带修掉的走查基础设施问题
+
+| 改动 | 收益 |
+|---|---|
+| `_browser.mjs` 新增 `outDir()` | 修掉"单独跑走查必挂"（7 套），并让路径问题变成显式断言 |
+| `_browser.mjs` 新增 `profileDir()` / `removeProfile()` | Edge profile 从截图目录移到系统临时目录并在结束时删除 —— 之前会在 `playtest-shots/` 堆 23 个几十 MB 的目录，还被 CI 当产物上传 |
+| `npc-fidelity.mjs` 不再重复写时间戳截图 | 之前每次跑多留一个 144 KB 的同名副本 |
+| 走查失败时的报错补上路径提示 | "端口未就绪"现在会提示"常见原因：--user-data-dir 不是绝对路径" |
+
+### 地图美术的具体改进依据（读图所得，非推测）
+
+读了 `playtest-shots/map-gallery.png`（现在也可用离线渲染器出图）后，
+客观可见的问题是：
+
+1. **地形之间没有过渡** —— 草地→石板、沙→水都是硬边。`coast` 的岸线是逐列 ±1 随机，
+   看起来仍是方块台阶，不是平滑岸线。
+2. **`tree` 瓦片是同心圆**（`rpgMap.ts` 约 210 行：按到中心的距离分 4 档上色），
+   密铺后像"珠子/圆环"而不像树冠 —— 这是森林场景最主要的观感短板。
+   改法：给树冠加**不规则轮廓**（按角度扰动半径）+ 每格随机取 2~3 种树形，
+   而不是所有格子同一张圆心图案。
+3. **装饰密度完全均匀** —— 没有稀疏/密集对比，缺少 RPG 地图该有的
+   路牌、水边芦苇、墙角杂物、地面阴影。
+4. **`interior` 的墙是细线**（`wall` 只画 1px 砖缝），俯瞰下像"空心房间"，
+   认不出是墙。
+5. **画面偏灰**：九种地形的色调都压在相近的明度带里（`sky` / `underground` / `mountain`
+   尤其接近），缺少"一眼能分辨这是哪个场景"的强色彩特征。
+
+> 改法都写在 `rpgMap.ts` 的 `drawTile()`（每种地形的瓦片画法）与 `buildLayout()`（三套布局）。
+> **每改一步都要出图并看图**，不要只看断言：
+> 快速看 —— `node scripts/render-offline.mjs map`（不用浏览器，几秒出图）；
+> 全量核对 —— `pnpm check:map`（含亮度递减等断言）。
+
+### 立绘的两个具体问题（读图所得，待复核）
+
+1. **「银叶精灵」发色与肤色几乎同色**（浅黄发 + 米色皮肤），轮廓糊在一起。
+   注意：项目已有 `pickContrastingCloth`（衣色 vs 肤色亮度差 < 45 就排除），
+   **但没有发色 vs 肤色的同类检查** —— 应该复用同一个函数思路。
+2. **管家（白发黑袍）腿部疑似有白色絮状残片**。
+   ⚠️ 这条**尚未用可靠方式复核**：当时看的是被拉伸过的拼图，
+   而后来用包围盒与 8/8 配方对比证明渲染本身是忠实的。
+   **复核方法**：`node scripts/render-offline.mjs sprite --desc="星夜堡的管家，衣着整洁，乌黑长发束成马尾" --scale=4`
+   再看图；若仍有残片，把配方里每个部件各渲染一张来定位。
+
+---
+
 ## 11. 一句话总结现状
 
 **项目是完整可玩、测试充分、已上线、免费、GPL-3.0 的状态。**
-246 个像素部件、9 个内置世界、239 条单元测试、8 套 154 项浏览器走查全绿，
+246 个像素部件、**3 个深度内置世界（各 ≥5 万字）**、**388 条单元测试**、8 套 154 项浏览器走查全绿，
 CI #33 成功，线上哈希与本地一致。
 
-**下一步的提升空间主要在美术表现（地图与立绘的精细度），而不是功能。**
+**2026-10-06 补上了五个体检工具**（看一眼 / 只重跑失败 / 词表校验 /
+离线渲染 / 编码守卫）—— 它们直接砍掉了这个项目里最大的一块工作量：
+"确认现象是真的"。工具当场就查出了 3 处静默失效并已修。
+
+**下一步提升空间在美术表现（地图与立绘的精细度），而不是功能。**
+具体问题清单见第 10.5 节，已按"读图所得"列明。
