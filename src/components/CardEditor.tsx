@@ -538,44 +538,65 @@ export function CardEditor() {
               </div>
 
               {/*
-                背景如何改变开场 —— 只读展示。
-                这是 `openingByBackground` 的编辑入口：它按「槽位 → 选项」组织，
-                用 textarea 硬编不现实（几十条），所以编辑器把它**列出来给作者看**，
-                正文由作者在数据文件里写。对内置世界足够，也避免了
-                一个没人会用的复杂表单。
+                「各不相同的开场」—— 只读展示 + 选择开场槽位。
+                它按「槽位 → 选项」组织，用 textarea 硬编几十段不现实，
+                所以编辑器把**开场槽位的覆盖情况**列给作者看，
+                正文由作者在数据文件里写。对本作的内置世界足够，
+                也避免了一个没人会用的复杂表单。
               */}
               {(() => {
-                const byBg = draft.story.openingByBackground
+                const slotLabel = draft.story.openerSlot
                 const slots = draft.backgrounds || []
-                if (!byBg || !Object.keys(byBg).length) return null
-                const rows = slots.flatMap(slot =>
-                  slot.options.map(o => ({
-                    slot: slot.label,
-                    title: o.title,
-                    text: byBg[slot.label]?.[o.id] ?? byBg[slot.label]?.[o.title] ?? '',
-                  })),
-                )
-                const covered = rows.filter(r => r.text.trim()).length
+                const map = slotLabel ? draft.story.sceneByOption?.[slotLabel] : undefined
+                const openerSlot = slots.find(s => s.label === slotLabel)
+                const rows = openerSlot
+                  ? openerSlot.options.map(o => ({
+                      title: o.title,
+                      text: (map?.[o.id] ?? map?.[o.title] ?? '').trim(),
+                    }))
+                  : []
+                const covered = rows.filter(r => r.text).length
                 return (
-                  <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-2">
+                  <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-3">
                     <SectionTitle>
-                      开场随背景变化
+                      各不相同的开场
                       <span className="ml-2 text-[10px] font-normal text-text-muted">
-                        {covered} / {rows.length} 个背景选项已有各自的开场切入点
-                        {covered < rows.length ? '（缺的那些会退回通用开场）' : ''}
+                        {openerSlot
+                          ? `${covered} / ${rows.length} 个处境已有专属第一幕${covered < rows.length ? '（缺的退回兜底开场）' : ''}`
+                          : '未指定开场槽位'}
                       </span>
                     </SectionTitle>
-                    <div className="max-h-56 overflow-y-auto space-y-1.5">
-                      {rows.map(r => (
-                        <div key={r.slot + r.title} className="text-[11px] leading-relaxed">
-                          <span className="text-text-muted">{r.slot}｜</span>
-                          <span className="text-text-primary">{r.title}</span>
-                          {r.text.trim()
-                            ? <span className="text-text-secondary"> —— {r.text}</span>
-                            : <span className="text-accent-forge"> —— 未写（会退回通用开场）</span>}
-                        </div>
-                      ))}
-                    </div>
+
+                    <Field
+                      label="开场槽位"
+                      hint="哪个背景槽位决定「主角此刻在做什么、身处何地」。它的每个选项应对应一段完整、彼此不同的开场场景。留空则统一用上面的兜底开场。"
+                    >
+                      <select
+                        className={inputCls}
+                        value={slotLabel || ''}
+                        onChange={e => patchStory({ openerSlot: e.target.value || undefined })}
+                      >
+                        <option value="">（不指定，用兜底开场）</option>
+                        {slots.map(s => (
+                          <option key={s.label} value={s.label}>
+                            {s.label}（{s.options.length} 项）
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    {rows.length > 0 && (
+                      <div className="max-h-56 overflow-y-auto space-y-2">
+                        {rows.map(r => (
+                          <div key={r.title} className="text-[11px] leading-relaxed">
+                            <span className="text-text-primary">{r.title}</span>
+                            {r.text
+                              ? <span className="text-text-secondary"> —— {r.text}</span>
+                              : <span className="text-accent-forge"> —— 未写（会退回兜底开场）</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )
               })()}

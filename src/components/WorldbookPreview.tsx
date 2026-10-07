@@ -219,12 +219,11 @@ export function WorldbookPreview({
           {world.story?.opening && (
             <Panel
               icon={<BookOpen size={14} />}
-              title="开场"
+              title="开场（示例）"
               hint={
-                // 有"按背景变化"的指引时要说清楚，否则玩家会以为开场是写死的
-                world.story.openingByBackground &&
-                Object.keys(world.story.openingByBackground).length > 0
-                  ? '舞台固定，但主角的处境会随你选的背景变化'
+                // 有逐处境的开场场景时要说清楚：下面那些才是真正的第一幕
+                world.story.sceneByOption && Object.keys(world.story.sceneByOption).length > 0
+                  ? '真正的第一幕按你选的「开局处境」而定，见下方'
                   : undefined
               }
             >
@@ -233,35 +232,34 @@ export function WorldbookPreview({
           )}
 
           {/*
-            背景如何改变开场 —— 把"每个背景各自的第一幕切入点"摊开。
-            这不只是展示，它直接回答玩家最关心的问题：
-            "我选这个背景，开场真的会不一样吗？"
+            ── 各不相同的开场 ──
+            这是本作"沙盒"最直接的体现：**同一世界观下，不同的处境对应不同的第一幕**，
+            而不是所有人挤在同一处、只是看的角度不同。
+            所以把每一段完整开场都摊开 —— 玩家一眼就知道自己想从哪儿开始。
           */}
           {(() => {
-            const byBg = world.story?.openingByBackground
-            if (!byBg) return null
-            const rows: { slot: string; title: string; text: string }[] = []
-            for (const slot of world.backgrounds || []) {
-              const map = byBg[slot.label]
-              if (!map) continue
-              for (const opt of slot.options) {
-                const text = map[opt.id] ?? map[opt.title]
-                if (text) rows.push({ slot: slot.label, title: opt.title, text })
-              }
-            }
+            const slotLabel = world.story?.openerSlot
+            if (!slotLabel) return null
+            const slot = (world.backgrounds || []).find(s => s.label === slotLabel)
+            const map = world.story?.sceneByOption?.[slotLabel]
+            if (!slot || !map) return null
+            const rows = slot.options
+              .map(o => ({ title: o.title, scene: (map[o.id] ?? map[o.title] ?? '').trim() }))
+              .filter(r => r.scene)
             if (!rows.length) return null
             return (
-              <Panel icon={<Sparkles size={14} />} title={`开场会随背景变（${rows.length} 种切入点）`}>
-                <div className="space-y-3">
+              <Panel
+                icon={<Sparkles size={14} />}
+                title={`开场：${slotLabel}（${rows.length} 种互不相同的开局）`}
+                hint="在选角页选哪个，第一幕就从哪里开始"
+              >
+                <div className="space-y-4">
                   {rows.map(r => (
-                    <div key={r.slot + r.title} className="border-l-2 border-accent-lantern/30 pl-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/10 text-accent-lantern border border-accent-lantern/30">
-                          {r.slot}
-                        </span>
-                        <span className="text-xs text-text-primary font-serif">{r.title}</span>
-                      </div>
-                      <p className="text-[11px] text-text-secondary leading-relaxed">{r.text}</p>
+                    <div key={r.title} className="border-l-2 border-accent-lantern/30 pl-3">
+                      <div className="text-xs text-text-primary font-serif mb-1">{r.title}</div>
+                      <p className="text-[11px] text-text-secondary leading-relaxed whitespace-pre-wrap">
+                        {r.scene}
+                      </p>
                     </div>
                   ))}
                 </div>

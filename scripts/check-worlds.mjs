@@ -151,6 +151,8 @@ const GATE = {
   rulesCjk: 3000,
   customStyleCjk: 500,
   openingCjk: 1200,
+  /** 配了 openerSlot 时，opening 只作兜底示例，门槛放宽到这个值 */
+  openingFallbackCjk: 60,
   /* ── 沙盒改造（2026-10）追加的门槛 ── */
   // 长期目标必须是"若干宏大宽泛的可选项"，不是一句话任务书
   mainQuestCjk: 700,
@@ -183,8 +185,18 @@ const GATE = {
   minBackgroundSlots: 4,
   minOptionsPerSlot: 8,
   bgOptionDescCjk: 100,
-  // 开场指引：每个槽位的每个选项都必须有一条，且要写得够具体
-  openingGuideCjk: 80,
+  /*
+    ── 开场：**各不相同的开场为各不相同的处境服务** ──
+    玩家第二次打回这件事时说得很清楚：
+      「我要的是同一个世界观里，各不相同的开场为各不相同的背景服务，
+        而不是一样的开场因不一样的背景而略有改变。这么多三六九等的人
+        却在干同一个枯燥的工作，完全背离了沙盒。」
+    所以现在要求：世界卡必须指定一个 `openerSlot`，它的**每个选项**都要有
+    一段**完整、彼此不同**的开场场景，而不只是"同一场景的另一种视角"。
+  */
+  sceneCjk: 260,
+  // 场景之间不得高度雷同（相似度兜底，专门防"同一段换几个词"）
+  sceneMaxSimilarity: 0.72,
 }
 
 /**
@@ -237,8 +249,8 @@ for (const exp of EXPECTED) {
     ...(w.items || []).map(i => i.name + i.description),
     ...(w.lores || []).map(l => l.name + l.description),
     ...(w.backgrounds || []).flatMap(b => b.options.map(o => o.title + (o.description || ''))),
-    // 开场指引也是实打实的内容，计入全卡字数
-    ...Object.values(w.story?.openingByBackground || {}).flatMap(m => Object.values(m || {})),
+    // 逐处境的开场场景也是实打实的内容，计入全卡字数
+    ...Object.values(w.story?.sceneByOption || {}).flatMap(m => Object.values(m || {})),
     ...(w.characters || []).map(c => c.name + c.description + c.personality + c.relationship),
   ].join('\n')
 
@@ -266,7 +278,26 @@ for (const exp of EXPECTED) {
   if (loreCjk < GATE.worldLoreCjk) fail(exp.label, 'worldLore 不足', `${loreCjk} < ${GATE.worldLoreCjk}`)
   if (rulesCjk < GATE.rulesCjk) fail(exp.label, 'rules 不足', `${rulesCjk} < ${GATE.rulesCjk}`)
   if (styleCjk < GATE.customStyleCjk) fail(exp.label, 'customStyle 不足', `${styleCjk} < ${GATE.customStyleCjk}`)
-  if (openingCjk < GATE.openingCjk) fail(exp.label, 'opening 不足', `${openingCjk} < ${GATE.openingCjk}`)
+
+  /*
+    ⚠️ `story.opening` 的长度门槛**必须分情况**。
+    旧语义里 opening 就是第一幕本体，所以要求 ≥1200 字是对的；
+    但新语义下开场由 `openerSlot` + `sceneByOption` 决定，opening 只是**兜底示例**——
+    这时再要求 1200 字就是自相矛盾：它逼作者往"兜底"里灌水，
+    而三个世界（大晟 48 字 / 三邦 84 字）确实因为写对了（写短）而被判不达标。
+    **门槛与设计打架时，错的是门槛。**
+    所以：配了 openerSlot 的世界只要求一段像样的兜底（≥60 字）；
+    没配的仍然按 ≥1200 字要求（那时它真的是唯一开场）。
+  */
+  const openingGate = w.story?.openerSlot ? GATE.openingFallbackCjk : GATE.openingCjk
+  row.openingGate = openingGate
+  if (openingCjk < openingGate) {
+    fail(exp.label, 'opening 不足',
+      `${openingCjk} < ${openingGate}` +
+      (w.story?.openerSlot
+        ? `（已配 openerSlot「${w.story.openerSlot}」，opening 只作兜底示例，门槛已放宽）`
+        : '（未配 openerSlot，opening 是唯一开场，须写足）'))
+  }
 
   // ② 结构
   if (!w.attributes?.length) fail(exp.label, '结构', 'attributes 为空')
@@ -359,14 +390,16 @@ for (const exp of EXPECTED) {
     }
 
     /*
-      ②.6 背景槽位与开场（2026-10 用户反馈）
+      ②.6 背景槽位与开场（2026-10 用户反馈，打回过两次）
       ────────────────────────────────────────
-      两件事以前完全没人管：
-        · 背景槽位太窄（2 槽 × 3 选项也能过），玩家"选了半天没得选"；
-        · `opening` 是写死的一段，背景**根本没进开场提示词**——
-          选哪个背景，第一幕都一模一样。
-      现在分别钉住：槽位与选项的**数量**、选项描述的**长度**、
-      以及 `openingByBackground` 对每个选项的**覆盖率**。
+      第一次：「选了半天背景，发现开场一模一样」—— 背景根本没进开场提示词。
+      第二次：「我要的是同一个世界观里，**各不相同的开场为各不相同的背景服务**，
+        而不是一样的开场因不一样的背景而略有改变。三六九等的人却在干
+        同一个枯燥的工作，完全背离了沙盒。」
+      所以现在验三层：
+        · 槽位与选项的**数量**、选项描述的**长度**；
+        · 必须有 `openerSlot`，且它的每个选项都有一段**完整开场场景**；
+        · 这些场景**彼此不能雷同**（相似度兜底，专治"同一段换几个词"）。
     */
     {
       const slots = w.backgrounds || []
@@ -375,8 +408,8 @@ for (const exp of EXPECTED) {
 
       /*
         ⚠️ 槽位 label 必须唯一。
-        `backgroundChoices` 与 `openingByBackground` 都是**按 label 做 key 的对象**，
-        两个槽位同名就会互相覆盖 —— 不报错，只是其中一个槽位的选择与开场指引
+        `backgroundChoices` 与 `sceneByOption` 都是**按 label 做 key 的对象**，
+        两个槽位同名就会互相覆盖 —— 不报错，只是其中一个槽位的选择与开场场景
         永远取不到（静默失效）。
       */
       const labels = slots.map(s => s.label)
@@ -408,29 +441,80 @@ for (const exp of EXPECTED) {
         }
       }
 
-      // 开场指引覆盖率：每个槽位的每个选项都应有一条
-      const byBg = w.story?.openingByBackground || {}
-      const missing = []
-      let covered = 0
-      for (const slot of slots) {
-        const map = byBg[slot.label]
-        for (const o of slot.options) {
-          const text = map?.[o.id] ?? map?.[o.title]
-          if (!text || cjk(text) < GATE.openingGuideCjk) {
-            missing.push(`${slot.label}／${o.title}`)
-          } else {
-            covered++
+      /*
+        ── 各不相同的开场（本次的核心验收）──
+        要验三件事：
+          1. 世界卡指定了 `openerSlot`，且这个槽位真实存在；
+          2. 该槽位的**每一个**选项都有一段完整开场场景（长度够）；
+          3. 这些场景**彼此确实不同** —— 不只是长度达标，
+             而是不能"同一段换几个词"。用二元组相似度兜底。
+        */
+      const openerLabel = w.story?.openerSlot
+      const openerSlot = slots.find(s => s.label === openerLabel)
+      const sceneMap = openerLabel ? w.story?.sceneByOption?.[openerLabel] : undefined
+
+      if (!openerLabel) {
+        fail(exp.label, '没指定开场槽位（openerSlot）',
+          '必须有一个背景槽位负责"开局处境"，否则所有背景又会被塞进同一个场面')
+      } else if (!openerSlot) {
+        fail(exp.label, 'openerSlot 指向了不存在的槽位',
+          `story.openerSlot="${openerLabel}"，但 backgrounds 里没有这个 label`)
+      } else {
+        const missing = []
+        const tooShort = []
+        const scenes = []
+        for (const o of openerSlot.options) {
+          const text = (sceneMap?.[o.id] ?? sceneMap?.[o.title] ?? '').trim()
+          if (!text) { missing.push(o.title); continue }
+          const n = cjk(text)
+          if (n < GATE.sceneCjk) tooShort.push(`${o.title}(${n})`)
+          scenes.push({ title: o.title, text })
+        }
+        row.opener = openerLabel
+        row.scenes = scenes.length
+
+        if (missing.length) {
+          fail(exp.label, '开场场景没覆盖全部开局处境',
+            `${scenes.length}/${openerSlot.options.length} 已写；缺 ${missing.length} 个：` +
+            missing.slice(0, 8).join('、') + (missing.length > 8 ? ' …' : ''))
+        }
+        if (tooShort.length) {
+          fail(exp.label, '开场场景太短',
+            `每条需 ≥${GATE.sceneCjk} 汉字（要能承载时间/地点/他在做什么/在场的人/钩子）：` +
+            tooShort.slice(0, 8).join('、'))
+        }
+
+        /*
+          相似度兜底：把每段场景切成 2 字组，算 Jaccard 相似度。
+          中文没有词边界，二元组是够用的近似 —— 目的是抓"同一段换几个词"，
+          不是做精确的文本比对。
+        */
+        const bigrams = s => {
+          const t = s.replace(/[\s，。、；：！？「」『』（）—…·"'*#-]/g, '')
+          const out = new Set()
+          for (let i = 0; i + 2 <= t.length; i++) out.add(t.slice(i, i + 2))
+          return out
+        }
+        const sim = (a, b) => {
+          if (!a.size || !b.size) return 0
+          let inter = 0
+          for (const g of a) if (b.has(g)) inter++
+          return inter / (a.size + b.size - inter)
+        }
+        const sets = scenes.map(s => ({ title: s.title, set: bigrams(s.text) }))
+        const tooSimilar = []
+        for (let i = 0; i < sets.length; i++) {
+          for (let j = i + 1; j < sets.length; j++) {
+            const v = sim(sets[i].set, sets[j].set)
+            if (v >= GATE.sceneMaxSimilarity) {
+              tooSimilar.push(`${sets[i].title} ↔ ${sets[j].title}（相似 ${(v * 100).toFixed(0)}%）`)
+            }
           }
         }
-      }
-      row.bgCovered = covered
-      if (!Object.keys(byBg).length) {
-        fail(exp.label, '缺少 openingByBackground',
-          '开场必须随背景变化 —— 否则玩家"选了半天背景，开场一模一样"')
-      } else if (missing.length) {
-        fail(exp.label, '开场指引没覆盖全部背景选项',
-          `${covered}/${row.bgOptions} 已覆盖；缺 ${missing.length} 条（每条需 ≥${GATE.openingGuideCjk} 字）：` +
-          missing.slice(0, 8).join('、') + (missing.length > 8 ? ' …' : ''))
+        if (tooSimilar.length) {
+          fail(exp.label, '开场场景彼此太像（就是"同一段换几个词"）',
+            tooSimilar.slice(0, 6).join('；') + (tooSimilar.length > 6 ? ` …共 ${tooSimilar.length} 对` : ''))
+        }
       }
     }
   }

@@ -1,19 +1,24 @@
 import { describe, it, expect } from 'vitest'
-import { buildOpeningInstruction, describeBackgroundChoices } from '@/constants/prompts'
+import { buildOpeningInstruction, describeBackgroundChoices, resolveOpeningScene } from '@/constants/prompts'
 import type { CharacterCard, PlayerCard, WorldCard } from '@/types/cards'
 
 /**
  * 开场指令的回归测试。
  *
- * ## 为什么值得单独测
+ * ## 这段逻辑被玩家打回过**两次**，两次的错法都值得记住
  *
- * 玩家反馈过："选角页挑了半天的背景，开场却一模一样，很影响代入感。"
- * 根因是 `buildOpeningInstruction` **压根没有收到背景选择** ——
- * 它只拿到（世界、主角、在场角色），于是不管选哪个出身，
- * 送进提示词的都是同一段 `story.opening`。
+ * 第一次："选角页挑了半天的背景，开场却一模一样。"
+ *   → 根因：`buildOpeningInstruction` 压根没收到背景选择。
  *
- * 这类缺陷**不会报错、不会崩**，只表现为"玩了才发现没区别"，
- * 所以必须用断言钉住：**不同背景必须产出不同的开场指令**。
+ * 第二次（本次）："我要的是**同一个世界观里，各不相同的开场为各不相同的背景服务**，
+ *   而不是一样的开场因不一样的背景而略有改变。这么多三六九等的人
+ *   却在干同一个枯燥的工作，完全背离了沙盒。"
+ *   → 根因：我只做了"同一场景 + 按背景换视角"（旧 `openingByBackground`），
+ *     于是官、军、商、江湖、罪犯全挤在同一间值房里。
+ *
+ * 所以下面最要紧的两条是：
+ *   · **不同开场处境 ⇒ 不同场景**（不是同一场景换词）
+ *   · **其余背景只加质感，不得把场景挪走**
  */
 
 const mkWorld = (over: Partial<WorldCard> = {}): WorldCard => ({
@@ -22,30 +27,41 @@ const mkWorld = (over: Partial<WorldCard> = {}): WorldCard => ({
   attributes: [], resources: [],
   backgrounds: [
     {
-      label: '出身',
+      label: '开局处境',
       options: [
-        { id: 'poor', title: '穷苦出身', description: '在码头长大', startingItems: ['rope'] },
-        { id: 'noble', title: '世家子弟', description: '自小读书', startingItems: ['seal'] },
+        { id: 'office', title: '在值房核账', description: '你是个小吏', startingItems: ['ledger'] },
+        { id: 'frontier', title: '在边镇守烽', description: '你是个队正', startingItems: ['saber'] },
+        { id: 'shop', title: '在城南开店', description: '你是个商人', startingItems: ['abacus'] },
       ],
     },
     {
-      label: '牵挂',
+      label: '出身',
       options: [
-        { id: 'sister', title: '有个妹妹', description: '她还在等你', startingItems: [] },
-        { id: 'none', title: '无牵无挂', description: '走得快', startingItems: [] },
+        { id: 'hanmen', title: '寒门', description: '家里没钱', startingItems: [] },
+        { id: 'xungui', title: '勋贵', description: '家里有功', startingItems: ['seal'] },
       ],
     },
   ],
   attributePoints: 0,
   items: [
-    { id: 'rope', name: '一捆麻绳', description: '', tags: [] },
-    { id: 'seal', name: '家传印章', description: '', tags: [] },
+    { id: 'ledger', name: '一本点验簿', description: '', tags: [] },
+    { id: 'saber', name: '一把横刀', description: '', tags: [] },
+    { id: 'abacus', name: '一副算盘', description: '', tags: [] },
+    { id: 'seal', name: '家传印', description: '', tags: [] },
   ],
   lores: [],
   story: {
-    opening: '黄昏，铁桥桥头的客栈。桥下有兵在收过桥粮。',
+    opening: '（兜底）度支司的值房，申时三刻。',
     mainQuest: '',
     enableStages: false, stages: [], enableChoices: true, urgencyAfterTurns: 0,
+    openerSlot: '开局处境',
+    sceneByOption: {
+      开局处境: {
+        office: '汴梁度支司值房，你面前摊着含嘉仓的点验簿，裴无咎站在门口问你看完了没有。',
+        frontier: '云中镇外第三烽，风把火盆里的炭吹得发红，你手下的十个人等着你决定今夜点不点火。',
+        shop: '城南州桥边你的铺子刚卸下一船货，牙人堵在门口要你签一张三个月后付的契。',
+      },
+    },
   },
   narrative: { pov: 'second', tense: 'present', replyLength: 500, customStyle: '' },
   characters: [], enableMechanics: true,
@@ -59,87 +75,89 @@ const player: PlayerCard = {
 }
 const noChars: CharacterCard[] = []
 
-describe('开场指令 · 背景必须真的影响第一幕', () => {
-  it('没有背景选择时，仍然给出场景骨架（不崩、不空）', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, {})
-    expect(out).toContain('铁桥桥头')
-    // 没有背景时不该出现"背景如下"那一段
-    expect(out).not.toContain('主角开局选定的背景如下')
-  })
-
-  it('★ 不同背景产出**不同**的开场指令（这就是本次修复的核心）', () => {
+describe('开场指令 · 不同处境必须是不同场面（沙盒，不是同一工位）', () => {
+  it('★ 三个开局处境产出三段互不相同的场景（核心断言）', () => {
     const w = mkWorld()
-    const a = buildOpeningInstruction(w, player, noChars, { 出身: 'poor', 牵挂: 'none' })
-    const b = buildOpeningInstruction(w, player, noChars, { 出身: 'noble', 牵挂: 'sister' })
+    const a = buildOpeningInstruction(w, player, noChars, { 开局处境: 'office' })
+    const b = buildOpeningInstruction(w, player, noChars, { 开局处境: 'frontier' })
+    const c = buildOpeningInstruction(w, player, noChars, { 开局处境: 'shop' })
     expect(a).not.toBe(b)
-    expect(a).toContain('穷苦出身')
-    expect(b).toContain('世家子弟')
-    expect(a).not.toContain('世家子弟')
-    expect(b).not.toContain('穷苦出身')
+    expect(b).not.toBe(c)
+    expect(a).not.toBe(c)
+    // 各自带出各自的场面 —— 三段互不包含，是三个地方
+    expect(a).toContain('度支司值房')
+    expect(a).not.toContain('云中镇外第三烽')
+    expect(b).toContain('云中镇外第三烽')
+    expect(b).not.toContain('州桥边')
+    expect(c).toContain('州桥边')
+    expect(c).not.toContain('度支司值房')
   })
 
-  it('只换一个槽位也要有差异（不必所有槽位都不同）', () => {
+  it('★ 非开场槽位的随身物会被带进指令（给场面加质感）', () => {
+    // 开场槽位自己的物品写在场景正文里；这里验的是**别的槽位**的物品
+    const a = buildOpeningInstruction(mkWorld(), player, noChars, { 开局处境: 'office', 出身: 'xungui' })
+    expect(a).toContain('家传印')
+    expect(a).toContain('开局随身')
+  })
+
+  it('★ 有专属场景时**不再拼接兜底 opening**（否则两幕揉成一幕）', () => {
+    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 开局处境: 'frontier' })
+    expect(out).toContain('云中镇外第三烽')
+    expect(out).not.toContain('（兜底）度支司的值房')
+  })
+
+  it('★ 其余背景只加质感，不得把场景挪走', () => {
     const w = mkWorld()
-    const a = buildOpeningInstruction(w, player, noChars, { 出身: 'poor', 牵挂: 'sister' })
-    const b = buildOpeningInstruction(w, player, noChars, { 出身: 'noble', 牵挂: 'sister' })
-    expect(a).not.toBe(b)
+    const poor = buildOpeningInstruction(w, player, noChars, { 开局处境: 'frontier', 出身: 'hanmen' })
+    const noble = buildOpeningInstruction(w, player, noChars, { 开局处境: 'frontier', 出身: 'xungui' })
+    // 场面仍然只有边镇那一个
+    expect(poor).toContain('云中镇外第三烽')
+    expect(noble).toContain('云中镇外第三烽')
+    // 但两者的"质感"不同（出身被带进去了）
+    expect(poor).toContain('寒门')
+    expect(noble).toContain('勋贵')
+    // 并且明确禁止"因为别的背景把场景挪走"
+    expect(noble).toContain('场景已经由上面的开场处境定死了')
   })
 
-  it('把开局携带物写进指令 —— 让"手上有东西"成为开场抓手', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 出身: 'poor' })
-    expect(out).toContain('一捆麻绳')
-    expect(out).toContain('开局随身')
-  })
-
-  it('明确要求背景落到可见细节上，并禁止"只提一句"', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 出身: 'poor' })
-    expect(out).toContain('他为什么此刻在这个场景里')
-    expect(out).toContain('不要')
-    expect(out).toContain('同一段话换了几个词')
-  })
-
-  it('场景骨架仍然是世界卡里的那一段（舞台不跑偏）', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 出身: 'noble' })
-    expect(out).toContain('桥下有兵在收过桥粮')
-  })
-
-  it('世界卡为某个选项写了开场指引时，优先带上它', () => {
+  it('该处境没写场景时，退回兜底 opening 而不是崩掉', () => {
     const w = mkWorld()
-    w.story.openingByBackground = {
-      出身: { poor: '你是被人从码头叫醒的，麻绳还缠在手腕上。' },
-    }
-    const out = buildOpeningInstruction(w, player, noChars, { 出身: 'poor' })
-    expect(out).toContain('麻绳还缠在手腕上')
-    // 没写指引的那个选项不应凭空带上别人的
-    const out2 = buildOpeningInstruction(w, player, noChars, { 出身: 'noble' })
-    expect(out2).not.toContain('麻绳还缠在手腕上')
+    w.story.sceneByOption = { 开局处境: {} }
+    const out = buildOpeningInstruction(w, player, noChars, { 开局处境: 'office' })
+    expect(out).toContain('（兜底）度支司的值房')
   })
 
-  it('开场指引按选项标题写也认（兼容两种写法）', () => {
+  it('世界卡没配 openerSlot 时，用兜底 opening', () => {
     const w = mkWorld()
-    w.story.openingByBackground = { 出身: { 世家子弟: '你穿着不该出现在这里的好衣裳。' } }
-    const out = buildOpeningInstruction(w, player, noChars, { 出身: 'noble' })
-    expect(out).toContain('不该出现在这里的好衣裳')
+    delete (w.story as { openerSlot?: string }).openerSlot
+    const out = buildOpeningInstruction(w, player, noChars, { 开局处境: 'office' })
+    expect(out).toContain('（兜底）度支司的值房')
   })
 
-  it('背景槽位里没有的选项 id 不会造成异常', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 出身: '不存在', 牵挂: 'none' })
+  it('既没场景也没兜底 opening 时给出自拟指令，不崩', () => {
+    const base = mkWorld()
+    const w = mkWorld({ story: { ...base.story, opening: '', sceneByOption: {} } })
+    const out = buildOpeningInstruction(w, player, noChars, {})
+    expect(out).toContain('自行设计')
+  })
+
+  it('选了一个不存在的处境 id 不会造成异常', () => {
+    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 开局处境: '不存在' })
     expect(typeof out).toBe('string')
-    expect(out).toContain('铁桥桥头')
+    expect(out).toContain('（兜底）')
   })
 
-  it('世界卡没有 backgrounds 时也不崩', () => {
-    const out = buildOpeningInstruction(mkWorld({ backgrounds: [] }), player, noChars, { 出身: 'poor' })
-    expect(typeof out).toBe('string')
+  it('resolveOpeningScene 能解析出槽位/选项/场景', () => {
+    const r = resolveOpeningScene(mkWorld(), { 开局处境: 'shop' })
+    expect(r).toMatchObject({ slot: '开局处境', id: 'shop', title: '在城南开店' })
+    expect(r?.scene).toContain('州桥边')
+    expect(resolveOpeningScene(mkWorld(), {})).toBeNull()
   })
 
-  it('describeBackgroundChoices 会解析出分类/选项/说明/携带物', () => {
-    const picked = describeBackgroundChoices(mkWorld(), { 出身: 'poor', 牵挂: 'sister' })
+  it('describeBackgroundChoices 解析出分类/选项/说明/携带物', () => {
+    const picked = describeBackgroundChoices(mkWorld(), { 开局处境: 'frontier', 出身: 'hanmen' })
     expect(picked).toHaveLength(2)
-    expect(picked[0]).toMatchObject({ label: '出身', id: 'poor', title: '穷苦出身' })
-    expect(picked[0].items).toEqual(['一捆麻绳'])
-    // 没选中的槽位不该出现
-    const onlyOne = describeBackgroundChoices(mkWorld(), { 出身: 'noble' })
-    expect(onlyOne).toHaveLength(1)
+    expect(picked[0]).toMatchObject({ label: '开局处境', id: 'frontier', title: '在边镇守烽' })
+    expect(picked[0].items).toEqual(['一把横刀'])
   })
 })

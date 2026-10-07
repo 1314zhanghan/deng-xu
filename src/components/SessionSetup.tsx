@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Play, Users, Check, Compass, UserRound, BookmarkPlus, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Play, Users, Check, Compass, UserRound, BookmarkPlus } from 'lucide-react'
 import type { HeroPreset, PlayerCard, WorldCard } from '@/types/cards'
 import { useSessionStore } from '@/stores/session'
 import { useGameStore } from '@/stores/game'
@@ -792,62 +792,55 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                     </>
                   )}
 
-                  {/* 开场预览 */}
-                  {world.story.opening && (
-                    <div className="pt-4 border-t border-text-muted/20 space-y-2">
-                      <h3 className="text-sm font-bold text-accent-lantern">开场</h3>
-                      <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
-                        {world.story.opening}
-                      </p>
+                  {/*
+                    ── 开场预览 ──
+                    ⚠️ 这里显示的是**这一局真正会用的第一幕**，由玩家在
+                    「开局处境」槽位上的选择决定（`openerSlot` + `sceneByOption`）。
+                    所以不再拿 `story.opening` 当主角 —— 那只是没有专属场景时的兜底示例。
+                  */}
+                  {(() => {
+                    const slotLabel = world.story.openerSlot
+                    const slot = slotLabel ? world.backgrounds.find(s => s.label === slotLabel) : null
+                    const map = slotLabel ? world.story.sceneByOption?.[slotLabel] : null
+                    const chosenId = slotLabel ? backgroundChoices[slotLabel] : undefined
+                    const opt = slot?.options.find(o => o.id === chosenId)
+                    const scene = (opt && map ? (map[opt.id] ?? map[opt.title] ?? '') : '').trim()
+                    const carried = (opt?.startingItems || [])
+                      .map(id => world.items.find(i => i.id === id)?.name)
+                      .filter((x): x is string => !!x)
 
-                      {/*
-                        ── 你的背景会怎样改变这一幕 ──
-                        这一段是本次修复的"可见部分"：玩家在选角页挑了背景，
-                        却看不到它有任何影响，自然会觉得白选了。
-                        所以把**当前所选背景**对应的开场切入点摊在他眼前。
-                      */}
-                      {(() => {
-                        const byBg = world.story.openingByBackground
-                        if (!byBg) return null
-                        const hits: { slot: string; title: string; text: string; items: string[] }[] = []
-                        for (const slot of world.backgrounds) {
-                          const chosenId = backgroundChoices[slot.label]
-                          const opt = slot.options.find(o => o.id === chosenId)
-                          if (!opt) continue
-                          const map = byBg[slot.label]
-                          const text = map?.[opt.id] ?? map?.[opt.title]
-                          if (!text) continue
-                          hits.push({
-                            slot: slot.label,
-                            title: opt.title,
-                            text,
-                            items: (opt.startingItems || [])
-                              .map(id => world.items.find(i => i.id === id)?.name)
-                              .filter((x): x is string => !!x),
-                          })
-                        }
-                        if (!hits.length) return null
-                        return (
-                          <div className="rounded border border-accent-lantern/25 bg-accent-lantern/[0.04] p-3 space-y-2">
-                            <div className="flex items-center gap-1.5 text-[11px] text-accent-lantern">
-                              <Sparkles size={12} />
-                              你的背景会这样改变这一幕
-                            </div>
-                            {hits.map(h => (
-                              <div key={h.slot + h.title} className="text-[11px] leading-relaxed">
-                                <span className="text-text-muted">{h.slot}｜</span>
-                                <span className="text-text-primary">{h.title}</span>
-                                <span className="text-text-secondary"> —— {h.text}</span>
-                                {h.items.length > 0 && (
-                                  <span className="text-text-muted">（随身：{h.items.join('、')}）</span>
-                                )}
-                              </div>
-                            ))}
+                    if (scene) {
+                      return (
+                        <div className="pt-4 border-t border-text-muted/20 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-sm font-bold text-accent-lantern">开场</h3>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/10 text-accent-lantern border border-accent-lantern/30">
+                              {slotLabel}：{opt?.title}
+                            </span>
+                            <span className="text-[10px] text-text-muted">
+                              换一个「{slotLabel}」，第一幕就换一个地方
+                            </span>
                           </div>
-                        )
-                      })()}
-                    </div>
-                  )}
+                          <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
+                            {scene}
+                          </p>
+                          {carried.length > 0 && (
+                            <p className="text-[10px] text-text-muted">开局随身：{carried.join('、')}</p>
+                          )}
+                        </div>
+                      )
+                    }
+                    // 没有专属场景 → 显示兜底示例
+                    if (!world.story.opening) return null
+                    return (
+                      <div className="pt-4 border-t border-text-muted/20 space-y-2">
+                        <h3 className="text-sm font-bold text-accent-lantern">开场（示例）</h3>
+                        <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
+                          {world.story.opening}
+                        </p>
+                      </div>
+                    )
+                  })()}
                 </>
               )}
             </motion.div>
