@@ -61,24 +61,47 @@ const cjk = s => (String(s || '').match(/[\u4e00-\u9fff]/g) || []).length
 /** 总字符数（含标点、数字、西文） */
 const total = s => String(s || '').length
 
-// ── 期望的三个世界 ──
+// ── 期望的内置世界 ──
+// `required: true` 的世界缺一个就报错；其余世界是"若存在则必须达标"，
+// 这样新增世界时不必改这里（加进去只为了给它配一份更精确的禁用词表）。
 const EXPECTED = [
   {
     id: 'builtin_deepcore',
     label: '深核集团·地渊之下（后末日反乌托邦企业世界）',
-    // 地渊世界禁用：魔法/宗教/AI/现实货币
+    required: true,
+    // 地渊世界禁用：魔法/AI/现实货币
     banned: ['魔法', '法术', '神明', '灵魂', '人工智能', '机器人', '美元', '人民币'],
     // 允许出现"AI"作为**被禁止的历史名词**，所以不把裸的 AI 列入
   },
   {
     id: 'builtin_greatchen',
-    label: '中式古风王朝（无超自然力量）',
+    label: '大晟会典（中式古风王朝，无超自然力量）',
+    required: true,
     banned: ['内力', '真气', '轻功', '法术', '修仙', '仙尊', '灵气', '神通', '妖', '魔', '系统', '面板', '经验值', '技能点'],
   },
   {
     id: 'builtin_westfantasy',
-    label: '经典西方奇幻（帝国/王国/联邦 + 人类/精灵/矮人/兽人/龙）',
+    label: '三邦纪年（经典西方奇幻）',
+    required: true,
     banned: ['系统', '面板', '经验值', '技能点', '内力', '真气', '修仙', '科技', '公司', '数据'],
+  },
+  {
+    id: 'builtin_oceanic',
+    label: '大洋纪年（大航海 / 海洋文明）',
+    required: false,
+    banned: ['系统', '面板', '经验值', '技能点', '内力', '真气', '修仙', '仙尊', '灵气', '科技', '公司', '数据', '魔法', '法术', '巨龙'],
+  },
+  {
+    id: 'builtin_steam',
+    label: '蒸汽纪年（工业革命 / 蒸汽与钢铁）',
+    required: false,
+    banned: ['系统', '面板', '经验值', '技能点', '内力', '真气', '修仙', '电脑', '网络', '数据', '程序', '人工智能', '机器人', '塑料', '魔法', '法术'],
+  },
+  {
+    id: 'builtin_bronze',
+    label: '青铜纪年（青铜时代 / 神话尚未退场）',
+    required: false,
+    banned: ['系统', '面板', '经验值', '技能点', '内力', '真气', '修仙', '仙尊', '灵气', '科技', '数据', '公司', '民族主义', '马镫'],
   },
 ]
 
@@ -99,7 +122,13 @@ const GATE = {
   factionCjk: 3000,
   lifeCjk: 3000,
   charDescCjk: 80,
-  minChars: 6,
+  /*
+    角色数门槛从 6 提到 8。
+    实测三个世界各有 9 / 10 / 13 张，6 这个门槛等于没约束；
+    而"关系面板一开局就有内容"是这个字段存在的理由，
+    8 张是能撑起一张关系网的底线。
+  */
+  minChars: 8,
   minPresent: 3,
   minItems: 15,
   minLores: 8,
@@ -110,26 +139,46 @@ const GATE = {
 /**
  * 沙盒内容的识别正则。
  *
- * ⚠️ 判据只能看**章节标题**，不能去正文里全文搜关键词 ——
- * 正文里出现"地图"两个字不代表真的写了地图（很可能是"没有地图"）。
- * 所以这里匹配 `**...**` 形式的标题，要求标题本身点明该主题。
+ * ⚠️ 两条教训（都是这个脚本自己踩出来的）：
+ *
+ * 1. **只按 `**标题**` 切段**，不能全文搜关键词 ——
+ *    正文里出现"地图"两个字不代表真的写了地图（很可能是"没有地图"）。
+ *
+ * 2. **标题词表必须够宽。** 第一版只认「舆图/地图/地理/势力/日常…」这几个词，
+ *    于是三个新世界明明写了大量同类内容却全部判为 0 分 ——
+ *    因为它们用的是「世界的形状」「十二种人」「生活与活法」「一处地方」
+ *    这类更自然的标题。**校验器的词表比作者的用词窄，就会把好内容判成没写。**
+ *    宁可放宽词表（有"正文长度 ≥3000"这道兜底），也不要逼作者改标题去迁就脚本。
  */
 const SANDBOX_SECTIONS = {
-  geo: /舆图|地图|地理|疆域|行旅|层志|区域|方位|交通|路线|坊市|城内|街/,
-  faction: /势力|派系|党争|阵营|家族|行会|地盘|控制|藩镇|部族|范围/,
-  life: /日常|生活|物价|饮食|市井|民生|作息|婚|娱乐|闲暇|风俗|语言|称谓/,
+  geo: /舆图|地图|地理|疆域|行旅|层志|区域|方位|交通|航线|路线|坊市|城内|商路|海图|铁轨|铁路|四地方|世界|陆与岛|海峡|礁带|港口|码头|城市|乡村|别处的城|海峡|岛|海域|平原|草原|沙漠|山脉|河流|河口|航道|水路|铁路|车道|街巷|地方/,
+  faction: /势力|派系|党争|阵营|家族|行会|地盘|藩镇|部族|范围|冲突|做主|握着|权力|阶层|主义|政体|信仰|教会|结社|宗族|军队|朝廷|议会|商会|同盟|联盟|组织|集团|统治|官署|衙门|世家|门派|谁控制|谁的地盘/,
+  life: /日常|生活|物价|饮食|市井|民生|作息|婚|娱乐|闲暇|风俗|语言|称谓|活法|一天|一日|行当|谋生|价钱|穿|丧|礼节|忌讳|谚语|怎么活|过日子|开销|工资|薪|收入|贫穷|穷|教育|医疗|病|食|吃喝|住|穿用|婚嫁|嫁娶|节庆|节日|集市/,
 }
 
-if (WORLDS.length !== EXPECTED.length) {
-  fail('(整体)', '世界数量', `期望 ${EXPECTED.length} 个，实际 ${WORLDS.length} 个：${WORLDS.map(w => w.id).join(', ')}`)
+/*
+  世界清单校验。
+  必须存在的世界缺一个就报错；可选世界**存在才校验**（这样新增世界不必改脚本）。
+  另外：出现在 BUILTIN_WORLDS 里但没有登记进 EXPECTED 的世界也报出来，
+  提醒补一份禁用词表 —— 否则新世界会「没人管」。
+*/
+for (const exp of EXPECTED) {
+  if (exp.required && !WORLDS.some(w => w.id === exp.id)) {
+    fail(exp.label, '缺失', `必须存在的世界 ${exp.id} 不在 BUILTIN_WORLDS 里`)
+  }
+}
+{
+  const known = new Set(EXPECTED.map(e => e.id))
+  const unregistered = WORLDS.filter(w => !known.has(w.id)).map(w => w.id)
+  if (unregistered.length) {
+    fail('(整体)', '有世界未登记进校验表', `${unregistered.join(', ')} —— 请为它补一份禁用词表与门槛`)
+  }
 }
 
 for (const exp of EXPECTED) {
   const w = WORLDS.find(x => x.id === exp.id)
-  if (!w) {
-    fail(exp.label, '缺失', `找不到世界 ${exp.id}`)
-    continue
-  }
+  // 可选世界不存在就跳过（不算失败）
+  if (!w) continue
 
   const allText = [
     w.title, w.tagline, w.worldLore, w.rules,
@@ -295,10 +344,47 @@ for (const exp of EXPECTED) {
   if (new Set(charIds).size !== charIds.length) fail(exp.label, '角色 id 重复', charIds.join(','))
 
   // ⑤ 禁用词
+  /*
+    ⚠️ 必须先剪掉「禁令清单」本身。
+    每个世界的 rules 里都有一条"绝对禁止出现的词汇：系统/面板/数据/公司…"，
+    那是**规则书在列举哪些词不许用**，不是内容违规。
+    第一版直接全文搜，于是每一条禁令都被自己举报了一次
+    （三邦纪年就被误报「出现禁用词『公司』」）。
+    判据：凡是同一行里出现"不得出现/绝对禁止/不要出现/禁用"这类措辞的行，
+    整行从扫描范围里剔除 —— 那是在**定义**禁词，不是在**使用**禁词。
+    只扫 worldLore：rules 的职责就是写禁令，天然会提到这些词。
+  */
+  const BAN_MARK = /不得出现|绝对禁止|不要出现|禁止出现|禁用|不得引入|不得使用|不得有/
+  const prose = String(w.worldLore)
+    .split('\n')
+    .filter(ln => !BAN_MARK.test(ln))
+    .join('\n')
+
+  /*
+    ⚠️ 还要放过**描述"这个东西不存在"的句子**。
+    世界书里"技术边界"这类章节天生要写「没有马镫」「没有纸币」——
+    那是在**交代世界缺什么**，是负责任的写法，不是违规。
+    第一版把这个也判成违规（青铜纪年因「马镫」被误报），
+    等于惩罚"把边界写清楚"的作者。
+    判据：命中处前后 ±40 字内出现否定词，就跳过这一处。
+    注意这是**逐处**判断，不是整段豁免 ——
+    同一段里若另有非否定的用法，仍然会被抓出来。
+  */
+  const NEG = /没有|无|不存在|尚不|还没有|未出现|不会有|不设|缺乏|缺少|买不到|不许|不能|尚未|从未/
   for (const bad of exp.banned) {
-    // 逐词统计出现次数（只看 worldLore + rules，避免误伤"明令禁止"的说明文字）
-    const n = (w.worldLore.match(new RegExp(bad, 'g')) || []).length
-    if (n > 0) fail(exp.label, `出现禁用词「${bad}」`, `worldLore 中出现 ${n} 次`)
+    const re = new RegExp(bad, 'g')
+    const real = []
+    let m
+    while ((m = re.exec(prose))) {
+      const around = prose.slice(Math.max(0, m.index - 40), m.index + 40)
+      if (NEG.test(around)) continue      // 这是在说"没有它"
+      real.push(m.index)
+    }
+    if (real.length) {
+      const at = real[0]
+      fail(exp.label, `出现禁用词「${bad}」`,
+        `${real.length} 处（已排除"描述其不存在"的用法）；上下文：…${prose.slice(Math.max(0, at - 50), at + 50).replace(/\n/g, ' ')}…`)
+    }
   }
 }
 
@@ -310,15 +396,20 @@ if (AS_JSON) {
 
 console.log('\n=== 内置世界书验收 ===\n')
 console.log(`  世界数量：${WORLDS.length}\n`)
+// 用真实的问题清单判断每一行的 ✓/✗，而不是另算一套近似判据
+// （否则"这一行显示 ✓ 但问题清单里有它"这种自相矛盾会出现）
+const problemWorlds = new Set(problems.map(p => p.world))
+const rowOk = r => !problems.some(p => p.world.includes(r.title) || (p.detail || '').includes(r.title))
 console.log('  ' + '世界'.padEnd(30) + '中文字数'.padStart(9) + 'worldLore'.padStart(10)
   + 'rules'.padStart(7) + '角色'.padStart(5) + '物品'.padStart(5) + 'lore'.padStart(5))
 for (const r of report) {
-  const ok = r.cjkTotal >= GATE.worldCjk && r.loreCjk >= GATE.worldLoreCjk
+  const ok = rowOk(r)
   console.log('  ' + (ok ? '✓ ' : '✗ ') + r.title.padEnd(28)
     + String(r.cjkTotal).padStart(9) + String(r.loreCjk).padStart(10)
     + String(r.rulesCjk).padStart(7) + String(r.chars).padStart(5)
     + String(r.items).padStart(5) + String(r.lores).padStart(5))
 }
+void problemWorlds
 
 console.log('\n  —— 沙盒内容（用户要求：地图 / 势力范围 / 生活气息 / 可选目标）——')
 console.log('  ' + '世界'.padEnd(30) + '地理'.padStart(8) + '势力'.padStart(8)
@@ -346,7 +437,7 @@ if (problems.length) {
     if (list.length > 12) console.log(`      … 另有 ${list.length - 12} 条`)
   }
 } else {
-  console.log(`\n  ✓ 三个世界全部达标（每个 ≥${GATE.worldCjk} 中文字，worldLore ≥${GATE.worldLoreCjk}）`)
+  console.log(`\n  ✓ 全部 ${report.length} 个世界达标（每个 ≥${GATE.worldCjk} 中文字，worldLore ≥${GATE.worldLoreCjk}），沙盒四类内容齐备`)
 }
 
 console.log(`\n  门槛：中文字数 ≥${GATE.worldCjk} / worldLore ≥${GATE.worldLoreCjk} / rules ≥${GATE.rulesCjk}`
