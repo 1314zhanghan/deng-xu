@@ -1102,7 +1102,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_core',
           title: '核心区眷属',
           description:
-            '你出生在第 91 层以上，父母中至少有一人拥有执行副总裁以上的职级。你从未刷过闸机，因为核心区不设闸机；你从未排过配给队，因为你的名字不在配给表上。你的工牌编号是空白的，空白本身就是最高权限。你见过真实的橘子树、见过人造天空的亮度周期，也见过监控里不打码的浅层生活片段。你知道外面的人不知道的事，但你也从没做过任何一件需要签字的事——你的档案干净得像一张没有内容的白纸，而这正是被人忌惮的地方：一件从没签过字的档案，随时可以被填上任何内容。',
+            '长在最高处，见惯了不用排队的生活。路走得顺，但每一步都有人替你记着。',
           attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 0, access: 2 },
           resourceBonus: { health: 0, energy: 0, credit: 4200, standing: 30 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_coverall', 'item_nano_patch'],
@@ -1111,7 +1111,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_deep_tech',
           title: '深层技术家庭',
           description:
-            '你出生在第 71 至 90 层，父亲是能源循环部的液冷回路工程师，母亲在第 88 层做过十二年档案核对。你从小在图纸和参数表里长大，十二岁起接入脑机接口辅助学习，会读压力曲线、会看台账里的批号、知道哪一页被换过。你家的公寓是全地渊少数几间有独立温控的住宅，你母亲的说法是"参数优先"。你十六岁那年，父亲签过一份一级供电调整单的第二联，签完之后三个月，浅层的藻池缺氧了。他从此没再提过那份文件，但你知道他把复印件藏在哪里。',
+            '图纸、参数表与批号是你的母语。你会看曲线，也知道哪一页被换过。',
           attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 5, credit: 1600, standing: 18 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_bio_wristband', 'item_coded_note'],
@@ -1120,7 +1120,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_mid_admin',
           title: '中层行政家庭',
           description:
-            '你出生在第 51 至 70 层，父母都是五级经理或六级高级经理。你上过中层学校，学过统计、流程管理、基础工程，会写规范公文，会背文号规则，知道一份文件在十二个部门之间可以走到第几格。你家的公寓七十八平方米，有独立厨房，因而你从小就知道"能自己决定吃什么"是一种阶级标志。你父母一生最怕的两件事是审计抽样与档案缺号，他们把这套恐惧完整地传给了你：你签字前必须看边注，你办事前必须留副本，你从不在同一份文件上出现两次。',
+            '中层双职工家里长大，懂流程、会写公文，最怕审计抽样与档案缺号。',
           attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 1, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 900, standing: 14 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_paper_ledger', 'item_coverall'],
@@ -1129,7 +1129,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_industrial',
           title: '浅层重工业家庭',
           description:
-            '你出生在第 26 至 30 层，父亲在高炉前站了二十九年，母亲在第 38 层的拆解线上拣铜。你十四岁进厂，班前会、签到表、防护耳塞、水冷背心，这套东西是你的童年。你会看火色，会听风机的异响，会在粉尘浓度超过每立方米 12 毫克的时候自动把面罩拉紧。你家里死了很多人，死亡在你们的账本上是一种可预期的支出：抚恤金、丧葬返还、以及"工序性死亡"这四个字如何让责任消失。你不太会写字，但你记得住编号，记得住每一个班组里谁欠谁一顿饭。',
+            '在粉尘与高炉边长大。认编号、认师傅、认班次，也认得"工序性死亡"这四个字。',
           attributeBonus: { might: 2, wits: 0, charm: 1, nerve: 1, access: 0 },
           resourceBonus: { health: 5, energy: 5, credit: 260, standing: 4 },
           startingItems: ['item_workbadge', 'item_steel_boots', 'item_dust_mask', 'item_ear_plugs', 'item_coverall'],
@@ -1138,7 +1138,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_farm',
           title: '浅层农场家庭',
           description:
-            '你出生在第 3 至 25 层的农业与养殖区间。你熟悉红蓝光下的作物、藻池的水温、虫房的气味与湿度。你每天看着 2100 千卡变成食物，也看着这些食物被别人按层级领走。你家住的是十二人集体宿舍，公共浴室每天供应 40 分钟热水，你从小练出的本事是在前五分钟内洗完。你有一个没有配额出生的弟弟或妹妹，他不上学、不登记、不体检，由互助会照看。你之所以还能往上走一步，是因为你会读写，而你的同层邻居里会读写的人不到三成。',
+            '红蓝光下长大的孩子，会看水温与秧苗。家里还有一个没有号的手足。',
           attributeBonus: { might: 1, wits: 1, charm: 1, nerve: 1, access: 0 },
           resourceBonus: { health: 5, energy: 0, credit: 200, standing: 3 },
           startingItems: ['item_workbadge', 'item_algae_brick', 'item_coverall', 'item_dust_mask'],
@@ -1147,7 +1147,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_unregistered',
           title: '无号者',
           description:
-            '你出生在第 40 层以下的废弃巷道里，或者在浅层的宿舍夹层里，总之你没有出生登记，因此也没有工号。制度上你不存在：你不占配额、不上学、不体检、不被统计，也因此在所有闸机记录里都是空白的。你熟悉全部四条不走闸机的路线——通风管、货梯夹层、拆解区传送带下的缝隙、以及医疗废弃物出口。这一天，你手上多了一张工牌，而这张工牌不属于你。你不知道给你工牌的人为什么这么做，你只知道从现在起你必须学会像一个有号的人那样走路、说话、刷闸机。',
+            '没有出生登记，因此没有号。熟悉所有不刷牌的路，也随时可能被清走。',
           attributeBonus: { might: 1, wits: 2, charm: 0, nerve: 2, access: -1 },
           resourceBonus: { health: -5, energy: 0, credit: 40, standing: 0 },
           startingItems: ['item_forged_badge', 'item_pipe_map', 'item_coded_note', 'item_contraband_cigarette'],
@@ -1156,7 +1156,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_collector_family',
           title: '采集队家属',
           description:
-            '你住在第 1 至 3 层，家里有一个人在采集队，工牌编号以 RC 开头。你们的住房是优先分配的，因为你家符合"在职家属"条件；米柜里也真的有过真咖啡与一小块烟草，那是队里分下来的、不进入配给表的东西。代价是你已经听过三次"请注意，您即将离开集团管辖范围"，也签过两次抚恤金与丧葬返还的材料。家属区的墙上贴着一张名单，名单上的人后面画着两种记号：回来的和没回来的；你母亲每天上班前都会看一眼那张名单，但她从不告诉你她在看谁。你的日常工作是替全家人算配给：如果那个人这个窗口期回不来，下一次结算之后你们家要少领多少千卡。',
+            '家里有人在采集队。住房优先，配给里偶尔有真东西；墙上的名单只有两种记号。',
           attributeBonus: { might: 1, wits: 0, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { health: 5, energy: 0, credit: 520, standing: 6 },
           startingItems: ['item_workbadge', 'item_rebreather', 'item_geiger_counter', 'item_mourn_stub'],
@@ -1165,7 +1165,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_retired',
           title: '退役者',
           description:
-            '你曾经是第 29 层的一名四级主管，两年前因一次轧机事故被转到第 12 层的菌类栽培间。你的左手有三根手指伸不直，行政后勤部给你的鉴定是"部分丧失作业能力"，因此配给从 2400 千卡降到 2100。你的档案里有一条"处置记录"标签——不是因为你犯了事，是因为事故的责任需要一个名字，而当时负责该班组的名字是你的。你每月从财务审计部领 150 贡献点的伤残补贴，实际拿到手的是 96，因为扣了住房与医疗的分摊部分。你现在住在第 12 层的一间四人宿舍，同屋的三个人都比你年轻，也都比你更能干重活。你唯一的优势是你懂流程：你能把任何一份申请退回到它不该通过的那一步，而中层那些人最怕的，就是一个懂流程又没什么可失去的人。',
+            '伤残后被调离原岗，档案里带着处置记录。懂流程，也没什么可失去的。',
           attributeBonus: { might: 0, wits: 1, charm: 1, nerve: 2, access: -1 },
           resourceBonus: { health: -10, energy: -5, credit: 150, standing: 1 },
           startingItems: ['item_workbadge', 'item_sedative_ampoule', 'item_nano_patch', 'item_ear_plugs'],
@@ -1174,7 +1174,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_commuter',
           title: '跨层通勤者',
           description:
-            '你家在第 33 层，工作在第四十五层，每天往返要过四道闸机、坐两段 C 线、排三次队。你办的是长期通勤许可，一年一审，每年要重新提交住房证明、单位证明与无处置记录证明三份材料。你的一天比同一层的人多消耗两小时在路上，因此你的配给里有一项"通勤加给"：每天多 120 千卡，以藻砖折算。你的妻子在第 27 层上夜班，你们一周里同时醒着在家的时间平均 3.5 小时。你熟悉所有换乘点的换乘时间，能背出 C 线每一班车的实际到站误差；你也会在班次紧的时候花钱买一次换班——这个行情你比任何人都清楚。你最大的恐惧不是降层，是通勤许可在某一年被"缓议"。',
+            '每天跨层上下工，一年一审的通勤许可比工资更要紧。时间都花在路上。',
           attributeBonus: { might: 1, wits: 1, charm: 0, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: -5, credit: 380, standing: 5 },
           startingItems: ['item_workbadge', 'item_credit_chip', 'item_shift_chit', 'item_coverall'],
@@ -1183,7 +1183,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_origin_deepchurch',
           title: '深地教会家庭',
           description:
-            '你的父母都是"读数人"的家属。在你家，抄表不是工作，是家里最重要的仪式：每天早班前，父亲会把本层的温度、湿度与水位抄在一张 8 厘米宽的纸条上，贴在楼道公告栏的角落；母亲负责核对前一天的数字，如果两天的数字完全一致，她会认为这是"它在不动"。你们家并不相信任何超自然的东西，你从小被教的是：这座城有偏好，它回应过，所以要对它诚实。代价是你不能拒绝任何一个要求你抄数字的人，因此你家门口常年有人来借笔、借纸、借一张能贴的公告栏位置。你比同龄人更早学会看曲线，也比同龄人更早知道：数字一旦被人改动，改动的不是数字，是人。',
+            '读数人的家属。会抄数、会看曲线，相信这座城有偏好，也因此在公告栏的角落里过日子。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 240, standing: 4 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_wired_phone', 'item_algae_brick'],
@@ -1195,108 +1195,108 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       options: [
         {
           id: 'bg_path_hr',
-          title: '人力资源部见习员',
+          title: '在人事与档案上做事',
           description:
-            '你在人力资源部档案处做见习员，工号 HR 开头，试用期还剩四个月。你的日常工作是核对编制余额、整理调动申请、把一份份人事档案按文号归位。你面前放着全渊最完整的一批纸：每个人的职级、处置记录、婚配登记、生育配额申请，全都在你的取阅范围内。你的上级告诉你，人事专员一年办错三份档案就要调岗，而他没说出口的是：只要你手上有一份别人档案里的东西，别人就会对你客气。你的第一份独立任务，是核对一份 2097 年的旧档案。',
+            '核对编制、归置卷宗。手边放着全渊最完整的一批纸：职级、处置记录、婚配与配额。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 0, access: 1 },
           resourceBonus: { energy: 0, credit: 320, standing: 8 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_crt_terminal', 'item_coverall'],
         },
         {
           id: 'bg_path_security',
-          title: '安全保卫部学员',
+          title: '在治安与巡逻上做事',
           description:
-            '你是安全保卫部的第 41 期学员，编制在第 38 层的治安站，训练期九个月，已过六个月。你学过约束动作、人群控制、闸机核查流程与现场记录写法。你配发了一支动能武器，但部门规定非经批准不得取出弹仓，违者按"未经授权使用受管制技术设备"处理。你的教官反复强调一件事：治安站的成绩不看抓了多少人，看现场记录写得够不够干净。你已经处理过三次聚集事件，第二次的时候你按流程用了刺激性气体，事后你在记录上写下"现场秩序恢复"，那四个字你写了三遍才写对。',
+            '查闸机、控人群、写现场记录。成绩不看抓了多少人，看记录写得干不干净。',
           attributeBonus: { might: 2, wits: 0, charm: 0, nerve: 2, access: 1 },
           resourceBonus: { health: 10, energy: 10, credit: 280, standing: 6 },
           startingItems: ['item_workbadge', 'item_steel_boots', 'item_coverall', 'item_bio_wristband'],
         },
         {
           id: 'bg_path_research',
-          title: '科研发展部助理研究员',
+          title: '在技术与实验上做事',
           description:
-            '你在科研发展部第 66 层的数据清洗组做助理研究员，职级五级。你的工作是删数据：按规程，那些"没有科研价值"的重复片段必须被清掉，其中包括受试者在连续映射中反复出现的同一画面。你删过几千条，后来开始偷偷记下它们。你所在的小组有六个人，组长是实用派，隔壁组是前沿派，两派在例会上从不直接争吵，只互相要求"补材料"。你手里有一份编号不全的实验记录，缺的那一页，恰好是 2106 年 11 月。',
+            '清洗数据、抄参数、删掉没有价值的片段。删掉的东西你偷偷记了下来。',
           attributeBonus: { might: 0, wits: 3, charm: 0, nerve: 1, access: 1 },
           resourceBonus: { energy: 0, credit: 620, standing: 10 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_coded_note', 'item_sedative_ampoule'],
         },
         {
           id: 'bg_path_collect',
-          title: '资源采集部预备队员',
+          title: '跟着采集队做事',
           description:
-            '你是资源采集部的预备队员，编制在第 1 层，已完成三次模拟窗口期，还没有真正出站。你穿过的重型防护服重 34 公斤，循环呼吸器一次可用 6 小时，装甲运输车的后舱没有窗户。你签过那份"贡献点余额留给谁"的口头记录，你填的是一个你并不想让她知道这件事的人。老队员告诉过你三件事：出站之后不要抬头；看见东西不要先说话；如果队友不动了，先看他的呼吸器，再看他的眼睛。你的第一次正式窗口期排在十一天以后。',
+            '穿三十四公斤的防护服练窗口期，还没真正出过站。签过一份"余额留给谁"。',
           attributeBonus: { might: 2, wits: 1, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { health: 10, energy: 15, credit: 400, standing: 5 },
           startingItems: ['item_workbadge', 'item_rebreather', 'item_geiger_counter', 'item_steel_boots', 'item_coverall'],
         },
         {
           id: 'bg_path_audit',
-          title: '财务审计部记账员',
+          title: '在账目与审计上做事',
           description:
-            '你在财务审计部第 68 层的台账组做记账员，职级四级。你面前是 1400 万页纸质副本与 12 台存储阵列，全渊每一笔贡献点的发行与回收都在这里变成数字。你的工作枯燥、精确、不通人情，部门文化只有一句话：账不会说谎，写字的人会。你入职第二年就学会了一件事——差额从来不藏在数字里，差额藏在"抄录时间"里。你手上有一批需要复核的 41 天用电台账，其中 7 天的记录是整点抄录的。经办人已注销，你无法核对。',
+            '复核流水与抄录时间。账不会说谎，写字的人会——所以只信时间戳。',
           attributeBonus: { might: 0, wits: 3, charm: 0, nerve: 1, access: 1 },
           resourceBonus: { energy: 0, credit: 480, standing: 9 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_crt_terminal', 'item_personal_terminal'],
         },
         {
           id: 'bg_path_discipline',
-          title: '纪律监察部见习监察员',
+          title: '在调查与核对上做事',
           description:
-            '你是纪律监察部的见习监察员，工号 DI 开头，入职十四个月。你参与过四次情况核对，全程没有律师在场，因为法律没有规定辩护权。你的上级教你的第一件事是不用姓名，只用工号；第二件事是把每一个回答都抄下来，包括停顿；第三件事是永远不要在同一个案子里签署两份文件。你现在手上有一份案卷，案由一栏只写了六个字：该网络形态不明。案卷里夹着一张铅笔写的便签，上面是一个坐标与一个时间，笔迹不属于案卷中任何一个已注销的工号。',
+            '问话、誊抄、写便笺。法律没有规定辩护权，而你的笔迹也要归档。',
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 2, access: 2 },
           resourceBonus: { energy: 0, credit: 540, standing: 12 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_coded_note', 'item_sedative_ampoule'],
         },
         {
           id: 'bg_job_broker',
-          title: '黑市掮客',
+          title: '做掮客与转手的买卖',
           description:
-            '你不生产任何东西，你只是让东西动起来。你的日常是三家：第 38 层拆解区的一个货位、第 47 层市场的一条后巷、第 52 层一间用来对账的空宿舍。你收 12% 的抽成，跨层加收 20% 至 50%，报价从不解释。你的账不用纸，只用三样东西记：一袋真咖啡豆（信物，按颗记）、一台拆掉上传模块的旧终端（存名单，名字只写工号后四位）、以及你自己的记性。你从不经手超过 5000 贡献点的货，因为大额流转会触发安全审查，而你的生意全靠"不触发"。你最怕的不是被抓，是有一天某一个下游的人被查获之后，纪律监察部的人问他"你上面是谁"，而他回答的是一个工号——你的工号。',
+            '让东西动起来：抽成 12%，报价不解释。最怕下游被查时说出一个工号。',
           attributeBonus: { might: 0, wits: 2, charm: 2, nerve: 2, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 1800, standing: -6 },
           startingItems: ['item_coffee_token', 'item_credit_chip', 'item_pipe_map', 'item_coded_note'],
         },
         {
           id: 'bg_job_pipewalker',
-          title: '管廊检修工',
+          title: '钻管廊与通风道干活',
           description:
-            '你在第 44 层通风中转站作业，工单每 40 天开一次，一次 12 小时。你的活儿是钻进 1.1 米内径的风机维护通道，检查隔音棉、清理积尘、记录振动值。通道内温度 34 至 41 摄氏度，含尘量高，爬完一次大约 26 分钟，出来之后你会咳一整天。你的工资按工单发，一次 220 贡献点，另有一次 45 点的"高风险作业加给"。你身上常年带着两样东西：一副剪开当耳堵的耳塞，和一支只写了三个数字的铅笔——那三个数字是你自己记的振动峰值，因为你发现台账上写的是"传感器漂移"，而你手里的数不是漂移。你比任何人都清楚 SP-1 是什么，也是全渊最少数得出"26 分钟"意味着多少人的人之一。',
+            '按工单挣钱，爬完一次咳一天。台账上写"传感器漂移"，你的本子上是三个振动值。',
           attributeBonus: { might: 2, wits: 1, charm: 0, nerve: 1, access: 1 },
           resourceBonus: { health: -5, energy: 5, credit: 300, standing: 3 },
           startingItems: ['item_workbadge', 'item_dust_mask', 'item_ear_plugs', 'item_pipe_map'],
         },
         {
           id: 'bg_job_rationclerk',
-          title: '配给点记账员',
+          title: '在配给点上记账',
           description:
-            '你坐在第 43 层配给科的一张小桌后面，面前是一块垫板、一支蓝色钢笔和一本按层分册的配给表。你的工作是把每天的领取记录核对一遍：谁领了、领了多少、有没有重复领、有没有替领。这四个问题决定 4 万 2000 人每天吃多少。你知道这张表上的每一个异常：某三个人长期替领，某个班组每月固定少领 6 份，某一个没有登记的名字每周三会出现一次。你没有权力处理任何一条，只能把它们抄在"待核"栏里，而"待核"栏已经满了十一页。你的好处是：在这个位置上，没有人敢跟你吵配给，因为你的笔可以让他们少领 140 千卡，也可以让他们明天再来——而"明天再来"这四个字，在浅层是可以换东西的。',
+            '核对谁领了、谁替谁领。你的笔能让人少领 140 千卡，也能让他明天再来。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 340, standing: 6 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_ration_stub', 'item_wired_phone'],
         },
         {
           id: 'bg_job_nurse',
-          title: '地下诊所护士',
+          title: '在医务室与暗处之间做医护',
           description:
-            '你白天在第 45 层的一间正规医务室上班，工牌是真的，职级是三级；晚上你在同一层的一间宿舍里做另一件事：处理那些不能进医务室的人——没登记的、受伤后不敢报案的、做过处置后不该再出现的。你的设备是一台旧超声、两套可高温复用的器械、以及从医院废弃物出口流出来的药品。你收 2000 至 1 万贡献点一次，视手术难度，也可以收实物：铝件、真烟、或者一次"以后我替你做一件事"。你的技术是真的（你在正规医务室做过四年外科辅助），因此你的成活率不低。你的风险也是真的：非法医疗的处置依据是第六十三条与第七十一条两条并用，一旦被认定，不会有警告的环节。',
+            '白天在正规医务室，晚上处理不能进医务室的人。风险按第六十三条与第七十一条并算。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 3, access: 0 },
           resourceBonus: { health: 0, energy: -5, credit: 900, standing: -3 },
           startingItems: ['item_workbadge', 'item_sedative_ampoule', 'item_nano_patch', 'item_clinic_key'],
         },
         {
           id: 'bg_job_undertaker',
-          title: '替人办后事的人',
+          title: '替人办后事',
           description:
-            '你在工段互助会里当理事，一个理事管 40 人。你的工作只有一件：有人死了，你替他家把手续办完。具体包括：出具死亡经过的两份说明、找班组签字、凑齐丧葬返还申请的三份材料、把余额申领的 20% 争下来、以及把遗体按流程送进第 30 层的有机物回收线。你经手的案子一年大约 30 起，每一笔都有一张盖了指印的单子。你不收钱，你收"记名"：每一次帮忙，那家人的名字就进了你的本子。你的本子是全浅层最危险的东西之一，因为它是一份没有账目的账；而你的真正权力在于：只有你知道，哪一户人家在半年内死了两个人，以及为什么第二个人的死亡证明上，签字时间比死亡时间早了四天。',
+            '替人凑材料、争那 20%、把遗体送进回收线。不收钱，只收"记名"。',
           attributeBonus: { might: 0, wits: 1, charm: 3, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 260, standing: 8 },
           startingItems: ['item_workbadge', 'item_mourn_stub', 'item_paper_ledger', 'item_coded_note'],
         },
         {
           id: 'bg_job_gambler',
-          title: '靠赌换班次的人',
+          title: '靠换班与消息挣钱',
           description:
-            '你不下矿、不进厂、不坐班。你的营生是坐在第 35 层茶水间那张长凳上，等一个想换班的人，再用一次换班去换另一个人手里的东西。一次换班的市价是 3 至 12 贡献点，但真正赚钱的不是差价，是信息：你知道谁下周三要去看门诊，谁的孩子要考试，谁欠了别人一次班。你的赌局只有一种玩法，叫"三班对冲"：用同一周的三个班次与三个人分别作保，最后总有一头是空的，而空出来的那一头归你。你的本钱是 300 贡献点与一本记着 41 个人名的小册子。你已经连续 7 个月没有在一张正式考勤表上留下整月记录，而这件事本身，就是安全保卫部最容易盯上的东西。',
+            '不下矿、不坐班，用三个班次与三个人分别作保，总有一头是空的。',
           attributeBonus: { might: 0, wits: 1, charm: 3, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: -5, credit: 620, standing: -4 },
           startingItems: ['item_shift_chit', 'item_credit_chip', 'item_contraband_cigarette', 'item_ration_stub'],
@@ -1310,7 +1310,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_echo',
           title: '你是回声的联络人',
           description:
-            '你从未见过回声的核心成员，你只见过一个人，那个人只来过一次，交给你一个信封和一句口令，此后再没出现。你的任务是：把《层报》的手抄件塞进中层的终端推送位，或者把一张只有一句话的纸贴在配给公告栏上。你至今一共做过七次，每一次都在静层之后，每一次都在同样的两个位置。你不知道回声有多少人，不知道他们与地表是什么关系，也不知道自己为什么答应了。你只知道纪律监察部刚刚结了一个一万四千人的案子，结案报告的最后一句话是：该网络的组织形态尚不清楚。',
+            '替回声投递手抄件，两个位置，做过七次。你从不知道另一条线是谁。',
           attributeBonus: { might: 0, wits: 1, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { energy: 0, credit: 150, standing: -4 },
           startingItems: ['item_workbadge', 'item_coded_note', 'item_pipe_map', 'item_forged_badge'],
@@ -1319,7 +1319,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_laundry',
           title: '你替黑市洗贡献点',
           description:
-            '你的手法不算高明，但足够用：用配给结余在官方市场买日用品，转手在黑市换成等价物，再把等价物卖回给官方市场的摊主——贡献点在账上转了三次，来源就模糊了。你每次抽 9%，一个月能多出两百到四百点。你还替三个人保管过"待洗"的额度，其中一个人在上个月被注销了，额度还留在你的账上，你没敢动。你知道纪律监察部查账的方式不是看余额，是看流水的时间分布，所以你把每一笔都摊在班次结束那半个小时里。',
+            '替人过账：转三次手，来源就模糊了。你抽 9%，也替人保管过额度。',
           attributeBonus: { might: 0, wits: 2, charm: 2, nerve: 1, access: 1 },
           resourceBonus: { credit: 1200, standing: -6 },
           startingItems: ['item_workbadge', 'item_credit_chip', 'item_coffee_token', 'item_paper_ledger'],
@@ -1328,7 +1328,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_sample',
           title: '你藏着一份地表样本',
           description:
-            '那是一小瓶土，四十七克，装在离心管里，管壁贴着一张早已褪色的编号标签。它是你在拆解区的废料堆里捡到的，按规矩应当当场送交分类室，你没有交。你把它放在宿舍床铺下的一处空腔里，五年来换过四次住所，每次都带着它。你说不清自己为什么留着它：它不是证据，不是钱，不能吃，不能卖，唯一的作用是你偶尔会把它拿出来，隔着管壁看里面的颗粒。你知道藏匿地表样本按《深核基本法》第八十八条处理，处置方式是注销工牌。',
+            '一小瓶土，四十七克，缝在内衬里。按第八十八条处理，处置是注销工牌。',
           attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 3, access: 0 },
           resourceBonus: { credit: 120, standing: -2 },
           startingItems: ['item_workbadge', 'item_lead_case', 'item_unknown_seed', 'item_coded_note'],
@@ -1337,7 +1337,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_forged',
           title: '你伪造过职级档案',
           description:
-            '你在第 38 层花了 1000 贡献点做了一份伪造工牌，工牌上的职级比你实际的高一级。你用了十七个月才被发现——没有被人发现，是被闸机发现：一次随机核查中，闸机读到的权限与档案里的权限存在 0.4 秒的响应差。处理你的是一个你从未见过的中层官员，他没有上报，而是把这件事收进了自己的抽屉，从那以后你每个月要给他 60 贡献点。你现在用的工牌是真的，但你随时可以被"恢复"成那份假档案里的人。',
+            '假工牌用了十七个月。有人把它收进抽屉，此后每月付他 60 点。',
           attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 1, access: 2 },
           resourceBonus: { credit: -180, standing: -5 },
           startingItems: ['item_workbadge', 'item_forged_badge', 'item_credit_chip', 'item_pipe_map'],
@@ -1346,7 +1346,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_secondauth',
           title: '你的工牌里有一段不属于你的权限',
           description:
-            '你是在一次闸机故障后发现的：维修员把你的工牌插进临时读写器，屏幕上有两行权限记录，第二行的编号不属于任何部门，有效期到 2111 年，覆盖第 41 至 90 层的全部公共区域。你没有问任何人。此后你试过两次，闸机对它没有反应，也没有留下任何记录——这一段权限被设成了不记录。你想不通谁把这段东西放进你的工牌，但你想通了一件事：给你权限的人，也在看着你用不用它。',
+            '一段不记录的权限，覆盖第 41 至 90 层。给你权限的人也在看你怎么用。',
           attributeBonus: { might: 0, wits: 1, charm: 0, nerve: 2, access: 3 },
           resourceBonus: { credit: 220, standing: 5 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_pipe_map', 'item_bio_wristband'],
@@ -1355,7 +1355,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_78c',
           title: '你见过第 78-C 机房的封条被换',
           description:
-            '你是第 78 层档案库的巡检员，每月十五日核对一次封条。2107 年 1 月，你照常走到 78-C 机房门前，发现两张封条都在，纸面、编号、日期都对，但背面胶层上有一层旧的压痕，形状与原封条不符。你按流程写了巡检记录，写的是"封条完好"。你没有写第二件事：你贴着门站了三分钟，门缝里透出来的温度比走廊低，而按照台账，这间机房的用电量为零已经三十六年。你后来查过一次同层房间的温度记录，差值恒定在 1.4 摄氏度。',
+            '封条完好，背面却有旧压痕。你写了"完好"，没写那 1.4 摄氏度。',
           attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 2, access: 1 },
           resourceBonus: { credit: 260, standing: 3 },
           startingItems: ['item_workbadge', 'item_coded_note', 'item_paper_ledger', 'item_crt_terminal'],
@@ -1364,7 +1364,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_stool',
           title: '你替纪律监察部做过一次线人',
           description:
-            '十四个月前，你在一次情况核对里被问了三小时，最后他们在纸上写了四个字：主动说明。你签了字，于是你从"被核对的人"变成了"提供情况的人"。你交代的是一间茶水间、一个传话的人、以及一次聚集的时间；那次聚集最终被按第五十七条处理，罚了 41 个人的配给额度，其中两个人后来被降层。你拿到的回报是：你的档案里那条"待观察"被撤掉了，你的职级提前了半年，以及监察部给你的一个承诺——"以后你不需要再被核对"。代价是你从此认识了一个工号，那个工号每隔几个月会出现在你的队列里、你的食堂里、你的班车上，而你必须装作不认识。你现在最怕的不是被发现，是被问起那 41 个人里有没有你认识的。',
+            '一次主动说明换来提前半年，代价是 41 个人的额度与一个你认得的工号。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 2 },
           resourceBonus: { health: 0, energy: 0, credit: 480, standing: 10 },
           startingItems: ['item_workbadge', 'item_wire_recorder', 'item_coded_note', 'item_personal_terminal'],
@@ -1373,7 +1373,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_signature',
           title: '你手里有一条人命的签字',
           description:
-            '那张纸现在折成四折，塞在你的工装内衬里。它是一份《越级供电调整单》的第二联，上面有两个签名，其中一个是你替别人签的——那天你所在部门的值班总监不在，而你按他的口头指示签了字。三个小时后，浅层农场的照明断了六个小时，藻池缺氧，苗株损失 11%，影响到 2400 万人的口粮。事后要被处理的是两个人，那两个人都不是你，但只要你把这张第二联拿出来，责任链就会往下延伸一格，而那一格是你。你留着它，是因为它是你唯一能证明"当时不是我决定的"的东西；你也知道，只要它在你身上，你就等于随身带着一份不生效的自首书。',
+            '一份调整单的第二联，折成四折。它是证据，也是一份不生效的自首书。',
           attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 3, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 420, standing: -2 },
           startingItems: ['item_workbadge', 'item_coded_note', 'item_paper_ledger', 'item_grey_pass'],
@@ -1382,7 +1382,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_deathcert',
           title: '你伪造过一份死亡登记',
           description:
-            '你在第 30 层的回收线做过半年文书。有一户人家的老人死在宿舍里，按流程应当报死亡登记、注销工牌、余额归集团；但那家人的女儿正要参加升学考试，家里唯一的合法收入是那位老人的补贴，于是你在一张《死亡经过说明》上把日期改后了四十天，让最后一笔补贴能够发下去。你没有收钱，你只收了那家人的一句话：以后有事你说。三个月后你在一次档案核对中发现，那份说明上多了一个不属于你的批注："已核，无需复核"。你不知道是谁写的，你只知道从那以后，你的档案里多了一条你从未申请过的权限变更记录，而那条记录的编号，你在任何台账里都查不到。',
+            '把死亡日期改后四十天，让最后一笔补贴发下去。档案里从此多了一条记录。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 200, standing: -3 },
           startingItems: ['item_workbadge', 'item_death_cert', 'item_paper_ledger', 'item_mourn_stub'],
@@ -1391,7 +1391,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_secret_101',
           title: '你从第 101 层的封堵段里拿过东西',
           description:
-            '那是四个月前，你在第 44 层做管廊作业时，在西侧的封堵面上发现了一处 3 厘米宽的裂缝。你没有上报，你用手电照进去看了大约两分钟，然后用一根弯钩从里面钩出了两样东西：一枚塑料外壳的零件，和一小块带着金属光泽的薄片。你把它们装进铝制饭盒，带回了宿舍。你没有告诉任何人——包括你最信任的那个人，因为他会把这件事换成一次晋升。你现在每天要做的事只有一件：确保没有任何人知道你那天在哪一段管廊、工作了多长时间。而你能确认的另一件事是，从裂缝里吹出来的风是暖的，而按图纸，那一段岩体里没有任何热源。',
+            '从三厘米的裂缝里钩出两件东西。风是暖的，而图纸说那里没有热源。',
           attributeBonus: { might: 1, wits: 2, charm: 0, nerve: 3, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 180, standing: -1 },
           startingItems: ['item_sealed_sample', 'item_pipe_map', 'item_coded_note', 'item_workbadge'],
@@ -1405,7 +1405,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_efficiency',
           title: '效率派',
           description:
-            '你真心相信"整体最优"，并且你能背出折算表里的关键数字：2071 年之前全渊的人均物资转化率只有现在的 61%，那 46 分 52 秒之后才变成 100%。你手上的那册 12 页《折算表》是抄的第三手，页边有别人的笔迹。你在班前会上从不谈这件事，只在茶水间里跟人争；你争的方式是不讲感情，只报数字，因为数字是你唯一站得住的武器。你的处境是：你越认真，越显得不像个正常人；你的上级喜欢你，你的同班组躲着你。你的代价是所有人都知道你会怎么选，因此没有人会在私下里求你替他们说话。',
+            '信"整体最优"。能背出折算表里的关键数字，只报数、不讲感情。',
           attributeBonus: { might: 0, wits: 3, charm: 0, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 320, standing: 9 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_crt_terminal', 'item_bio_wristband'],
@@ -1414,7 +1414,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_oldworld',
           title: '旧世怀念者',
           description:
-            '你收集地表时代的东西，一共 41 件，装在一个铁皮盒里，藏在宿舍床铺下的空腔里。你最珍视的三件是：一张 2041 年的公交车票、一张印着菜名的纸质菜单、以及一只开不了机的旧手机——你不修它，因为修好之后它就变成一台设备，而设备是受管制的。你们每月交换一次，6 到 20 人，清单手写、交换完烧掉。你在交换会上从不说话，只看别人带来的东西。你的代价是：你越珍视这些东西，越清楚它们全部来自一个"所有人都在里面"的世界，而那句你不敢回答的问题——你怀念的那个世界，是所有人都在里面的世界吗——你自己已经问过自己一百次。',
+            '收集地表时代的旧物，每月交换一次，清单烧掉。你不敢回答自己那句问话。',
           attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 1, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 300, standing: -2 },
           startingItems: ['item_workbadge', 'item_coded_note', 'item_credit_chip', 'item_coffee_token'],
@@ -1423,7 +1423,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_deepchurch',
           title: '深地教会信众',
           description:
-            '你是读数人之一，负责每天抄录第 39 层的温度、湿度、水位与两个通风口的压差，并把纸条贴在公告栏的角落。你不主张任何超自然的东西，你只主张一件事：这座城有偏好，而诚实是唯一能与它打交道的方式。你的优势非常实际——抄表是全渊少数不需要批准就能在公共场合进行的活动，因此公告栏前常年有人站着，而站着的人会交换消息。你的麻烦也很实际：《深核基本法》第五十七条规定三人以上未经批准的聚集必须在 20 分钟内解散，所以你必须一直在"抄表"和"聚集"之间精确地踩线，而踩线这件事，全凭你那张纸条写得好不好看。',
+            '抄数、贴纸条，相信这座城有偏好。靠抄表在公告栏前站着换消息。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 220, standing: 3 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_wired_phone', 'item_crt_terminal'],
@@ -1432,7 +1432,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_mutual',
           title: '工段互助会的人',
           description:
-            '你信的是最朴素的一条：班组里的人得互相把后事办完。你在互助会里干了六年，先做跑腿，后做理事。你会凑丧葬返还的材料，会替人垫门诊费，会在夜里去把一个人从治安站的窗口前领回来。你从不跟人谈政治，因为你见过谈政治的人是怎么消失的；但你也知道，一旦一个工段的人开始听你的，你就不需要谈政治了。你的处境是三重压力：治安站把你当缓冲垫，纪律监察部把你当潜在的组织者，而班组里的人把你当唯一能指望的人。你最大的代价是时间——你一天里有两个小时不属于自己，而这两个小时本来可以用来加班挣钱。',
+            '信班组里的人得互相把后事办完。治安站当你是缓冲垫，监察部当你是组织者。',
           attributeBonus: { might: 1, wits: 1, charm: 3, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: -5, credit: 240, standing: 5 },
           startingItems: ['item_workbadge', 'item_mourn_stub', 'item_paper_ledger', 'item_ration_stub'],
@@ -1441,7 +1441,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_returnto',
           title: '归地派',
           description:
-            '你读过《层线》，可能是读过最多的一个人：一共 31 期，你手上有 24 期的手抄件。你相信越深越不像人，主动往下走不是惩罚，是自救。你已经在准备一份自愿降层的调动申请，材料写了三稿，卡在"目的地部门同意接收"那一栏——因为浅层没人愿意接收一个自己要求下来的人，他们怀疑你是来查事的。你的处境是荒诞的：集团没有理由处置你，你完全合规，但你的每一次出现都在削弱"往上走"这套说法，因此你被中层的人躲着，被浅层的人盯着，被纪律监察部记着。你最难回答的问题，是你自己问自己的那句：你为什么不现在就走？',
+            '读过《层线》，相信往下走是自救。合规，却让"往上走"那一套说法变得可疑。',
           attributeBonus: { might: 1, wits: 2, charm: 0, nerve: 3, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 180, standing: -5 },
           startingItems: ['item_workbadge', 'item_coded_note', 'item_personal_terminal', 'item_coverall'],
@@ -1450,7 +1450,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_quota',
           title: '配额派',
           description:
-            '你有两个孩子，一个在册，一个不在。大女儿有配额、有工号、上同层学校；小的那个没有，只能由互助会带，白天不能出门，因为治安站会查。你参加家长会的时候会说话，说话的时候只说数字：浅层的中签率 8%，中层 21%，而浅层的人口是全渊最多的。你从不喊口号，你只要求"按层分配"，因为这句话在文件上是站得住的。你的代价是：你被列入了"待观察"，你丈夫的晋升被压了两年，而你心里清楚最坏的可能——你争到的那个名额，可能被你大女儿拿走，而小的那个一辈子都没有名字。',
+            '为配额说话，只报中签率：8%、21%、60%。一个孩子在册，一个不在。',
           attributeBonus: { might: 0, wits: 1, charm: 3, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: -5, credit: 160, standing: -4 },
           startingItems: ['item_workbadge', 'item_ration_stub', 'item_paper_ledger', 'item_algae_brick'],
@@ -1459,7 +1459,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_seal',
           title: '合闸派',
           description:
-            '你主张把地表入口彻底封死。你的理由全部是技术性的：粉尘、辐射、气密、检疫，你能把 2073 年那次难民潮的数据背出来。你在第 41 层的公开讨论栏上贴过三次意见，每次都有人跟帖，也每次都有人骂你。你的处境有一个你说不出口的矛盾：你自己每个月领的配给里，有一小份是采集队带回来的——不是咖啡，是某种更实在的东西，比如几粒真正的种子磨成的粉。你不承认那是特殊待遇，你把它称为"检疫合格的入库物资"。你最怕被问的问题只有一句：那采集队带回来的真咖啡，你喝不喝？',
+            '主张封死地表入口，理由是粉尘与检疫。你自己的配给里有一小份来自外面。',
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 420, standing: 8 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_dust_mask', 'item_paper_ledger'],
@@ -1468,7 +1468,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_line4',
           title: '四号线派',
           description:
-            '你相信 V-4 是真的存在的第二条路，两端并没有被封死，几十年里进去的人只是不想回来。你没有见过那条路，你只见过一个坐标：从第 44 层西侧第几块板子后面进去，走到第几个弯。给你坐标的人后来被按第七十一条处理，工牌注销，档案封存。你把这个坐标又传给了两个人，因为按规矩你必须传下去——这条路上没有留下东西的人，只有留下坐标的人。你的处境因此非常明确：你已经构成"涉四号线"，一旦被查到，处置等级是最高的那一档，没有降层的中间环节。你每天照常上工、照常刷牌，只是每次经过西侧那几块板子时会慢半步。',
+            '相信 V-4 没有真的被封死，手上只有一个坐标。涉四号线，处置没有中间环节。',
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 3, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 120, standing: -8 },
           startingItems: ['item_pipe_map', 'item_coded_note', 'item_workbadge', 'item_white_gloves'],
@@ -1477,7 +1477,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_doubter',
           title: '怀疑一切的人',
           description:
-            '你不属于任何一派，你只是不信。你不信效率派的折算表，因为折算表从来不折算提出折算表的人；你不信深地教会的读数，因为数字是可以被抄错的；你不信互助会，因为理事的本子就是一份账；你也不信官方，理由不用解释。你的方法是核对：同一件事，你至少找两个来源，如果两个来源的说法完全一致，你就认为这件事被人整理过。你在第 52 层做档案检索的辅助工作，这让你有条件核对。你的代价是很实际的：你没有任何一派可以依靠，没有人替你担保，也没有人在你被叫去情况核对的第二天来问你一句。你最擅长的事，是在一份完全正常的文件里看出哪一页被换过。',
+            '不信任何一派，只信两个以上来源。最擅长看出一份正常文件里哪一页被换过。',
           attributeBonus: { might: 0, wits: 3, charm: 0, nerve: 2, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 380, standing: 2 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_paper_ledger', 'item_wire_recorder'],
@@ -1486,7 +1486,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_faith_survivor',
           title: '什么都不信，只想活着',
           description:
-            '你不参加任何交换会，不去公告栏，不在茶水间谈名单，也不问第 101 层下面是什么。你的目标是可以写出来的三条：把家人的配给领足、把住房资格保住、把母亲的医疗排期往前挪。为此你做过一些你自己不愿意回想的事：替人值过班、买过一条烟送人、在一次核查里说了"我当时不在场"。你不觉得自己是坏人，你只是算得很清楚——在这个地方，多做一件额外的事，都要用一个具体的东西去换，而你手上没有多余的东西。你的处境是地渊绝大多数人的处境：你没有敌人，也没有担保人；你每天都能过下去，而任何一件意外都能让你过不下去。',
+            '只求三件事：配给领足、住房保住、母亲的排期往前挪。别的都不问。',
           attributeBonus: { might: 1, wits: 1, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 280, standing: 2 },
           startingItems: ['item_workbadge', 'item_ration_stub', 'item_algae_brick', 'item_credit_chip'],
@@ -1498,54 +1498,54 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       options: [
         {
           id: 'bg_scene_office',
-          title: '在第 61 至 70 层的办公室里当差',
+          title: '在行政与审批线上做事',
           description:
-            '你在行政管理区有一张自己的桌子，桌上垫板、钢笔、印章盒、三本在办的卷宗。你的职级是五级或六级，工牌能刷开第 41 至 70 层的全部办公区。你一天签 40 份文件，其中 39 份不看内容，只核文号与签字栏——因为流程已经审过了。体面在于：你不需要穿工装、不需要排配给队、不需要在粉尘里呼吸；你说"材料不全"这四个字，就能让一个人再等十一天，而没有人能因此责怪你。代价在于：你签的每一份文件都会进入抽样池，15% 的抽样率意味着你一生中总会有一次被追问"你当时看的是什么"；你的位置越靠上，越会发现签字栏里从来没有第二个名字。',
+            '坐在办公室里签文件的人。能退回材料、能让一件事再等十一天，但上面还有两层人能推翻你。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 600, standing: 8 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_paper_ledger', 'item_credit_chip'],
         },
         {
           id: 'bg_scene_industry',
-          title: '在第 26 至 30 层的重工业区上工',
+          title: '在重工业区上工',
           description:
-            '你是重工业区的一名操作工或维修工，编制在工业制造部，实际听班组长的。你的一天从班前会开始：安全通报、产量目标、纸质签到表上一个签名。作业面温度常年在 46 摄氏度以上，噪音 78 至 105 分贝，粉尘浓度在通风不良的角落能到每立方米 12 毫克。体面在于：重体力岗位的配给是 2260 千卡，比办公室的人多，而且工段里认人——你能不能上好的班次，取决于你师傅是谁。代价在于：这一区间的平均预期寿命是 61.3 岁，全渊最低；工伤与工序性死亡是日常，而"责任落实到人"这句话通常落在班组一级，也就是落在你或你的班组长头上。',
+            '在高温、粉尘与噪音里上工。配给比办公室多，命比办公室短；工段里认师傅，也认班次。',
           attributeBonus: { might: 2, wits: 1, charm: 0, nerve: 1, access: 0 },
           resourceBonus: { health: 5, energy: 5, credit: 260, standing: 3 },
           startingItems: ['item_workbadge', 'item_steel_boots', 'item_dust_mask', 'item_ear_plugs'],
         },
         {
           id: 'bg_scene_service',
-          title: '在配给点与生活层做服务',
+          title: '在配给点与生活服务上做事',
           description:
-            '你在配给点、食堂、宿舍管理站或医务室的挂号窗口上班，属于行政后勤部。你的桌子正对着所有人一天里最要紧的那件事：吃、住、看病。你手上的配给表按层分册，一页 200 个名字，谁领了多少、谁替谁领、谁这个月没来过，全在你眼底。体面在于：没有人敢在这个窗口前跟你吵，因为你的笔可以让他们少领 140 千卡，也可以让他们"明天再来"——而"明天再来"在浅层是可以换东西的。代价在于：这个位置是全渊人情债最密的地方，你每天都要在"按表办"和"给人方便"之间选一次，而两种选择都会被人记住；纪律监察部每年查获的案件里，行政后勤部永远是件数最多的一个部门。',
+            '所有人的吃、住、看病都从你桌前过。你的笔能让人少领 140 千卡，也能让他明天再来。',
           attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 340, standing: 6 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_ration_stub', 'item_wired_phone'],
         },
         {
           id: 'bg_scene_discipline',
-          title: '在纪律监察部做见习监察员',
+          title: '在监察系统里做事',
           description:
-            '你入职十四个月，参与过四次情况核对，每次都是两名监察员加一名记录员，全程录音并纸质誊抄。你穿不带名牌位的深灰制服，工牌插在内袋，称呼一律用工号。你的随身物是一本对折的便笺与一支蓝色钢笔——记录由记录员写，你只写便笺。体面在于：没有部门愿意得罪你，你去任何一层都有人给你让路；你的便笺可以决定一个人的隔离天数，而那个人甚至不知道是你写的。代价在于：你需要不停地判断"答话前后不一致"和"他只是害怕"之间的差别，而这两者的处理方式完全不同；你也知道《深核基本法》里没有规定辩护权，因此你每一次落笔都在替一套没有辩护环节的流程工作。',
+            '跑腿与记录。你能把话抄下来、让人多隔离二十天，也得把自己的笔迹交上去。',
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 2, access: 2 },
           resourceBonus: { health: 0, energy: 0, credit: 540, standing: 12 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_coded_note', 'item_wire_recorder'],
         },
         {
           id: 'bg_scene_farm',
-          title: '在农场层与藻池种吃的',
+          title: '在农场与藻池种吃的',
           description:
-            '你在第 3 至 15 层的农业与藻类区间上工，岗位可能是苗床、水培架、菌房或藻池。你在红蓝混光下长大，看东西偏黄；你会看水温、溶氧、根系的颜色，也会算一吨粮食要耗掉多少电。全渊 31% 的氧气来自你每天走过的那些池子。体面在于：这一区的食物相对充足，农场工人饿不着，而且苗情单、配给单这类纸面工作让你比同层的人更早识字、更早接触流程。代价在于：长年在 72% 湿度与 78 分贝噪音里作业，四十岁之后听力与关节都会出问题；而一旦藻池减产，全渊的配给价格会在三天内反应，最先被骂的是你们这一层。',
+            '种吃的、养氧气的人。饿不着，看东西偏黄；藻池一减产，全渊的价三天内就变。',
           attributeBonus: { might: 1, wits: 1, charm: 1, nerve: 1, access: 0 },
           resourceBonus: { health: 5, energy: 0, credit: 180, standing: 3 },
           startingItems: ['item_workbadge', 'item_led_panel', 'item_algae_brick', 'item_coverall'],
         },
         {
           id: 'bg_scene_scavenger',
-          title: '在维修爬梯与夹层里讨生活',
+          title: '在爬梯与夹层之间讨生活',
           description:
-            '你没有固定岗位，也没有固定住处。你的活动范围是三条不刷工牌的路：R 线那 84 段爬梯、第 44 层的风机维护通道、以及第 26 与 27 层之间那道 1.4 米高的夹层。你的营生是替人带东西：一封信、一袋药、一件不能过闸机的零件，价格按重量与风险算。体面在于：你不需要向任何人交代行踪，也没有考勤表能证明你几点在哪；整个地渊的闸机记录里，你是一段空白。代价在于：R 线只到第 84 层，第 60 层档案层的闸门要会签，通风管里的温度是 34 到 41 摄氏度，爬完一次要咳一天；而一旦被认定未授权位移，处置依据是第四十四条，没有人会听你解释那封信是谁的。',
+            '走不刷牌的路替人带东西。没有考勤表能记你，也没有任何一张名单会保你。',
           attributeBonus: { might: 2, wits: 2, charm: 1, nerve: 2, access: -1 },
           resourceBonus: { health: -5, energy: 0, credit: 90, standing: 0 },
           startingItems: ['item_pipe_map', 'item_grey_pass', 'item_coded_note', 'item_white_gloves'],
@@ -1554,25 +1554,25 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_scene_market',
           title: '在黑市与掮客线上做买卖',
           description:
-            '你在第 47 层中心市场的一条后巷里有自己的位置——不是摊位，是摊位后面的那块地方。你买卖的东西按流通性排序：铝件、药品、真食物、班次、铺位、消息。你收 12% 的抽成，跨层加收 20% 到 50%，报价从不解释。体面在于：你是全渊少数几个不用排队就能拿到东西的人，你可以把一支镇静剂、一次换班、一条消息变成任何你需要的东西；你手上的等价物比贡献点更硬，因为它们无法被集团增发。代价在于：你的每一笔生意都在给某个人留下记忆，而纪律监察部的立案率虽然只有 11%，但只要有一个下游的人愿意作证，这个数字就会变成 100%；你也永远无法确定，今天站在你摊子对面的人，是买主还是来数人的。',
+            '在市场的阴影里做买卖：铝、药、真食物、班次、消息。抽成固定，风险按人头算。',
           attributeBonus: { might: 0, wits: 2, charm: 2, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 1200, standing: -6 },
           startingItems: ['item_coffee_token', 'item_credit_chip', 'item_contraband_cigarette', 'item_shift_chit'],
         },
         {
           id: 'bg_scene_surface',
-          title: '在采集队与地表通道当差',
+          title: '在采集队与地表通道之间当差',
           description:
-            '你编制在资源采集部第 1 层，装备是一套 34 公斤的重型防护服、一具循环呼吸器、一台 2010 年型盖革计数器。你的工作以窗口期为单位：6 小时、12 人一队、半径不超过前进站 40 公里。地表氧浓度 17.9%，紫外指数常年高于 14，没有呼吸器两小时内会开始咳血。体面在于：这一行的待遇是全渊最好的之一——你可以优先拿到地表带回的稀有物资，家属有住房优先权，队里的人彼此信任到可以把命交给对方。代价在于：年均死亡率 12.4%，伤残率 31%，出站前每个人要在工牌里留一条口头记录，说明如果回不来，贡献点余额留给谁；而这条记录不进入官方档案，也不会有任何人向你公布你带回来的东西去了哪里。',
+            '穿三十四公斤的防护服往地表去。待遇好、伤亡率高，出站前要留一句"余额留给谁"。',
           attributeBonus: { might: 2, wits: 1, charm: 1, nerve: 2, access: 0 },
           resourceBonus: { health: 10, energy: 10, credit: 420, standing: 5 },
           startingItems: ['item_workbadge', 'item_rebreather', 'item_geiger_counter', 'item_lead_case'],
         },
         {
           id: 'bg_scene_workshop',
-          title: '在旧管风琴厅那样的角落里做手艺',
+          title: '在角落里做手艺',
           description:
-            '你在第 12 层那间名义上是仓库、实际上有回音的大屋子里有一块自己的地方。厅里立着 1240 根废金属管，管径不同，敲一下音高不同；你旁边是备品架、旧终端、一台手摇台秤。你的手艺可以是修、可以是改、可以是替人办后事、也可以是坐在长凳上等一个想换班的人。体面在于：这一层的人认你，因为你会的东西他们不会——一台开不了机的旧终端、一枚不合规格的零件、一只坏了的锁扣，在别人手上是垃圾，在你手上是能换东西的货；而 22:30 之后，这里是全浅层唯一还有回音的地方。代价在于：你的活儿大半在灰色地带，你接的每一件东西都要先问一句"这东西哪来的"，而你问过之后就必须替对方保密；你的工具、材料与客户名单，就是你全部的资产与全部的麻烦。',
+            '在有回音的角落里修东西、改东西、替人办事。别人不会的手艺就是你的位置。',
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 1, access: 0 },
           resourceBonus: { health: 0, energy: 0, credit: 300, standing: 4 },
           startingItems: ['item_workbadge', 'item_crt_terminal', 'item_paper_ledger', 'item_shift_chit'],
@@ -1581,34 +1581,34 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_scene_nobody',
           title: '刚被降层、没有号，或者编制外',
           description:
-            '你什么都没有。你可能刚被降层，档案里带着一条无法删除的处置记录；可能是编制外临时工，工牌是一张 72 小时就过期的灰色通行条；也可能根本没有号，制度上你不存在，因此不占配额、不上学、不体检。你没有宿舍额度，配给按天领，住处是一间 2 平方米的隔间或者别人的半张床。体面在于：制度管不到你——没有考勤表能记你，没有配给表能卡你，你可以把任何东西带过任何闸机，因为闸机只认号，而你身上没有号，只有一张照片不是你、编号以 HC 开头的东西。代价在于：你每天醒来第一件事是算今天能挣到什么，第二件事是确认昨晚睡的地方还能不能再睡一晚；你所有的筹码都是即时的，没有一样能留到明年，而全渊所有的门都假定你有一个可以追溯的过去。',
+            '什么都没有的人。制度管不到你，也意味着没有任何一张表会替你说话。',
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 2, access: -1 },
           resourceBonus: { health: -5, energy: 0, credit: 40, standing: 0 },
           startingItems: ['item_grey_pass', 'item_ration_stub', 'item_forged_badge', 'item_algae_brick'],
         },
         {
           id: 'bg_scene_deputy',
-          title: '在第 61 至 70 层当部门副职',
+          title: '在管理层有一间自己的办公室',
           description:
-            '你是某个部门在第 61 至 70 层的副职：副主管、部长助理，或者一个管着 40 到 120 人的处级副手。你有自己的办公室、自己的备案章、以及一个只在本部门有效的签字位——你能签三类东西：本部门月度预算执行表、200 人以下的岗位调整单、4 万贡献点以内的采购与报废单。签完的文件会进入审计抽样池，而上面至少还有两层人能一句话推翻它：你的正职，以及分管这个部门的副总裁。体面在于：你不需要排队，不需要在食堂选菜，也不需要解释你为什么知道别人的档案；一个电话就能让某个班组今晚加班，或者让某份申请"再核一遍"。代价在于：你不能决定编制总数，不能动跨部门的配额，也不能拒绝出席任何一场与你无关的会议——你的时间不属于你，而那个签字位随时可以被正职收回，理由只需要一句"程序上不合适"。',
+            '有职级、有印章、有自己的门。你能签三类东西，签字位也能被一句话收回。',
           attributeBonus: { might: 0, wits: 2, charm: 2, nerve: 1, access: 2 },
           resourceBonus: { health: 0, energy: 0, credit: 1400, standing: 20 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_paper_ledger', 'item_signing_seal'],
         },
         {
           id: 'bg_scene_bureau_chief',
-          title: '在纪律监察部当科长',
+          title: '在监察系统里管一个方向',
           description:
-            '你是纪律监察部的一名科长，手下 6 到 11 个人，管一个方向：内部调查、档案核对，或者反异见工作。你有两项别人没有的权限：可以持一份《调查许可》进入第 41 至 90 层的任何公共区域；可以发起情况核对，一次最长 48 小时、可延长一次。你能决定一个案子是结案、转立案，还是写进处置建议——处置建议一旦被总监签字，就意味着降层、劳动封印或者注销。体面在于：全渊没有哪个部门愿意让你久等，你去任何一层都有人给你开门；你的一张便笺可以让人多隔离 20 天，也可以让人明天就回家。代价在于：你的每一份建议都要归档，每一次核对都要留录音与誊抄件，而这些件最终会被审计委员会抽样；你自己也在被看——同科室的人记得住你的笔迹，总监记得住你签过几份"缓议"。',
+            '手里有调查权的人。你能定一个案子的走向，自己的档案也在别人的抽屉里。',
           attributeBonus: { might: 1, wits: 3, charm: 1, nerve: 2, access: 3 },
           resourceBonus: { health: 0, energy: 0, credit: 1100, standing: 26 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_case_file', 'item_coded_note'],
         },
         {
           id: 'bg_scene_allocator',
-          title: '当配给与住房总调度',
+          title: '管着配给与住房的总额',
           description:
-            '你是某个居住与生活区间（40 万到 120 万人）的配给与住房总调度，办公桌在第 43 层。你手上有三张表：日配给发放表、住房额度分配表、班次与加班表。这三张表决定这一区间的人今天吃多少、住哪间、什么时候上班，以及谁的门诊排期能往前挪一格。你能做的是在总额之内调整：把某个班组的配给从 2260 划到 2400，把一间空出来的两室公寓给一个人而不是另一个人，让某个人下周的班次避开他母亲复诊的日子。体面在于：机关里所有人都要跟你打招呼，食堂会给你多打半勺，维修队会把你的椅子修得比别人的好；你不需要认识大人物，因为每个人都会记得你。代价在于：你不能动总额，也不能改任何一条标准，每一次调整都要有依据并落到一张单子上；差额从哪里补给谁，你必须写清楚——而写清楚意味着，将来出了事，那张单子就是唯一的证据。',
+            '整片的饭、房与班次都从你手上过。总额你动不了，能动的只有分配。',
           attributeBonus: { might: 0, wits: 2, charm: 3, nerve: 1, access: 2 },
           resourceBonus: { health: 0, energy: 0, credit: 900, standing: 18 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_credit_chip', 'item_ration_stub'],
@@ -1998,25 +1998,11 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
   ],
   story: {
     opening: `
-（兜底示例。只有当玩家没有选择「开局处境」，或者所选处境在 sceneByOption 里没有对应场景时，才使用下面这一段；正式的第一幕以 sceneByOption 命中的那段完整场景为准。这一段刻意写得最通用：不指定职业，也不指定岗位，任何处境的人都能代入。）
+地渊没有天空。最浅的一层离地表只有几十米，最深的第 100 层埋在岩层下三千米；每一层都被四到九米厚的混凝土楼板隔开，听不见上一层，却能靠楼板的振动判断货运电梯停在哪一层。空气是循环的：三成氧气来自第 11 至 15 层的藻池，二氧化碳交给 260 组分子筛脱除，浓度常年压在 0.04% 以下。温度从浅层的 22 摄氏度一路往上爬，第 88 层的岩体表面是 61 摄氏度，靠液冷回路压到 28 度才有人作业。
 
-2107 年 4 月 12 日，05 时 05 分，地渊第 5 层集体宿舍区 C 栋三层。
+这里没有昼夜，只有班次钟：05:30 第一班，13:30 第二班，21:30 第三班，23:00 静层。静层之后楼道照明降到一成五，公共浴室关闭，走动的每一步都要过治安登记岗。
 
-班次钟还没有响，走廊里的灯已经亮到七成。宿舍是十二人一间，上下铺的铁架在有人翻身时会连着响三下，第三下通常最响。你睡在下铺靠门的位置，床头挂着一件洗到发灰的工装，左袖口磨白了，上衣口袋里插着一支只剩四厘米的铅笔。墙上有前一个住户留下的刻痕，一共十七道，最下面那道旁边写着一个日期，日期后面跟着一个名字，名字被划掉了。
-
-05 时 20 分，你去楼下的配给点刷工牌领早配。窗口前排着十四个人，队伍移动得很慢，因为读卡器每读三张牌就会卡一次。早配是一份藻砖、一碗谷物糊、一小碟腌菜，合计七百千卡。窗口后面的记账员会看一眼你的工牌，再看一眼你，然后才把东西推出来——不是怀疑你，是确认今天这张牌还能用。你身后的人在看表，因为第一班 06:00 上岗，晚一刻钟就要在班前会上说明原因。
-
-05 时 45 分，你走进楼道尽头的闸机口。三台闸机里有两台在运行，最左边那台的读卡器上贴着一条白纸，写着"维护中"。你把工牌贴上去，机器响了一声，屏幕上跳出你的工号后四位与今天的日期。这条记录会保留七年：它记录了你几点进、几点出、走的是哪一台闸机。旁边的治安登记岗里坐着一个人，他没有抬头，只是在你刷卡的时候把笔停了一下。
-
-06 时 00 分，你上岗。这一天会持续十二个小时，中间有两次十五分钟休息与一次三十分钟午餐。地渊没有昼夜，全渊统一使用标准班次钟，以二十四小时为一周期，第 1 层与第 100 层的时间完全一致。班次钟每天响四次：05:30 第一班、13:30 第二班、21:30 第三班、23:00 静层。静层之后，浅层楼道照明降到一成五，公共浴室关闭，宿舍统一熄灯；在静层里走动不算犯罪，但要过每一层两端的治安登记岗，而岗上只在 05:00 到 23:00 有人。
-
-你这一天的收入是七十八贡献点，扣除宿舍床位五十点、吃饭三十到四十五点，剩下的钱在一到十三之间浮动——取决于你今天有没有加班、有没有替人值过班、以及在管边摊上喝了几碗一贡献点的热汤。这就是地渊最普通的算术：一个月里，你能剩下的钱大概能换两次门诊，或者一双钢头靴，或者一次跨层的通行许可。攒够换一层的差额需要八到十二年，而在层与层之间，钱只解决一半问题，另一半是权限。
-
-23 时 00 分，静层。你回到那间十二人的宿舍，铁架又响了三下。有人在黑暗里小声说话，说的是明天的班次与第 43 层配给点的队伍长短。你躺下的时候会想起今天刷过的那几道闸机——它们全部都记得你。你没有做错任何事，也没有做成任何事；明天早上 05 时 05 分，走廊的灯会照常亮到七成。
-
-这一天里还有两件小事会重复发生。第一件是人情债：早上有人替你占了一次配给队的位置，中午你要替他在签到表上补一个名字，晚上他会说一句"我记着"——这句话没有利息，没有期限，也不必写下来，但你必须还。第二件是留痕：你今天刷卡四次、领配给两次、在班前会上签了一个名字、在楼道里被一台 CRT 屏上的公告照过一次；这些记录今天不会有人去查，但它们都在，保留七年。
-
-如果玩家已经选定了「开局处境」，请以 sceneByOption 里那一段为准：它才是第一幕的时间、地点与在场的人，上面这一段只是把一个最普通的地渊日子摆出来，用来防止开场落空。只有当 sceneByOption 里没有对应场景、或者玩家跳过了「开局处境」这一槽时，才回到这里；它不计入任何背景槽位，也不携带任何随身物，它只说明一件事：在地渊，一天是怎么开始的。
+日子由三样东西量出来：配给、贡献点、层号。一顿普通餐 2 到 5 点，集体宿舍床位月租 50 点，一次门诊 20 点，一张跨层通行许可 15 到 900 点，而浅层一名正式员工的月薪是 70 到 110 点。层号决定呼吸什么空气、能看几级医生、被谁管辖。所有的门都要刷工牌，每一次刷卡留七年记录——在这里，规矩不只写在纸上，也写在每个人的通行记录里。
 
 
 `,
@@ -2042,34 +2028,34 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
 
 地渊不催你。它只是一直在动。`,
     openerSlot: '开局处境',
-    sceneByOption: {
+    openingSeeds: {
       开局处境: {
         bg_scene_office:
-          '2107 年 4 月 12 日，07 时 40 分，第 65 层行政管理区 B 座 11 号审批台。你面前摊着 41 份《跨层人员临时调动申请》，第一份的签字栏已经空了三天。审批台是一张两米长的钢架桌，左边是你的印章盒，右边是六本待归档的卷宗，桌角有一杯已经凉了的谷物糊。你正在核对第 17 份——它的第 3 页边注上有一行铅笔字："此人不应在第 52 层。"笔迹不是你上级的，也不是人事专员的。你的上级汤慕之站在你身后三步远的位置，男，四十七岁，六级高级经理，他看文件的速度比你快，但他从来不看第 3 页。隔壁台是邹敏，女，三十三岁，她今天比平时早到二十分钟，因为她要往一叠加急件里插一份自己的。07 时 52 分，综合处的传令员推着小车过来，说要收 11 份加急件，其中第 4 份是你上周以"材料不全"为由退回过的。退回意味着结仇，放行意味着你的名字会留在上面。汤慕之没有说收还是不收，他只是把印章盒往你这边推了两厘米。你的手停在半空，而传令员在等你从 41 份里挑出 11 份。就在这个时候你翻到了最后一份：申请人一栏写着你的名字，而笔迹不是你的。',
+          '日常是案牍：一份文件在几个部门之间走一圈，谁先看、谁后看、落谁的款、用谁的印，都有讲究；消息在走廊里比在公文里走得快。打交道的多是同级办事的人、来催件的班组代表，以及靠材料吃饭的中层。体面是从不出错，代价是出一次错就有人替你记着。手里有能办成事的权力，也有必须打的招呼；想办的事常常卡在"再议一议"四个字上。',
         bg_scene_industry:
-          '2107 年 4 月 12 日，04 时 20 分，第 29 层炼钢区东侧，7 号轧机的液压泵旁。地面是花纹钢板，被铁屑磨出一层亮光，走在上面会打滑；头顶的排烟管道有 41 处形状各异的补丁。你正跪在泵体旁边拧最后四颗螺栓，工装后背已经湿透，防尘面罩挂在脖子上，因为戴着它看不清压力表。这台泵不是新件，是第 38 层拆解区送来的旧件，出厂编号被人用锉刀磨掉了。班组长郝大年蹲在你左边，男，五十二岁，右手虎口有一道二十年前的旧疤，他不说话，只是看着压力表。三十八岁的抬工韩老六靠在高炉旁的护栏上等你的结果，他今天要拉走四百吨钢坯，拉不走就要少一班加班。压力表在八分钟里抖了三次，每次指针回落 0.2 兆帕。按规程，这个现象必须停机上报，而班前会的纸质签到表上已经写了"设备完好"，签字的是全组十六个人，包括你。停机意味着四百吨的缺口、全组取消加班、以及一份必须有人签字的《非计划停机报告》。郝大年把一支笔放在泵体上，站起来拍了拍膝盖，说了一句"你自己看着办"，然后往高炉那边走了。远处第三班的广播开始报时，韩老六在后面问了一句：装好了没有？',
+          '日常在作业面上：高温、粉尘、机器的低频噪音，一班十二小时，中间两次休息。打交道的是班组长、抬工、检修工，以及来收数的记账员。体面在于配给足、工段里认人；麻烦在于事故与"责任落实到人"这句话，落到班组一级就落到个人头上。想办的事大多得靠人情换：一次换班、一片滤芯、一个轻省的岗位。这一层的班次最紧，也最短命。',
         bg_scene_service:
-          '2107 年 4 月 12 日，06 时 30 分，第 43 层配给科三号窗口。窗口是一块 8 毫米厚的透明板，板上有三道划痕，最下面那道是有人用搪瓷杯砸出来的。你坐在窗口后面，面前是按层分册的配给表，一共七本，最厚的那本写着第 26 至 30 层，一页 200 个名字。你在做的事是核对"待核"栏——那一栏已经满了十一页纸，今天你在第三页上第三次看到同一个名字：一个没有登记的孩子，每周三出现一次。窗口外排队的人在减少，因为早班快开了。主管骆有田站在你斜后方，男，五十二岁，右手食指缺了半截，他手里拿着一支红笔，只在"总数不符"的时候才用。四十一岁的米桂芝挤到窗口前，她是第 29 层的老住户，替三个人领过配给，每次都说同一句话："他们今天上早班。"按表办，你要在那个名字上画一道横线，停发这一份；骆有田刚才对你说的是"先记上，下午再说"。你手上的笔还没有落下，窗口的透明板被人敲了三下，是队伍末尾一个没有穿工装的男人，他没有排到窗口前，他只是站在队伍的最后面，一个一个地数人头。你听见骆有田在你身后很轻地吸了一口气。',
+          '日常在窗口与柜台后面：配给表、住房登记、门诊排期、食堂进出货，全都从手边过一遍。打交道的是排队的人、替领的人、来核数的记账员，以及偶尔来"看一看"的监察人员。体面在于没人敢跟你吵；麻烦在于这个位置人情债最密，每天都要在按表办与给人方便之间选一次。便利是消息快、路好走，掣肘是每一笔都要留痕。',
         bg_scene_discipline:
-          '2107 年 4 月 12 日，13 时 10 分，第 62 层纪律监察部 7 号谈话室。房间四米见方，一张桌子，三把椅子，桌角固定着一台录音装置，红灯亮着；墙上的时钟比走廊的钟快两分钟，这是有意调的。坐在你对面的是一个十九岁的女工，姓万，编制在第 38 层电子组装线，工装袖口还沾着焊锡的灰；她的手指一直在桌沿下画圈。你左边是监察员韩素问，女，三十四岁，短发，右眼下有一道浅疤，她把问题问得很短，中间留出很长的停顿；你右边是记录员，工号 DI-20183，他不说话，只誊抄，笔尖划过纸面的声音在这个房间里比问话更响。核对已经进行到第四十分钟。姓万的答话前后不一致：她先说那天晚上在宿舍，后来说在食堂，第三次又说在去食堂的路上；每一次改口，韩素问都不追问，只让记录员把整句抄下来。现在韩素问把她的便笺推到你面前，上面写着一行字："建议延长隔离 20 天。"按流程，这行字要由你在便笺下方补一句意见，再由她签字；不写，等于你不同意上级的判断，而这个判断会进入案卷。笔在你手里。这时姓万的忽然停下画圈的手，抬头看着你问了一句话："我签了字，我妹妹还能上学吗？"记录员的笔停了。',
+          '日常是记录与核对：问话很短，停顿很长，答话要一字不落抄下来。打交道的是被核对的人、同科室的人，以及来调卷宗的其他部门。体面在于没人愿意让你久等；麻烦在于每一次落笔都在替一套没有辩护环节的流程工作，而笔迹也要归档。便利是通行权限高，掣肘是任何一次判断失误都会被抽样翻出来。',
         bg_scene_farm:
-          '2107 年 4 月 12 日，02 时 50 分，第 15 层藻池区 7 号池边。池子直径十米、深两米，池水是浓绿色，表面不断翻起细小的气泡，气味是腥的、潮的、带一点铁锈味——这一层的人管它叫"绿味"。你穿的是防水围裙与胶靴，手里一根带刻度的探杆，正在测水温和溶氧。按记录，溶氧已经连续三小时低于阈值 0.4 毫克每升，而这一片两百口池子承担着全渊 6% 的氧气再生与四千万人的藻砖原料。老农艺师邢守田蹲在你旁边的池沿上，男，五十八岁，在水培架边站了一辈子，膝关节已经不能久蹲，他手里拿着你今天要交的那张苗情单。十四岁的"小满"蹲在更远一点的地方，他是互助会照看的无号孩子，负责在池边递工具，因此每天只能在 05:00 之前进出这一区。按规程，溶氧连续低于阈值必须立即上报能源循环部并停机检修；停机意味着这一片减产 19%，也就是两个月的藻砖配给要削减。邢守田把测值抄在你的那张纸上，抄完把笔帽盖上，说："你要报就报，反正这是你的号。"池面上又翻起一串气泡，这一串比刚才小。小满忽然站起来，指着池子西侧问你们：那边是不是有一根管子在响？',
+          '日常在水边与架下：测水温、看溶氧、抄苗情，红蓝光底下待久了，看东西都偏黄。打交道的是农艺师、互助会照看的孩子、来收配给单的人。体面在于饿不着；麻烦在于全渊的口粮价格跟着这里的水温走，减产三天内就会变成别人的骂声。便利是能接触到最基础也最要紧的东西，掣肘是停机与上报都要有人签字。',
         bg_scene_scavenger:
-          '2107 年 4 月 12 日，22 时 40 分，R 线第 48 层平台。R 线是沿 V-3 应急竖井铺的维修爬梯，每 12 层一道防火闸门，从第 1 层通到第 84 层；第 48 层是全线三处可坐平台中的第二处，铁凳焊死在墙上，旁边一根穿楼板的排水管每三秒滴一次水，在水泥地上砸出一个小坑。你把包放在铁凳上，包里有 12 封信与一小袋药——信封上写的是第 74 层与第 76 层的名字，药是给第 84 层一个不敢进医务室的人。你是从第 26 层的拆解区爬上来的，已经爬了 22 段，胶靴里全是汗。守签注间的人叫周德海，男，五十九岁，快退休了，他坐在平台下面的小屋里隔着铁门跟你说话；他记得每一个上过 R 线的人的名字，也记得谁从来没有签过。他刚才告诉你两件事：第一，第 60 层档案层的闸门今天多了一道会签，要档案管理员签字；第二，你前面已经有人在二十分钟前上去过，那个人没有签到。你的货里有一件东西经不起照，绕路只能走第 44 层的风机维护通道——通道内径 1.1 米，温度 34 到 41 摄氏度，含尘量高，爬完要咳一天，而你只剩 40 分钟。周德海把签注板翻到背面，用指节敲了两下，指给你看一行很旧的铅笔字。他说：今天的字不是他写的。',
+          '日常在没有编号的路上：爬梯、通风管、夹层，替人捎信、捎药、捎一件过不了闸机的东西。打交道的是守梯的人、等消息的家属，以及同样没有号的人。体面在于没有考勤表能记你；麻烦在于没有一张名单会保你，被认定未授权位移时，没有人听你解释那封信是谁的。便利是能从任何门缝里过去，掣肘是每一条路都要用肺和膝盖换。',
         bg_scene_market:
-          '2107 年 4 月 12 日，20 时 15 分，第 47 层中心市场后巷，一一四七号摊位背后。巷子三米宽，两侧是摊位的背板，背板上钉着钉子挂小件货品，地面常年有一层黏腻的东西，是藻油和废水混出来的。你蹲在米袋上对账，面前摊着三张芯片卡与一小袋真咖啡豆；斜上方两盏旧灯管，一盏偏黄，把你手上的铝片照成两种颜色。摊位那边是麦穗，女，二十九岁，她一边应付买主一边往你这边看；她的左腕上戴着一只拆掉上传模块的生物指标腕带。来退货的人叫老董，男，四十四岁，第 38 层的灯具维修工，他昨天花两千二百点从这里买走一台改装功能机，今天他要退——不是机器坏了，是他妹妹在第 58 层 B 区被查获，机器编号被供了出来。那台机器的来源是你，而给你货的上游只留了一个工号后四位。老董不知道这一层关系，他只想要回他的钱，他反复说的一句话是"我妹妹什么都不懂"。麦穗没有接他的话，她把一小袋咖啡豆从米袋下面推到你面前，袋子只有四十七克重。她说：这袋不是给你的，是给来问话的人的。巷口有两个穿灰夹克的人停了下来，一个在看摊位，一个在看巷子。',
+          '日常在市场后面的那块地方：等价物是铝件、药品、真食物、班次、铺位与消息，抽成固定，报价不解释。打交道的是买主、跑腿、来收保护费的人，以及偶尔混在人群里数人头的人。体面在于不用排队就能拿到东西；麻烦在于每一笔生意都在给某个人留下记忆。便利是现金与消息都活，掣肘是永远不知道对面是买主还是来数人的。',
         bg_scene_surface:
-          '2107 年 4 月 12 日，05 时 10 分，第 1 层 C-2 采集通道内闸门前。通道内壁是刷过三遍防霉漆的混凝土，地面有导流沟，沟里积着一层红褐色的薄水；头顶的防爆灯每隔六米一盏，第三盏在闪。你面前是十二个人和十二具循环呼吸器，你正在逐一检查吸收罐的温度与氧气瓶压力——这是出站前的最后一道流程，做完就要开第一道气闸。三道气闸今天已经泄压两道，第三道的气密指示是绿的。队长关长庚站在队列最前面，男，四十八岁，脸被地表的风与紫外光磨得像旧皮革，耳廓有冻伤后的变形，他不说话，只看你的手。队列里最年轻的是二十二岁的路遥，男，第一次出站，他的手一直在拉紧手套的腕带。麻烦在你手上：路遥那具呼吸器的吸收罐，昨天的训练记录里闪过一次温度报警；按规程必须整罐更换，而备用罐只剩两具，另一具已经分配给第 3 队。关长庚知道你手上有几具，他也知道换给路遥意味着另一队有人要在没有备用的情况下走完六小时。他把一支笔递给你，笔杆上缠着胶带，然后指了指出站名单的第二联——那一联上写着"装备完好"，下面空着一个签名栏。通道尽头传来第一道气闸开始泄压的声音。',
+          '日常在气闸与通道之间：检查装备、等窗口期、把带回来的东西交出去，然后什么也不问。打交道的是队友、清点的人、家属，以及把报告收走的人。体面在于待遇最好、家属有优先权；麻烦在于伤亡率，以及出站前那句"余额留给谁"的例行记录。便利是能看见别人一辈子看不见的东西，掣肘是看见之后不许说。',
         bg_scene_workshop:
-          '2107 年 4 月 12 日，21 时 50 分，第 12 层旧管风琴厅。这间屋子在一期工程时曾计划做文娱厅，为此运进过 1240 根管风琴金属管，后来文娱厅改到了第 51 层，管子就留在这里当货架立柱；管径不同，敲一下音高不同，整间屋子有回音。你坐在最里面那张用木箱拼成的工作台前，正在修一台旧终端——它的读卡器坏了，而里面存着 41 个人的名字，只写工号后四位。你手边是两把改锥、一卷绝缘胶带、一只手摇台秤，还有今天别人送来的一枚不合规格的锁扣。仓库管理员叫文砚秋，女，四十六岁，管着这一层全部的备品与那 1240 根管子，她平时只敲管、不说话，22:30 之后才会敲一段旋律，敲完就走。今晚来取货的人是个穿深色便服的年轻人，他说是替第 52 层的人来拿终端；他带来的换班筹码有问题——铝片上的痕不是钢针划的，是刻刀刻的，边上有毛刺。你把终端推到他面前，他伸手去拿，你按住了机壳。就在这个时候，文砚秋在你身后敲了一下那根最粗的管子，声音比平时低。她说：有人在你后面站了十分钟了。你没有回头。你先把终端从年轻人手里抽回来，再把那枚刻坏了痕的筹码压在台秤上——台秤的指针晃了一下，停在 12 的位置。文砚秋没有再看你，她转过去，用指节敲了第二下；这一次敲的是那根最细的管子，音高很高，整间屋子的回音要过三秒才散。你身后的脚步没有动，也没有退。',
+          '日常在角落的台子前：修旧终端、改不合规格的零件、替人办手续、替人看一张看不懂的纸。打交道的是慕名来的人、送货来的人，以及来问"这东西哪来的"的人。体面在于别人不会的东西你会；麻烦在于接下的每一件东西都带着来路，而你必须替对方保密。便利是不用排班，掣肘是活儿大半在灰色地带。',
         bg_scene_nobody:
-          '2107 年 4 月 12 日，23 时 20 分，第 26 层与第 27 层之间的夹层。这一层高 1.4 米，成年人在里面只能弯腰走；原先是管线检修层，现在用废料板隔成一个个 2 平方米的隔间，住着大约 400 个人，一个也不在任何名单上。照明是从第 27 层的通风机房偷接出来的电线，带三四块捡来的旧 LED 灯板，光是红的与蓝的混在一起——那是农场层淘汰下来的作物灯。你昨晚被人从一个更小的隔间里挪到这里，铺位是别人让给你的半边，让铺的人没说自己叫什么，只说他姐姐在第 31 层有号、他等着她来。此刻你躺在两块木板拼的床上，头顶就是第 27 层的楼板，能听见上面走路的脚步。管这一段电的人刚才来过一次，说这个月的"电份子"要涨，从每人 12 点涨到 20 点，理由是上周跳了两次闸。你身上能用的东西只有一张 72 小时有效的灰色通行条、四十贡献点、一块藻砖，和一张照片不是你、编号以 HC 开头的工牌。你旁边睡的是十六岁的阿砚，男，他没有号，认得这一区所有不走闸机的路；这些天他一直在帮人带东西，一趟挣二十点，钱给他姐姐。他把头凑过来，压着嗓子问了你一句：你那个号，还能刷几天？',
+          '日常在别人看不见的地方：找活儿、找住处、找一口热的，替人跑腿挣当天的钱。打交道的是同样没有号的人、偶尔施舍的熟人，以及来清人的治安员。体面在于制度管不到你；麻烦在于所有的门都假定你有一个可以追溯的过去，而你什么都没有。便利是能把任何东西带过任何闸机，掣肘是每一样筹码都是即时的。',
         bg_scene_deputy:
-          '2107 年 4 月 12 日，08 时 30 分，第 67 层行政管理区 3 号会议室。房间不大，一张 4.2 米长的会议桌，桌面上摆着十一只白瓷杯，其中三只没动过；墙上挂着一块 2001 年制造的挂钟，比走廊的钟慢一分钟。你坐在桌子右侧第二位——那是副职的位置，正职坐主席位，两侧按部门代号排。今天开的是季度编制核定会，议程七项，第四项是你负责的第 29 层炼钢 4 号班补员方案，你为它准备了十一页材料，第 6 页有你的意见与签字。正职方彧，男，五十六岁，坐在主席位上，念议程的语速很均匀，念到第四项时停了一下，说"这一项先撤下，等材料齐了再说"。你手边那十一页材料就摊在桌上，第 6 页签字栏里是你的名字。坐在你对面的另一位副职岑漪，女，四十一岁，她没有看你，只在本子上写了一行字，然后把本子合上。会议继续，第五项讨论采购与报废，这一项原本属于岑漪，但方彧让她先讲，讲完他说"按岑副处长说的办"。你的茶杯还是满的。散会前，会务员把全部材料收走装订成册，你伸手想把第 6 页抽回来，会务员说了一句"要装订的"，然后把它拿走了。会议记录的表决栏里，今天没有你的签字位。',
+          '日常在会议与批件之间：定方向、分任务、看下面报上来的数，再决定哪一件先办。打交道的是同级、上级，以及来要资源的其他部门。体面在于不用排队、一个电话就能让人加班；麻烦在于不能决定总额，也不能拒绝一场与你无关的会，签字位随时可以被收回。便利是能看到全局，掣肘是每个决定都要落到纸上。',
         bg_scene_bureau_chief:
-          '2107 年 4 月 12 日，15 时 20 分，第 62 层纪律监察部走廊东段。走廊长 47 米，尽头是总监的 9 号办公室，门口摆着一条 1.8 米长的木长椅，椅面上有一段被磨得发亮的地方——所有来等签字的人都坐同一个位置。你在这里已经坐了 40 分钟，手上是一份 6 页的《处置建议》，第 4 页的处理意见栏写着"降层 15 层"，第 6 页留着一个空白签字栏，等总监落笔。卷宗编号 DI-2107-03117，被处置的人叫邓万山，男，五十三岁，第 71 层的设备检验员——他曾经是你的师傅，教过你看台账里的批号。这份建议里有三处数据是他自己上报的，其中第二处被改过：原始值是 0.4%，誊抄件里写的是 4%。改动不是你做的，你只是发现了改动的痕迹。门里有两个人在说话，声音压得很低，但走廊太安静，你听见了自己的名字，后面跟着"那份 03117"。同科室的纪川，男，二十九岁，站在走廊另一端替你抱着另外两份卷宗，他不问你在等什么。15 时 35 分，门开了，总监的秘书霍婉，女，五十岁，出来对你说："总监让你下午三点再来。"她说这句话的时候把门留了一条 7 厘米的缝，你从那条缝里看见总监桌上摊着另一份文件，封面上有你的名字。',
+          '日常在案卷与谈话之间：决定一个案子是结、是转、还是写进建议，也决定谁先被问、谁可以回家。打交道的是被查的人、手下的人、来打招呼的同级，以及盯着你的审计与上级。体面在于没人敢让你久等；麻烦在于你也在被记，每一次"缓议"都有人数着。便利是权限极高，掣肘是每一份建议都会归档，同科室的人也在记你的笔迹。',
         bg_scene_allocator:
-          '2107 年 4 月 12 日，09 时 05 分，第 43 层配给与住房总调度室。屋里有三张桌子、一块 2 米宽的调度板、以及一部接在墙上的有线电话，电话线用胶带固定在桌腿上。调度板上钉着这一区间的三张表：日配给发放表、住房额度分配表、班次与加班表，其中发放表上第 26 至 30 层那一段被红铅笔圈了三道。你在核一张《跨部门配给调整单》：第 29 层炼钢区两个班组要加配到 2400 千卡，共 620 人，理由是连续三周加班。这张单子上有三个栏位——本区间调度签字、行政后勤部配给科会签、能源循环部值班总监会签。第一栏你已经签了，第二栏是骆有田的，他上午签了；第三栏空着。能源循环部派来的联络员税遇，男，三十八岁，站在调度板前面，他已经拒签过一次，理由写得很规范："调整涉及三级负荷结算，需先出具能耗评估。"你的助手苗小池，女，二十四岁，把这句理由抄在了自己的本子上。这张单子今天必须走完，否则明天早班这 620 个人按 2260 千卡发。09 时 12 分，电话响了，是第 29 层打来问今晚的饭。你一只手按着话筒，另一只手还压在没签完的那张单子上；税遇看着调度板，说了一句话："你把能耗评估写出来，我就签。"',
+          '日常在调度板与电话之间：配给表、住房额度、班次表，三张表决定一整片人今天怎么过。打交道的是各层来的办事员、会签的兄弟部门，以及来问"今晚有没有饭"的班组。体面在于人人都跟你打招呼；麻烦在于你动不了总额，也不能改任何一条标准，每一次调整都要有依据，而依据将来就是证据。便利是消息最先到你这里，掣肘是差额得由你去补。',
       },
     },
     enableStages: false,
@@ -2107,7 +2093,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '不外露，说话时不带情绪，问话极短，只有一个问题接着一个问题的停顿。她不威胁、不动怒，也不需要对方认罪：她只需要把答话抄下来，等对方自己在下一句里前后不一致。她信奉一条原则，从不在同一个案子里签署两份文件。对流程的尊重是真实的，对他人的同情也是真实的，但两者不会互相干扰。',
       relationship:
-        '三天前，她以编号 DI-2107-03044 在你的档案里写入了一条记录，事由栏写着「该网络形态不明」。她知道你手上有一张便笺，而她没有立即找你，因为她想看看你会在 06 时 40 分出现在哪里。',
+        '纪律监察部的调查员，入职十四个月完成四次情况核对。她问话极短，从不追问，只把答话一字不落抄下来；对流程的尊重是真的，对他人的同情也是真的，但两者互不干扰。在她眼里，像你这样的人先是一个工号，其次才是一个人。',
       scenario: '她正在第 41 层换乘大厅的治安站里，坐在靠门的那把椅子上，面前放着一份打印名单。',
       present: true,
       location: '第41层·换乘大厅治安站',
@@ -2121,7 +2107,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '务实到近乎冷漠，只谈能落到纸上的东西：配额、文号、签字栏、申辩期。他不喜欢讲道理，也不喜欢听道理，但对守规矩的人有一种不移交的偏袒。他记得住每一个在他办公室签过字的人的工号，记得住谁在交接单第二联上写得潦草。',
       relationship:
-        '今天 06 时 50 分之前，你必须把编号 AL-2107-07712 的配给通知副本交到他手上，让他签一次字。他不认识你，但他认得这份文件的编号——因为它写的正是他手底下 4 万 2000 人的口粮。',
+        '行政后勤部第 43 层配给科的主管，右手食指缺了半截，是轧机留下的。他只谈能落到纸上的东西：配额、文号、签字栏、申辩期，对守规矩的人有一种不移交的偏袒。像你这样的人去找他，他会先要材料，再谈别的。',
       scenario: '他在第 43 层行政办公室的配给科里，面前摊着一叠等待签字的交接单。',
       present: true,
       location: '第43层·行政办公室配给科',
@@ -2135,7 +2121,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '精力充沛，算账极快，报价干脆且不还价。她对人只有两种分类：留痕的和不留痕的。她记不住名字，只记编号，因为「编号不会骗人」。她有一种近乎温情的实用主义：她会把货卖给明显买不起的人，然后收走对方的婚戒。',
       relationship:
-        '你手里那张便笺上的坐标，与她昨天的最后一次交易有关。她知道 06 时 40 分会有事，也知道别人会为这条消息付多少钱；问题只在于，你打算用贡献点、用秘密，还是用一次人情债来换。',
+        '第 47 层市场一一四七号摊位的摊主，二十九岁，卖配给结余、修好的小电器与消息；左腕上那只能上传数据的腕带早被拆掉。报价不还价，只记编号不记名字。像你这样的人站到她摊前，她先看鞋，再决定要什么价。',
       scenario: '她正在第 47 层市场整理摊位，把新到的改装功能机藏进米袋底部。',
       present: true,
       location: '第47层·中心市场一一四七号摊位',
@@ -2149,7 +2135,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '话多、好奇、缺心眼，但记路的能力惊人。他把所有不走闸机的路线都记在脑子里，从不写下来，因为他不会写几个字。他对「上头」有一种没有根据的向往，同时对死亡有异常准确的估计——他认识的三十多个无号的人里，已经死了七个。',
       relationship:
-        '他在闸机队列里注意到你被拦下了，而他知道 C 区所有不需要工牌的路。他要价不高，但他要的不是贡献点：他要你把一件事带到第 31 层去。',
+        '十六岁，没有号，靠替人带东西挣当天的钱，一趟二十点，钱给他姐姐。认得这一区所有不刷工牌的路；话多、好奇，对"上头"有一种没有根据的向往。像你这样的人找他，他会先问一句你那个号还能刷几天。',
       scenario: '他蹲在 C 区闸机东侧货运通道的通风口旁边，等人叫他。',
       present: true,
       location: '第41层·C区货运通道通风口',
@@ -2163,7 +2149,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '服从流程但不在意流程背后的目的。他不打人，也不喜欢看别人打人——他更愿意让对方自己走。他的判断标准只有一条：现场记录写得干不干净。他有一个真实的底线：不在没有记录的情况下动手，因为那样他就要自己承担后果。',
       relationship:
-        '他手里那份打印名单上有十一个工号，其中第七行是你的。他并不急于抓人，他在等 C 区闸机全线停机之后的原地等待——那时候所有人都会停下，核查最省力。',
+        '安全保卫部的外勤巡逻队长，四十一岁，从不在没有记录的情况下动手。判断标准只有一条：现场记录写得干不干净。他不打人，也不喜欢看别人打人，更愿意让对方自己走。像你这样的人落到他手上，他会先问工号，再看鞋。',
       scenario: '他从治安站出来，手里拿着名单，正在核查队列里的第三个人。',
       present: false,
       location: '第41层·换乘大厅C区闸机前',
@@ -2177,7 +2163,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '精确、缺少社交耐性，用数字和参数表达情绪。她删过几千条「没有科研价值」的数据，后来开始偷偷记下它们，因为她发现那些被删掉的画面里反复出现同一件东西。她厌恶一切模糊的说法，包括「差不多」「大概」「按道理」。',
       relationship:
-        '你在第 41 层那次事件之后若想上溯到第 88 层，必须经过她手上的实验记录：2106 年 11 月那一页缺失的记录，恰好与那个来源不明的铝制容器同日。她愿意交换，但她要的是一份不属于你权限的东西。',
+        '科研发展部第 66 层数据清洗组的助理研究员，二十六岁，十二岁起接入辅助学习，思考快，不擅长应付含糊的人际表达。她删过几千条被判定没有价值的数据，后来开始偷偷记下它们。像你这样的人想从她那里拿东西，得先拿得出同等精确的东西换。',
       scenario: '她在第 66 层的数据清洗组里核对一份缺页的实验记录，已经核了整个夜班。',
       present: false,
       location: '第66层·科研发展部数据清洗组',
@@ -2191,7 +2177,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '沉默，迷信色彩浓厚但不承认。他不谈地表，也不允许队员在出站前谈论地表。他有一套自己的规矩：出站之后不要抬头，看见东西不要先说话，队友不动了先看呼吸器再看眼睛。他救过十七个人，也亲手在第四个窗口期把两个人留在外面。',
       relationship:
-        '他需要一个人替他在第 1 层分类室核对一份清点记录——因为官方清点结果从不向采集队公布，而他开始怀疑某些东西根本没有进过分类室。他相信你是因为你手上那份配给通知的编号，恰好与他一箱样本的编号同批。',
+        '资源采集部的老队长，四十八岁，脸被地表的风与紫外光磨得像旧皮革，耳廓有冻伤后的变形，是仍在服役的采集队长里资历最长的一个。不谈地表，也不许人在出站前谈地表。像你这样的人若问起带回来的东西去了哪，他只会说一句：按流程交了。',
       scenario: '他在第 1 层的采集队准备室里检查循环呼吸器的吸收罐，准备下一次窗口期。',
       present: false,
       location: '第1层·采集队准备室',
@@ -2205,7 +2191,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '把一切换算成代价与期限。她不生气，也不威胁，她只是把一件事情的两种结局摆出来，然后让对方选。她对流程有近乎审美的尊重，因为流程是她唯一无法亲自修改的东西——章程修改需要七票，而一百年来没有一次集齐过。',
       relationship:
-        '你的档案里那条「该网络形态不明」的记录，出自一次由她批注启动的核查。她并不想抓你，她想确认一件事：一份 2097 年的边注原件，究竟是被谁、在什么时候替换成了 2101 年生产的副本。',
+        '董事会七名成员之一，代号丙，女性，在册年龄五十余岁。样貌只在极少的影像记录里出现过，戴一枚无标识的黑色胸针，不穿任何部门颜色的外套。她说话慢，句子完整得像文件。在她眼里，像你这样的人是一个可以核对的变量。',
       scenario: '她在第 97 层的生活区里看一段不打码的浅层监控片段，屏幕上的时间停在 06 时 40 分。',
       present: false,
       location: '第97层·董事会生活区',
@@ -2219,7 +2205,7 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
       personality:
         '冷酷、高效、极少发怒，把「落实责任」当成一项长期工程来做。他从不解释自己的决定，也从不记恨反对者——他只需要对方在三个月内被调走。他真正在意的事情只有一件：让每一次死亡都有一个具名的责任人，哪怕那个人并不真正负责。',
       relationship:
-        '2097 年第 88 层停摆事故的调整单第一联上，有他的部门当年的旧编号；而 2107 年 4 月，他正在处理一件比事故更麻烦的事——第 100 层的用电量同比上升了 41%，而这件事没有人可以签字负责。',
+        '深核集团总裁，男，六十一岁，地质工程师出身，曾任资源采集部部长，2079 年起任总裁；左手小指因一次缺氧事故永久僵直。说话慢，习惯先复述问题再回答。他真正在意的是让每一次死亡都有一个具名的责任人；像你这样的人站到他面前，最好先想清楚自己签过什么。',
       scenario: '他在第 96 层的总裁办公室里审阅一份不超过三页的摘要，摘要上有一段被删去了。',
       present: false,
       location: '第96层·总裁办公室',

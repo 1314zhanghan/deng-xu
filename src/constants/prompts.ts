@@ -376,22 +376,23 @@ export function describeBackgroundChoices(
 }
 
 /**
- * 解析玩家选定的「开场场景」。
+ * 解析玩家选定的「开局处境」素材。
  *
- * ## 为什么单独一个函数
+ * ## 这里我改错过两次
  *
- * 第一版把开场做成"同一个场景 + 按背景换视角"（`openingByBackground`），
- * 玩家指出这背离了沙盒：
- *   「这么多三六九等的人却在干同一个枯燥的工作」
- * 官、军、商、江湖、僧道、罪犯本该各自开场，而不是全挤在同一间值房。
+ * 第一版：开场对所有背景都一样（玩家："选了半天背景，开场一模一样"）。
+ * 第二版：每个选项带一段**写死的完整开场**，并作为第一幕的**唯一依据**，
+ *   还明令"场景已定死、别的背景不许挪动它"。结果玩家说：
+ *   「我的自设主角是**刑部正四品**，开局却固定有俩**仓部**上司」
+ *   —— 我用背景槽位顶掉了玩家自己写的主角设定。
  *
- * 现在从世界卡里找出 `openerSlot` 指定的那个槽位，取玩家选中的选项，
- * 返回它对应的**完整开场场景**。找不到就返回 null，由调用方退回兜底开场。
+ * 所以现在它只解析出**素材**（这类处境长什么样），交给 AI 作附加参考；
+ * 主角自设设定才是主要依据。见 `buildOpeningInstruction`。
  */
-export function resolveOpeningScene(
+export function resolveOpeningSeed(
   world: WorldCard,
   choices: Record<string, string>,
-): { slot: string; id: string; title: string; scene: string } | null {
+): { slot: string; id: string; title: string; seed: string } | null {
   const slotLabel = world?.story?.openerSlot
   if (!slotLabel) return null
   const slot = world.backgrounds?.find(s => s.label === slotLabel)
@@ -399,21 +400,47 @@ export function resolveOpeningScene(
   const chosenId = choices?.[slotLabel]
   const opt = slot.options.find(o => o.id === chosenId)
   if (!opt) return null
-  const map = world.story?.sceneByOption?.[slotLabel]
+  const map = world.story?.openingSeeds?.[slotLabel]
   // 优先按选项 id 找；找不到再退回按标题找（作者两种写法都认）
-  const scene = (map?.[opt.id] ?? map?.[opt.title] ?? '').trim()
-  if (!scene) return null
-  return { slot: slotLabel, id: opt.id, title: opt.title, scene }
+  const seed = (map?.[opt.id] ?? map?.[opt.title] ?? '').trim()
+  if (!seed) return null
+  return { slot: slotLabel, id: opt.id, title: opt.title, seed }
+}
+
+/**
+ * 把**玩家自己填的主角设定**整理成开场提示词的第一段。
+ *
+ * 为什么它排在最前面：玩家为这个角色填的每一个字都是他的创作，
+ * 而"自述背景"往往直接写明了他的身份与职位（"刑部正四品"）。
+ * 一旦 AI 用世界卡里的背景槽位覆盖掉它，玩家立刻会觉得"这不是我设的那个人"。
+ */
+function describePlayerForOpening(player: PlayerCard): string {
+  const lines: string[] = []
+  const put = (label: string, v?: string) => {
+    const t = (v || '').trim()
+    if (t) lines.push(`- ${label}：${t}`)
+  }
+  put('姓名', player.name)
+  put('性别', player.gender)
+  put('年龄', player.age)
+  put('外貌', player.appearance)
+  put('性格', player.personality)
+  put('**自述背景**', player.background)
+  put('补充设定', player.extra)
+  return lines.join('\n')
 }
 
 /**
  * 第一幕的额外指令。
  *
- * 职责划分（改这里之前请先读）：
- *   · **开场场景**（`sceneByOption` 命中的那一段）= 第一幕演什么。
- *     时间、地点、主角正在做的事、在场的人、钩子，都来自它。
- *   · **其余背景选择** = 给这个场景加质感与代价（手上有什么、谁认识他、
- *     别人怎么称呼他），**但不得改变场景本身**。
+ * ## 三条铁律（改这里之前请先读）
+ *
+ * 1. **没有固定的开场。** 世界卡里不再有任何一段"这就是第一幕"的文本。
+ *    第一幕由 AI 依据下面的材料**现场创作**。
+ * 2. **主角自设设定优先级最高。** 背景槽位是**附加参考**，
+ *    不得覆盖、替换或无视玩家自己写的身份、职位、来路。
+ * 3. **不许替玩家认亲。** 不得凭空安插"你的上司 / 你的上峰 / 你的同僚"，
+ *    也不得给主角一个他没写过的头衔 —— 玩家已经因为这件事打过回票。
  */
 export function buildOpeningInstruction(
   world: WorldCard,
@@ -423,43 +450,55 @@ export function buildOpeningInstruction(
 ): string {
   const parts: string[] = [];
   const picks = describeBackgroundChoices(world, backgroundChoices);
-  const picked = resolveOpeningScene(world, backgroundChoices);
+  const seed = resolveOpeningSeed(world, backgroundChoices);
+  const playerCard = describePlayerForOpening(player);
+  const hasOwnBackground = !!(player.background || '').trim();
 
-  if (picked) {
-    /*
-      ── 有专属开场场景：它就是第一幕 ──
-      ⚠️ 这一段**不要**再拼 `story.opening`。
-      那个字段与这里是"另一个场面"，两个一起给会让模型把两幕揉成一幕
-      （实测表现：场景来回跳，或者干脆只用其中一个）。
-    */
-    parts.push(`**这一局的第一幕就发生在下面这个场面。** 请以它为准写开场，不要另找地方、不要换一件事做：
+  parts.push(`这是这一局的**第一幕**，由你现场创作。**没有任何预设的固定开场**，
+请依据下面的材料即兴写出来。
 
-（开场处境：${picked.title}）
-${picked.scene}
+═══ 一、主角本人（**最高优先级，第一幕必须与它吻合**）═══
 
-写作时把上面这段当作"导演给的分场说明"：把它的时间、地点、在场的人、
-正在发生的事都写实写细，但**不要逐字复述**，要把它铺成有呼吸的叙事。`);
+${playerCard || '（玩家没有填写任何主角设定 —— 此时请让第一幕留出余地，不要替他安上具体身份。）'}
+
+⚠️ 上面这些是**玩家亲手写的**。如果其中写了他的身份或职位
+（例如"刑部正四品"、"某伯爵的次子"、"第 62 层监察科员"），
+那么第一幕里他就**必须**是这个身份 ——
+不要把他换成别的部门、别的官职、别的出身，也不要给他加一个他没写过的上司。`);
+
+  if (seed) {
+    parts.push(`═══ 二、开局处境（**附加参考**）═══
+
+他选的处境是「${seed.title}」。这类处境通常是这个样子（**这是素材，不是剧本**）：
+
+${seed.seed}
+
+用法：从这里取"场合的质感、会碰到的人的类型、这一行当特有的麻烦与体面"，
+然后**结合上面第一段里主角自己的身份**，写出属于他一个人的第一幕。
+
+⚠️ 若这段素材与主角的设定**冲突**（例如素材说他在某个衙门、某个部门，
+而主角写的是另一个），**一律以主角的设定为准**，素材只保留可用的氛围与人物类型。
+${hasOwnBackground ? '' : '\n（主角没有自述背景，所以这一段可以更大程度地充当他的处境依据。）'}`);
   } else {
-    // 没有专属场景（世界卡没配 openerSlot，或玩家还没选）→ 用兜底开场
-    const fallback = world.story.opening.trim();
-    if (fallback) {
-      parts.push(`本世界没有为该处境单独写开场，请以下面这段**示例场面**为基调，
-写一个属于这位主角的第一幕（可用它的世界质感与地标，但主角的处境按他的背景走）：
+    const tone = (world.story?.opening || '').trim();
+    if (tone) {
+      parts.push(`═══ 二、世界开场的基调（**附加参考**）═══
 
-${fallback}`);
-    } else {
-      parts.push(`本世界没有预设开场。请根据世界观、主角设定与在场角色，自行设计一个**有张力、能立刻勾起行动欲望**的开场场景，把主角放进一个必须做出回应的处境里。`);
+本世界没有为这个处境单独写素材。下面这段是世界特有的氛围参考 ——
+**取它的时间感、地标、气味与规矩即可，不要照搬其中的具体人与事**：
+
+${tone}`);
     }
   }
 
   /*
-    ── 其余背景怎么用 ──
-    关键是只让它们"加质感"，不让它们"改场面"。
-    第一版正是在这里写坏了：我要求"背景决定他为什么在这里"，
-    于是所有背景都被拉回同一个地方找理由 —— 三六九等全挤进同一间值房。
+    ── 其余背景槽位：只提供"他带进场景里的东西" ──
+    这里绝不能再说"背景决定他为什么在这里"——
+    那句话会把所有背景拉回同一个地方找理由（= 同一个工位），
+    而且会盖掉玩家自设的身份。
   */
   if (picks.length) {
-    const others = picks.filter(p => !picked || p.label !== picked.slot);
+    const others = picks.filter(p => !seed || p.label !== seed.slot);
     if (others.length) {
       const lines = others.map(p => {
         const bits = [`【${p.label}】${p.title}`]
@@ -467,32 +506,46 @@ ${fallback}`);
         if (p.items.length) bits.push(`　开局随身：${p.items.join('、')}`)
         return bits.join('')
       })
-      parts.push(`主角的其他选择如下。它们**只用来给这个场面加质感，不要因为它们把场景挪走**：
+      parts.push(`═══ 三、他的其他选择（**附加参考，优先级最低**）═══
 
 ${lines.join('\n')}
 
-具体落到这几处：
-- **手上有什么**：开局随身物要真的出现在第一幕里（拿在手里、揣着、藏在靴筒里），并成为他行动的依据。
-- **谁认识他**：在场的人里，谁会因为他的来路多看他一眼、少说一句话、或者装作不认识。
-- **他第一眼会注意到什么**：外行看热闹、内行看门道 —— 让他的身份决定他先看见什么、先忽略什么。
-- **别人怎么称呼他**：一个乡绅和一个逃奴走进同一个院子，被叫的名字不该一样。
-- **他的立场与隐秘**：可以让他心里有偏向、有顾忌，但**不要**在这一幕里就把它们挑明。
+这些只用来给第一幕**加质感与动机**，具体落到：
+- **手上有什么**：随身物要真的出现在第一幕里（拿在手里、揣着、藏在靴筒里），并成为他行动的依据。
+- **他心里想要什么、怕什么**：立场与志向决定他在这件事上的偏向；隐秘决定他的顾忌。
+- **他第一眼会注意到什么**：外行看热闹、内行看门道 —— 让他的来路决定他先看见什么。
+- **别人怎么称呼他**：称呼要跟他的身份相称。
 
-⚠️ 不要把这些选择写成一段自我介绍（"你出身于……"）；
-也不要因为"他是商人"就把场景改成商号，因为"他是军人"就改成军营 ——
-**场景已经由上面的开场处境定死了，这些只是他带进场景里的东西。**`);
+⚠️ 三条禁令：
+1. 不要把这些写成一段自我介绍（"你出身于……"）；
+2. **不要因为"他是商人"就把场景改成商号、因为"他是军人"就改成军营** ——
+   他身处什么场合，**首先由第一段里他自己的身份决定**；
+   第二段只提供这类场合的氛围与人物类型，这些选择只是他带进场合里的东西；
+3. **更不要因为它们去改主角的身份与职位** —— 那是第一段说了算的。`);
     }
   }
 
   if (activeCharacters.length) {
-    parts.push(`若在场角色与这个场面合得来，就在开场中自然引入：${list(activeCharacters.map(c => c.name))}。合不来就不必硬塞。`);
+    parts.push(`═══ 四、世界里的人（可选素材）═══
+
+本世界有这些人物：${list(activeCharacters.map(c => c.name))}。
+他们各有自己的位置与立场（见角色卡）。你可以让**其中合得来的一两位**在第一幕里出场，
+但要注意：
+- 他们的立场是**客观**的（他是某个衙门的人、某个结社的人），**不是"你的谁"**——
+  他与你是什么关系，由**你写的第一幕**来确立，而不是反过来。
+- 如果这一位与主角的身份对不上（例如他是某个主角根本不会去的场合里的人），
+  **宁可不让他出场**，也不要硬塞。
+- 也可以一个人都不出场，另写几个合乎主角身份与处境的配角。`);
   }
 
-  parts.push(`要求：
-- 交代清楚时间、地点、以及主角此刻正在做什么 —— **以开场处境为准**。
-- 在结尾留一个明确的、需要玩家回应的钩子。
+  parts.push(`═══ 创作要求 ═══
+
+- **依据上面第一段（主角本人）来定他是谁、在哪、做什么**；第二、三段只提供氛围与动机。
+- 交代清楚时间、地点、以及他此刻**正在做什么**（正在做，不是刚醒）。
+- 在场的人按他的身份合理设定。**不要凭空给他安上司、下属、同僚或亲戚。**
+- 结尾留一个明确的、必须马上回应的钩子。
 - 这是第一幕，不要信息过载，先让玩家站稳。
-- 主角姓名：${player.name || '（未命名）'}。`);
+- 叙事里**不要出现**"开局处境""背景槽位""世界卡"这类游戏术语。`);
   return parts.join('\n\n');
 }
 

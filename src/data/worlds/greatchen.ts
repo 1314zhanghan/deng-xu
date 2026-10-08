@@ -1652,7 +1652,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_hanmen',
           title: '寒门举子',
-          description: '你家在河南道一个下州的乡里，父祖三代没有出过做官的人。你七岁入村塾，十四岁能默全《大晟律》十二篇，十九岁州试得解，二十三岁省试中式，殿试落在第四甲——「赐出身而不与官」。你在汴梁城东租了一间月租三百文的屋子，靠替人写状纸、抄书、代记账过日子，等了两年，才等到户部度支司一个流外吏员的缺。你没有座师可以拜，只有一个同年的名字还记在心里。你比谁都清楚：这世上的门，大多数是从里面锁着的，你要么找到钥匙，要么找到一条没人走的缝。',
+          description: '家里没有做官的人。你读过书、会算账，靠替人写字和等一个缺过日子。',
           attributeBonus: { li: 2, cha: 1 },
           resourceBonus: { money: 2, qing: 1 },
           startingItems: ['item_suanpan', 'item_lv_chaoben', 'item_yinxia'],
@@ -1660,7 +1660,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_shihuan',
           title: '士族子弟',
-          description: '你出范阳卢氏的旁支，祖父做过一任中州刺史，父亲守着一座三百顷的田庄和四十七户佃客。你从小读的是家里的抄本，用的是自家制的墨，出门有仆从，见官不必跪。你二十岁以门荫入仕，授从九品下，第一个差事是在户部仓部司点验转般仓的陈米。族里给你的期许很明确：三十岁前做到五品，四十岁前替族里拿下一个盐铁或漕运的差遣。你也知道族里没有说出口的那半句：若你做不到，族里还有七个像你一样的子弟在等着这个位置。',
+          description: '族里有人做过官。你一开口就有人认得你的姓，代价是族里要你办事。',
           attributeBonus: { shi: 2, ming: 1 },
           resourceBonus: { money: 5, rank: 1, qing: 1 },
           startingItems: ['item_yufu', 'item_gongfu', 'item_jiashu'],
@@ -1668,7 +1668,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_xungui',
           title: '勋贵之后',
-          description: '你的父亲在永熙六年的河工上做过一任押纲官，后来在北陲因军功授了从五品的勋官，赐田八十顷，荫一子。你是那个被荫的儿子。你在西京的军营里长大，十一岁能骑光背马，十五岁能开七斗弓，十九岁跟着父亲走过一趟雁门镇，亲眼见过边军是怎么把杀良冒功写成「斩获首级」的。你的短处很实在：你写得不好，也不耐烦读长文书；你的长处也很实在：你认识三衙里七八个能带兵的人，你知道军报上哪个数字是假的。',
+          description: '军功人家出身。你懂马、懂刀、认识几个能带兵的人，文书却写得不好。',
           attributeBonus: { wu: 2, shi: 1 },
           resourceBonus: { health: 2, money: 3 },
           startingItems: ['item_kanhe', 'item_qidougong', 'item_jiuhulu'],
@@ -1676,7 +1676,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_shangjia',
           title: '商贾之子',
-          description: '你家在扬州做盐的生意，从你祖父挑着担子卖私盐开始，到你父亲手里已经有了两张盐引和一间邸店。你识数极快，十岁能核一本流水账，十三岁跟着家里的船走过一趟淮口，知道闸口上每一个闸夫的名字和每一个闸夫要几文钱。你父亲花钱替你捐了一个从九品的出身——天下人背后叫它「河工出身」。你不在乎。你见过账本上一笔钱是怎么从一石盐变成一座宅子的，也见过一个五品官是怎么因为三百贯的亏空被抄家的。',
+          description: '家里做买卖。你识数、识货、识人；钱来得快，清誉来得慢。',
           attributeBonus: { cha: 2, mou: 1 },
           resourceBonus: { money: 8, qing: -1 },
           startingItems: ['item_yanyin', 'item_didian_qi', 'item_suanpan'],
@@ -1684,7 +1684,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_huanguan',
           title: '内侍养子',
-          description: '你本姓不知，七岁那年被家里卖给内侍省一个姓王的都知做养子，从此在宫墙里长大。你学会了三件事：走路不出声，听话只听后半句，以及记住每一个人的把柄而不说出口。你二十岁补上内侍省的一个小职，名义上是管洒扫，实际是替都知传递禁中的消息。你身上有一个宫里的腰牌，那东西能让你走进六部衙门而没人敢拦。你也知道你脚下踩着的是一条随时会断的绳：宫里的恩宠一日一变，养父若倒，你连收尸的人都没有。',
+          description: '在宫墙里长大。走路不出声、听话听后半句，腰上有一块能进衙门的牌子。',
           attributeBonus: { shi: 2, cha: 1 },
           resourceBonus: { money: 3, qing: -2 },
           startingItems: ['item_neishi_yaopai', 'item_juncang_zhang', 'item_yaosan'],
@@ -1692,7 +1692,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_jiangmen',
           title: '将门遗孤',
-          description: '你的父亲是朔方镇的一名从五品都尉，永熙六年因「私卖军马」被处斩，同案十一人，家产没官，母亲带你回到河东的外祖家，靠二十亩薄田把你养大。你今年二十六岁，会骑马、会开弓、认识军中的号令与旗色；你不会写骈文，科举是走不通的，你唯一的出路是被人举荐去军前做一个「**效用**」（无品级的军中差遣）。你身上带着父亲留下的一枚铜牌——朔方镇都尉的旧腰牌，牌上刻着编号，编号是可以查的。你查过：兵部的旧档上，那十一人的案由只有四个字「**私卖军马**」，没有赃数，没有供状，没有画押。',
+          description: '父辈是边镇军官，死于旧案。你会骑射、认得军中号令，家世是一笔糊涂账。',
           attributeBonus: { wu: 2, shi: 1 },
           resourceBonus: { health: 1, money: 2, qing: -1 },
           startingItems: ['item_qidougong', 'item_yutu', 'item_jiuhulu'],
@@ -1700,7 +1700,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_zongshi',
           title: '宗室旁支',
-          description: '你姓萧，是太祖第四子的第十一支，到你这一辈已经离嫡系七代。你们这一支在宗正寺的玉牒上占着第十一支的第四十七行，一年领食禄四十二贯、绢八匹，不多，但够一家人在汴梁租一处两间的宅子。你自幼受的教是「不要出头」：宗室不得任御史、不得典兵、不得做知州，最多只能在内库、宗正寺、太常寺这类地方做佐贰。你父亲去年病故，留下三百亩的祭田和一句遗言：「宗室的分寸，就是知道自己不能做什么。」你今年二十九岁，觉得自己已经知道自己不能做什么了——你只是还不知道自己能做什么。',
+          description: '国姓，但离嫡系很远。你领一份不多的食禄，也被规矩框住：不许典兵，不许做谏官。',
           attributeBonus: { shi: 1, ming: 1, li: 1 },
           resourceBonus: { rank: 1, money: 2, qing: 1 },
           startingItems: ['item_yudie', 'item_sujuan_pingfeng', 'item_gongfu'],
@@ -1708,7 +1708,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_zaifu_menren',
           title: '宰相门生之家',
-          description: '你的父亲是二十年前一位吏部侍郎的门生，靠着那一封手札从县令做到中州刺史，四十八岁那年死在任上。他留下的东西里有一束手札，十四页，末尾三个名字被另一支笔圈过。你从小就知道自己「有门路」，也从小听着母亲的嘱咐：**不要把父亲的名字写在任何文书上**。你今年二十六岁，家中田产在父亲死后被族里分去大半，剩下汴梁一处旧宅与一门已经冷了的交情。你在这个天下唯一的本钱，是那束手札上还活着的两个名字——而按本朝举主连坐之法，他们的名字一旦与赃罪沾上边，你父亲的名字也会被翻出来。',
+          description: '父辈与朝中一位大员有旧。你手上有他当年写的几页手札——是门路，也是把柄。',
           attributeBonus: { ming: 1, shi: 1, mou: 1 },
           resourceBonus: { money: 2, qing: 1 },
           startingItems: ['item_xianren_shouzha', 'item_donggong_zhizha', 'item_yinxia'],
@@ -1716,7 +1716,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_zhouli_zhijia',
           title: '州县吏员之家',
-          description: '你的父亲是河南道一个中州的司户参军，一辈子没升到六品，却把这一县十年的钱粮、诉讼与差役都抄了下来，抄成六册。他说过一句话：「**官是客，吏是主；官三年一走，账留在这里。**」他死时你十九岁，你带着这六册抄本与一枚下县的木记进了汴梁，先在一家邸店做账房，再靠人举荐进了户部做流外吏员。你写得不好、文章不通、见了进士出身的同僚要矮半头；但你知道一斗米在哪个仓里会「生耗」，也知道一份文书该在哪一天记进用印簿。',
+          description: '父辈是州县的吏员。你有一县十年的钱粮与讼案抄本，比新来的官更懂地方。',
           attributeBonus: { li: 2, cha: 1 },
           resourceBonus: { money: 1, qing: 1 },
           startingItems: ['item_zhou_xian_andu', 'item_muji', 'item_suanpan'],
@@ -1724,7 +1724,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_jianghu',
           title: '匠户世代',
-          description: '你家里三代都是匠户，编在将作监的名下，做的是木作。本朝的匠户不得应科举、不得改业、不得迁居他州——这二十七个字是你七岁那年父亲逼你背下来的，他说：「记住这个，你就知道什么叫命。」你二十岁应上番到京，在作院里做过三年，练出一手好活：能看出一根梁的纹理往哪边走，也能从一件器物的尺寸上看出它是官造的。你今年三十一岁。三年前你替一位将作少监私下修了一处宅子，得钱四十贯，也是那一年，你第一次动了「不做匠户」的念头。',
+          description: '编在匠籍的人家。手艺好、身份低：不得应举、不得改业，尺子比人管用。',
           attributeBonus: { cha: 2, li: 1 },
           resourceBonus: { money: 2, health: 1 },
           startingItems: ['item_jiangchi', 'item_duandao', 'item_yaosan'],
@@ -1732,7 +1732,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_liumin',
           title: '流民出身',
-          description: '永熙十九年淮西旱，你十一岁，跟着家人往北走。走了四百里，同行的十七口人剩下九口；走到汴梁时剩下四口。你后来知道那年本朝的账上写着「赈济用钱二十二万贯」，也知道你们四口人一文钱没见着。你在汴梁做过脚夫、挑夫、替人看过货，十九岁那年顶着一个死人的名字补进了厢军，才有了籍。你今年二十四岁，会看人、能忍饿、走路比骑马的人还快；你不识字，但你认得数字，也记得住每一个欠你钱的人的脸。**你不恨这个天下，你只是从来没被它算进去过。**',
+          description: '从荒年里活下来的人。没有籍、没有保人，什么都得现挣，也什么都不怕丢。',
           attributeBonus: { wu: 1, cha: 1, mou: 1 },
           resourceBonus: { health: 2, money: -1, qing: -1 },
           startingItems: ['item_caoxi', 'item_xiangqu_jianshu', 'item_duandao'],
@@ -1740,7 +1740,7 @@ export const greatchen: WorldCard = {
         {
           id: 'bg_zuichen',
           title: '罪臣之后',
-          description: '你的父亲做过一任河东道的转运判官，永熙十四年因为一笔「支移折色」的账被夺官、抄没家产、流三千里。抄没的文书你留着：宅一区、田三百二十亩、绢四百匹、书三千卷。**按本朝之制，籍没之家的子弟可以读书、可以应举，但三代之内不许做御史、不许做谏官、不许应「清望」之选。**你今年二十八岁，考过两次省试，一次差二十名，一次差七名。你手上还留着一封东宫旧札——那是父亲当年在詹事府的朋友写的，其中三个人已经死了，只有一个还在京里做官。',
+          description: '父辈被抄没。你可以读书应举，但三代之内不许做御史，也不许做谏官。',
           attributeBonus: { mou: 1, cha: 1, ming: 1 },
           resourceBonus: { qing: -1, money: 1 },
           startingItems: ['item_chaomo_wenshu', 'item_donggong_zhizha', 'item_lv_chaoben'],
@@ -1753,7 +1753,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_keju',
           title: '科举正途',
-          description: '你是省试第一百零七名，殿试三甲，授正九品，分发户部度支司观政。你的同年有七个人在京，其中三个在御史台，两个在礼部，一个在兵部，一个在西京留守司——这张网是你全部的本钱，也是你全部的负担：同年有难你不伸手，往后就没人替你伸手。你手上有一份礼部给的「出身文书」，上面盖着礼部与吏部两个大印，是你唯一能证明自己不是冒名者的东西。你每天卯时到衙，酉时散值，夜里抄例案到三更。',
+          description: '考出来的出身。你的本钱是同榜的那几个人，负担也是他们。',
           attributeBonus: { li: 2, ming: 1 },
           resourceBonus: { rank: 1, qing: 2 },
           startingItems: ['item_chushen_wenshu', 'item_tongyin', 'item_yinxia'],
@@ -1761,7 +1761,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_liuyi',
           title: '吏员入流',
-          description: '你在度支司做了八年吏员，从抄写做到掌案。你比任何一个新来的进士都懂账，也都懂这间值房里谁跟谁不对付。八年里你考了两次流外入流试，第一次差两分，第二次本司长官的保状被人压了一个月，错过期限。今年第三次，你三十二岁，这是最后一次机会——超过三十五岁便不得再应流外试。你的长处是把一桩事办成而不留痕迹，你的短处是你没有同年、没有座师，你的名字在吏部的册子上只占半行。',
+          description: '在衙门里熬出来的。你比谁都懂实务，也比谁都缺一个"出身"。',
           attributeBonus: { li: 3, cha: 1 },
           resourceBonus: { rank: -1, money: 2, qing: 1 },
           startingItems: ['item_lian_anben', 'item_suanpan', 'item_lv_chaoben'],
@@ -1769,7 +1769,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_jianju',
           title: '上官举荐',
-          description: '你原是河东道一个中州的司仓参军，某一年度支郎中裴无咎巡按河东，查一笔陈年亏空，全道七个州的账只有你一个人的册子对得上。裴无咎回京后具保状举荐你，把你调进了度支司，授从八品。你在京里无根无基，唯一的关系就是这位举主——而按《大晟律》，举主连坐：他若因你犯赃而获罪，他的官就没了。所以他既要护你，也会在必要的时候舍你。你心里明白这一点，但还是把他写给你的那封举荐信收在贴身的地方。',
+          description: '被一位大员看中举荐。他护着你，也能随时把你切下来。',
           attributeBonus: { cha: 2, li: 1 },
           resourceBonus: { rank: 1, money: 2 },
           startingItems: ['item_jianju_zhuang', 'item_lian_anben', 'item_kanhe'],
@@ -1777,7 +1777,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_junn',
           title: '军功叙用',
-          description: '永熙二十三年，雁门镇与北狄在黄花谷接了一仗。你当时是押送冬衣的一名校尉，谷口被截，你带着二十七个人守住了一处土堡，等到了援兵。战报上你只占了一行字：「押纲校尉某，守堡三日。」就是这一行字，让你从流外叙了三等，转入兵部职方司做一个从九品的勾当。你身上有两处伤，一处左肋，一处右腿，天阴会疼。你不惯京里的规矩——你不懂为什么一封文书要在三个衙门之间转十四天。',
+          description: '靠一场仗换来的官身。身上有伤，心里有一笔没算完的账。',
           attributeBonus: { wu: 2, shi: 1 },
           resourceBonus: { rank: 1, health: -1, money: 2 },
           startingItems: ['item_qidougong', 'item_yutu', 'item_jiuhulu'],
@@ -1785,7 +1785,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_juan',
           title: '捐纳入官',
-          description: '你父亲在永熙六年河工上纳了一千石米，替你换了一个从九品的出身。你在吏部等了四年，等到一个河南道下州的县尉缺。你到任的第一天就明白了两件事：第一，你的同僚没有一个看得起你，你的上官叫你「河工」；第二，这个县里有八十四个村子，其中十九个村子在上一任的册子上就是空的。你手里有县衙的库房钥匙，里面有三十二贯钱和一杆验尸用的银钗。',
+          description: '花钱买的出身。只能做小官，被人背后另叫一个名字。',
           attributeBonus: { cha: 1, wu: 1, li: 1 },
           resourceBonus: { money: 4, qing: -2, rank: 1 },
           startingItems: ['item_muji', 'item_yinxia', 'item_tongyin'],
@@ -1793,7 +1793,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_bishu',
           title: '门荫之外的旁支',
-          description: '你的父亲做过一任下州的别驾，去年病故。按本朝门荫之制，荫子只荫一人，而那个名额给了你的长兄——他现在在西京留守司做一个从九品的勾当。你什么都没有得到，只得到父亲留下的一箱书、一方旧砚、以及父亲的一句遗言：**「不要跟你的兄长争。」**你今年二十四岁，读了十七年书，州试过了两次，省试落了一次。你手上还有一次机会：明年春天的省试。但你连汴梁的房租都快要付不出，所以你打算先找一份替人抄书或者代记账的活——而这份活，很可能把你带进度支司的架阁库。',
+          description: '荫补的名额给了兄弟。你读书、等机会，也替人抄书糊口。',
           attributeBonus: { li: 2, ming: 1 },
           resourceBonus: { money: -1, qing: 1 },
           startingItems: ['item_chushen_wenshu', 'item_lv_chaoben', 'item_suanpan'],
@@ -1801,7 +1801,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_muliao',
           title: '幕僚（未入流而掌实权）',
-          description: '你是河东道一位观察使的幕僚，人称「某先生」，没有品级，没有俸禄名目，一年得束脩二百四十贯，另有三节（端午、中秋、冬至）的节礼。你替东家办的事包括：起草文书、核算钱粮、应付上官与同年、以及在必要的时候替他说那句他不方便说的话。**本朝的幕僚是一个奇特的群体：他们在吏部的册子上查不到，却往往比七品官更懂这一路的实务。**你今年三十四岁，跟过两位东家，第一位被弹劾，你及时抽身；第二位调任回京，把你留在汴梁替他把账理清——而你很快发现，他那几本账里有三个数目对不上。',
+          description: '没有品级，却掌实权。你替人办事、替人说话，身份挂在别人的门上。',
           attributeBonus: { li: 2, mou: 2 },
           resourceBonus: { money: 3, rank: -1, qing: 1 },
           startingItems: ['item_shihuan_jiugui', 'item_yinxia', 'item_xunlu'],
@@ -1809,7 +1809,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_yinqin',
           title: '姻亲之荫',
-          description: '你娶的是户部一位员外郎的堂妹。这桩婚事是你父亲拿六十贯嫁妆与一张「永不求告」的字据换来的——字据上写的是绝不向妻族索求荐举，而三年之后，替你说话的人还是妻族。你如今任从九品，在开封府下辖一个县里管仓库，不算肥缺，但也没人得罪你。**你的处境可以用一句话说完：你走的路不是你自己走出来的。**同僚当面不说什么，背后叫你「裙带」；而你连辩解都不能辩解，因为事实如此。你今年三十一岁，最怕的不是别人叫你什么，是有一天妻族的门不再为你开。',
+          description: '靠妻族的门路入仕。路走得顺，背后的话也听得见。',
           attributeBonus: { shi: 2, ming: 1 },
           resourceBonus: { rank: 1, money: 3, qing: -1 },
           startingItems: ['item_wupin_jianshu', 'item_gongfu', 'item_didian_qi'],
@@ -1817,7 +1817,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_yinhuo',
           title: '因祸得官',
-          description: '永熙二十五年冬天，你在汴梁城西一家质库做账房。那年腊月，质库失火，烧了两间库房，死了三个伙计。你从火里抢出了一箱契书与一本底账，救下了东家大半的产业。事后东家替你捐了一个从九品的出身，又托人把你送进了户部。**本朝的人都知道，捐纳出身的官止于九品、且只能选下等州县的缺**，所以你如今在度支司做一个从九品的勾当，位置不算好，但你已经从一个账房变成了朝廷的人。你心里有一件没对人说过的事：那场火，起火的地方正是存放「加二借契」的那间库房。',
+          description: '一场变故让你进了体制，得官的过程不便细说，也说不清。',
           attributeBonus: { cha: 2, wu: 1 },
           resourceBonus: { money: 2, qing: 1, rank: 1 },
           startingItems: ['item_zhiqi', 'item_tongyin', 'item_lv_chaoben'],
@@ -1825,7 +1825,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_neiting',
           title: '内廷承奉',
-          description: '你走的是内廷这条路：由内侍省都知的一句话，把你从流外补进了一个「承奉」的名目，不入正途的铨选，只在禁中与诸司之间往来传话。**本朝的规矩写得清楚：非科第、非门荫、非军功者不得为清望之官**；所以你的官阶注定升不到五品以上，也不会有人替你写考语。但你有一件别人没有的东西：**你能在一天之内让某一份奏疏"消失"，也能让另一份奏疏在第二天早上出现在御案的最上面。**你今年二十七岁，身上有一块内侍省的腰牌，六部衙门的门吏见了它不会拦你；而你自己知道，这块牌子的分量全部来自那个人的一句话。',
+          description: '走内廷的路进来。官阶不高，但你能决定一份文书先给谁看。',
           attributeBonus: { shi: 2, cha: 1 },
           resourceBonus: { money: 3, rank: -1, qing: -3 },
           startingItems: ['item_neishi_yaopai', 'item_neiku_gongshi', 'item_yufu'],
@@ -1833,7 +1833,7 @@ export const greatchen: WorldCard = {
         {
           id: 'path_maipu',
           title: '投状自鬻（毛遂自荐）',
-          description: '你没有家门、没有同年、没有举主。三年前你在汴梁走遍了三处衙门，最后用一封信把自己「卖」了出去：信上写清了自己的长处（善算、能写、耐夜）和愿意接受的差事（不要品级，只要月给），抄了十七份，投给十七位官员的门房。**本朝的士人看不起这种做法，叫它「投状自鬻」**；但十七封信里有一封回了一个字：「可。」你就这样进了户部，先从抄写做起，如今是流外里最靠前的那几个。你今年三十岁，心里的账很清楚：已经欠了这份知遇，就再没有别的地方可去了。',
+          description: '自己写信把自己荐出去。没有同年、没有座师，只有一份知遇。',
           attributeBonus: { cha: 2, li: 2 },
           resourceBonus: { rank: -1, money: 1, qing: 1 },
           startingItems: ['item_wupin_jianshu', 'item_suanpan', 'item_xunlu'],
@@ -1846,7 +1846,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_genghua',
           title: '更化派',
-          description: '你信「**账要清、人要核、权要收**」。你主张清丈田亩、整编军籍、把盐利三成从内库要回户部、给宗室食禄定一个不与人口挂钩的定额。你的靠山是门下侍郎萧望之这一脉，你的同路人在御史台与户部里各有几个。你很清楚这条路要付出的东西：**清丈要得罪河北的大族，核军费要得罪三镇的刀，动盐利要得罪内廷。**你今年刚进这个圈子，还没有资格上疏，只能把手上的册子抄得比别人准——因为你信一件事：**只要数目是真的，迟早有人要用它。**',
+          description: '要核账、要清田、要把权收回来。得罪的人会排成一长串。',
           attributeBonus: { li: 2, cha: 1 },
           resourceBonus: { qing: 2, money: -1 },
           startingItems: ['item_lian_anben', 'item_shihuan_jiugui', 'item_yinxia'],
@@ -1854,7 +1854,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_chizhong',
           title: '持重派',
-          description: '你的信条是「**守祖宗成法，不轻改作**」。你见过两次更化：一次在崇宁朝，清丈田亩清出八十万顷隐田，两年后被「扰民」两个字尽数退还；一次在元祐朝，罢市易司、召回流人，边费省了一成，三年后边上的马价又涨回去了。所以你对任何新办法的第一个反应是「**此事宜缓**」。你与中书侍郎崔敬延这一脉走得近，办事讲究一个「稳」字：宁予其费，不夺其权。你不贪，也不争，你只是觉得这个天下经不起折腾——**而你的对手会说，正是这种"不折腾"把窟窿养到了二百一十万石。**',
+          description: '守成法、少改动。你挡得住别人的事，却始终拿不出钱来。',
           attributeBonus: { mou: 1, li: 2 },
           resourceBonus: { money: 1, qing: 1, rank: 1 },
           startingItems: ['item_shihuan_jiugui', 'item_gongfu', 'item_yinxia'],
@@ -1862,7 +1862,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_neiting',
           title: '内廷派',
-          description: '你依附内侍省都知这一系。你知道这条路名声不好——本朝的士林管靠内廷得官的人叫「**北门出身**」——但你也知道它最实在：**内库的钱不入户部的账，内库的差遣不必经吏部的铨选，内库的一句话能让你的名字出现在御案上。**你替内廷做过的事包括：把一份来自某州的状子压三天，把某位御史调卷的行踪透给都知，以及在内库的支度单上写一个改过的数字。你今年三十二岁，官阶不高，但你在两处衙门里都有不必通报就能进的门。',
+          description: '靠着宫里那条门路做事。来钱快，名声差，翻脸也快。',
           attributeBonus: { shi: 2, cha: 1 },
           resourceBonus: { money: 4, qing: -3 },
           startingItems: ['item_neiku_gongshi', 'item_neishi_yaopai', 'item_yinxia'],
@@ -1870,7 +1870,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_bianzhen',
           title: '边镇派',
-          description: '你认为本朝的病不在边镇，在京里：**边上要的是粮、是马、是三年不换将；京里给的是文书、是规矩、是一年一调任。**你与三镇在汴梁的三处进奏院都有往来，替云中镇递过一次请和市的状，也替朔方镇催过一次被"缓付"的军费。你写的每一份文书都比别人直，因为你信「边事专任，便宜行事」这八个字。你自己的处境也说得很直：你在京里的位置随时可以被撤，但只要三镇还需要一个在户部替他们看账的人，你就不会被撤。',
+          description: '替边上说话。你信粮与刀，不信京里那套公文往来。',
           attributeBonus: { wu: 1, shi: 2 },
           resourceBonus: { money: 3, qing: -1 },
           startingItems: ['item_bianzhen_liangce', 'item_kanhe', 'item_qidougong'],
@@ -1878,7 +1878,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_caoyun',
           title: '漕运商帮',
-          description: '你信的是「**河要流，人要吃饭**」。你在漕河上下有关系：押纲的官、闸口的闸官、香会的掌事、扬州的盐商、汴梁一百二十行里的几个行首。你不结党，但你替人办过很多事：替一个盐商把引期延了十天，替一个纲司把「遇风沉没」写成「例应核销」，替一位行首把和买的摊派额压下去两成。**你的规矩只有一条：不上书，不谈国事。**因为你知道，河上的人一旦开始谈国事，河就要断。',
+          description: '和河上的人打交道。不上书、不谈国事，只谈货与闸。',
           attributeBonus: { cha: 1, shi: 1, mou: 1 },
           resourceBonus: { money: 5, qing: -2 },
           startingItems: ['item_caoyun_bangtie', 'item_yanyin', 'item_didian_qi'],
@@ -1886,7 +1886,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_qingliu',
           title: '清流（不惜丢官）',
-          description: '你把「**明于事理、不避权贵**」当作立身之本。你不受贿、不赴私宴、不替人带话，写状只写事实与数目。你手上有过两个题目：一个是某州的一笔漕米短少，一个是某衙门的一笔支度无据。你都上过状，两次都被「照例办理」压了下来，第二次之后有人在朝会上问起你的名字，那是你第一次觉得自己真的站在了台面上。**清流的路很少有好下场**——你已经做好被贬的准备，只是还没想好被贬到哪里、以及那时谁来养你的家。',
+          description: '只写事实与数目。你会得罪人，也可能因此被记住。',
           attributeBonus: { ming: 2, cha: 1 },
           resourceBonus: { qing: 4, money: -2, rank: -1 },
           startingItems: ['item_lv_chaoben', 'item_gongfu', 'item_duanzu'],
@@ -1894,7 +1894,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_kaoke',
           title: '只求考课中上',
-          description: '你不想站队，你只想把三年一任过完：**考语上写「清慎明著、干济有闻」八个字，任满得一个「减选」，调一处稍好的缺，俸禄够养家，清誉不掉到中下。**为此你做的事很实在：把本司的例案抄熟，把上官的忌讳记住，凡是不该你署名的文书绝不署名，凡是可能出事的账一定写「再详」。你不觉得这叫苟且，你觉得这叫本分——**本朝九成的地方官一辈子就是这么过的。**',
+          description: '不站队，只求三年一任平安过完，考语上别有难听的字。',
           attributeBonus: { li: 2, mou: 1 },
           resourceBonus: { qing: 2, money: 1, rank: 1 },
           startingItems: ['item_shihuan_jiugui', 'item_suanpan', 'item_xunlu'],
@@ -1902,7 +1902,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_quanchen',
           title: '想做权臣',
-          description: '你要的不是清名，是「**离了我这件事办不成**」。你已经在做三件事：把本司的例案抄成只有你看得懂的次序；在每一次上官交代的差事里留一个只有你能补上的口子；把每一个经手过的数目记在自己的一本私册上。你不急，你知道权臣不是一天做成的——**本朝的权臣多半是从一个"掌案"开始的**。你也不打算只靠一个人：你同时替更化派抄账、替持重派递话、替内廷传一份无伤大雅的数目。你今年三十岁，你相信自己四十五岁前能坐到一个不必向任何人解释的位置。',
+          description: '让事情离了你就办不成。慢慢来，位置比名声要紧。',
           attributeBonus: { mou: 2, shi: 1 },
           resourceBonus: { money: 2, qing: 1 },
           startingItems: ['item_lian_anben', 'item_yinxia', 'item_yufu'],
@@ -1910,7 +1910,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_jianchen',
           title: '想做奸臣',
-          description: '你已经想明白了：**在这个天下，清名是最不值钱的东西，清名归零也不过是一份弹章。**所以你做的事都很直接：凡经你手的账，多出来的那一部分先扣出三成，交给上官，自己留一成；凡有人来求你办一件不太干净的事，你先问三件事——**要办成什么、什么时候要、你出多少**。你不认为自己坏，你认为自己只是比别人先看清了规矩：本朝的律写得很严，而"例"很宽，落在中间的那一段，就是你的活路。你今年三十三岁，第一笔私留的钱已经攒到了十一贯。',
+          description: '该拿的拿、该办的办，只问值多少、什么时候要、谁来担。',
           attributeBonus: { mou: 2, li: 1 },
           resourceBonus: { money: 5, qing: -4 },
           startingItems: ['item_siyan_dizhang', 'item_zhiqi', 'item_jiuhulu'],
@@ -1918,7 +1918,7 @@ export const greatchen: WorldCard = {
         {
           id: 'stance_shuiying',
           title: '谁赢跟谁',
-          description: '你不属于任何一派，你只判断两件事：**这一件事最终会落在谁手上，以及那个人会不会记得是谁先到的。**所以你在更化派的酒席上坐半个时辰，在持重派的同年家里吃一顿饭，在内廷的人过路时"恰好"递上一份抄件。你从不表态，别人问起你的立场，你只说一句：「**下官只管本司的账。**」这句话在这个天下是一张最好的护身符——它让你四次避开了牵连，也让你至今没有任何一个真正愿意为你说话的人。你今年三十一岁，位置稳，前途不明。',
+          description: '不表态，只看最后落在谁手上，以及他记不记得你先到。',
           attributeBonus: { cha: 2, shi: 1 },
           resourceBonus: { money: 2, qing: 1 },
           startingItems: ['item_xunlu', 'item_suanpan', 'item_lian_anben'],
@@ -1931,7 +1931,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_nengchen',
           title: '做能臣，把账查到底',
-          description: '你选的是最笨也最难的一条：**账查到底。**你手上已经有两条线：一条是含嘉仓短少的三千六百石，一条是三镇军仓本色少的那两三成。你知道再往下走一步就会碰到人——不是一个人，是一串人：仓吏、押纲官、转运使的属官、镇上的粮料官、以及某一位已经在京里做了三品官的人。你不指望三年办成，你给自己定的期限是十年。**你也知道这条路的结局通常有两个：要么你查出真相而被调走，要么你查出真相而被留在原处——因为朝廷需要有人一直在查。**',
+          description: '把账查到底。要很多年，得罪一串人，账会干净一点。',
           attributeBonus: { cha: 2, li: 1 },
           resourceBonus: { qing: 2, money: -1 },
           startingItems: ['item_juncang_zhang', 'item_hanjia_bo', 'item_chenmi_yang'],
@@ -1939,7 +1939,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_quanchen',
           title: '让某位皇子离不开我',
-          description: '你的野心不写在脸上：你要做**某一位皇子身边不能少的那个人**。你算过：今上五子，长子十九岁好兵、次子十七岁好文、三子十四岁体弱；册立太子须经礼部、宗正寺、太常寺三司覆核，而册礼要三十万贯。这三个孩子里总有一个会成为皇帝，而一个未来的皇帝需要的第一样东西，**不是一个忠臣，是一个能替他把账管住、并且知道他太多事的人。**你已经开始做两件事：把度支司的例案抄成便于"教人"的样子，以及在每一次可能遇见东宫属官的场合，让自己显得可靠而不显眼。',
+          description: '在储位未定的时候站到某一位身边，让他离不开你。',
           attributeBonus: { mou: 2, shi: 1 },
           resourceBonus: { money: 2, qing: 1, rank: 1 },
           startingItems: ['item_yufu', 'item_donggong_zhizha', 'item_lian_anben'],
@@ -1947,7 +1947,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_bianchen',
           title: '去云中镇挣一块自己的地盘',
-          description: '你不想在汴梁的案子上耗一辈子。你想去云中镇——**用马料账和军报换一块真正归你管的地盘。**你的算盘打得很清楚：京里最缺的是"能说清边上账目的人"，而边上最缺的是"能在京里替他们说话的人"；你若两头都占住，就能从度支司的一个小吏变成某镇幕中不可少的人，再从幕中转到正式的差遣。你已经有一册边镇粮册的抄件，也知道它缺了十四页；你还认识三镇进奏院里的两个人。你缺的只是一次出京的机会。',
+          description: '离开京城，用账与军报换一块真正归你管的地方。',
           attributeBonus: { wu: 1, mou: 1, shi: 1 },
           resourceBonus: { money: 2, health: 1 },
           startingItems: ['item_bianzhen_liangce', 'item_kanhe', 'item_yutu'],
@@ -1955,7 +1955,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_fujia',
           title: '在漕河上挣一份产业',
-          description: '你打算给自己留一条退路。这条退路很具体：**一条船、一间邸店、一张盐引、几个肯替你说话的牙人。**你不打算辞官——本朝的官可以"兼营"，只要不经手与自己职权有关的买卖；你要做的是把汴梁城东那间邸店先盘下来，再用它换来一张盐引的额度，然后靠飞钱的兑付点认识几个南北的商人。你把这件事叫做"**给自己攒一副不怕夺官的身家**"。你算过本钱：四百二十贯，眼下手上有八贯，还欠黄四娘十一贯。',
+          description: '一条船、一间邸店、一张盐引，攒一副不怕丢官的身家。',
           attributeBonus: { cha: 1, shi: 1, li: 1 },
           resourceBonus: { money: 5, qing: -1 },
           startingItems: ['item_didian_qi', 'item_yanyin', 'item_caoyun_bangtie'],
@@ -1963,7 +1963,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_qingliu',
           title: '把一件事捅到御前',
-          description: '你不求升迁，你只想**做成一件对的事**。你手上的题目已经选好了：永熙十四年淮西那笔三十万贯的赈灾钱，其中十一万贯经七个衙门的手，最后落在一个如今已是三品官的人家里。御史中丞沈越的抽屉里有一张匿名状，而按律匿名状不予受理——所以他需要一个人，能把这笔钱在户部的旧账上一条一条核出来，**让状子上的数目字变成"官文书里的数目字"**。这件事一旦做成，你可能升官，也可能丢官，还可能连命一起丢。你今年三十四岁，你想过一次"要不要等几年再说"，那天夜里你没睡着。',
+          description: '不惜丢官，把某一件事摆到皇帝面前，让天下人都知道。',
           attributeBonus: { ming: 2, cha: 1 },
           resourceBonus: { qing: 4, money: -2, health: -1 },
           startingItems: ['item_lian_anben', 'item_duanzu', 'item_gongfu'],
@@ -1971,7 +1971,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_richang',
           title: '只求把日子过稳',
-          description: '你的目标很小，也很实在：**家里的田别被人占去（本朝田宅买卖须先问亲邻，一不留神祖田就成了别人的），亲族里有一个能接上举荐的后辈，自己的考课别落在中下。**这三件事听起来不像志向，但本朝九成的人一辈子就在办这三件事。你为此做的准备是：把族中公田簿带在身上，把祖田的四至抄清，把每一位可能提携族中子弟的官员的考语记下来，凡是不该你署名的文书绝不署名。你不介意别人说你没有大志——**你要的是十年之后还站在这间值房里，而大多数人已经站不住了。**',
+          description: '田不被占、族里有后辈、考课别落在中下。别的不管。',
           attributeBonus: { li: 1, mou: 1, cha: 1 },
           resourceBonus: { qing: 2, money: 2, rank: 1 },
           startingItems: ['item_zutian_bu', 'item_jiashu', 'item_suanpan'],
@@ -1979,7 +1979,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_kuli',
           title: '做酷吏：用最简单的手段把事办成',
-          description: '你选定的是最见效也最伤人的一条路：**做酷吏。**你在河南道一个下县做县尉时立过一次威——为催十九个空村子的税，你抓了里正、枷了三日、当众打了六个人的板子，十天之内把那一县三年的欠税收回了七成。上官在考语上写「**干济有闻**」，那年你得了减选。你从此明白一件很实在的事：**在这个天下，办成事的办法往往只有一个，就是把别人的疼用对地方。**你也知道这条路的下场通常很清楚——清誉跌到中下之后，上官会把所有"见不得光的差事"都派给你，而你既不能推，也不能停。你今年三十六岁，你已经开始睡不好了。',
+          description: '用最直接的手段把事办成。见效最快，名声也坏得最快。',
           attributeBonus: { li: 2, wu: 1 },
           resourceBonus: { money: 3, qing: -3, rank: 1 },
           startingItems: ['item_muji', 'item_duandao', 'item_lv_chaoben'],
@@ -1987,7 +1987,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_meili',
           title: '靠魅力做事：让人愿意替你办',
-          description: '你不用刀，也不全靠账本，你用人。你要做的是那种**让人愿意替你跑一趟、愿意替你担一句、愿意在你落难时先把话递过来的人**：可以是在酒楼里与六部吏员喝到三更的游士，可以是在后院里经营出一支消息网的谋主，也可以是靠一副嗓子、一张脸过活的伶人。**本朝不许官员宿娼，但本朝的官场几乎没有人不靠人情办事**——会做人是一门实实在在的本事。你今年二十九岁，你身上最值钱的东西是三十七个人的名字，以及每一个人欠你的那点小情。你不打算用这些东西去换官，你打算用它们去换时间——**在自己还站得稳的时候，把该办的事一件一件办出去。**',
+          description: '不用刀也不用账本，用人：让人愿意替你跑一趟、担一句。',
           attributeBonus: { ming: 2, shi: 2 },
           resourceBonus: { money: 2, qing: 1 },
           startingItems: ['item_jiuhulu', 'item_gongfu', 'item_xunlu'],
@@ -1995,7 +1995,7 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_haishang',
           title: '做海商：把身家押在广州的季风上',
-          description: '你押的是一年两度的季风。你在广州、泉州或明州找一条船，凑一份本钱（**本朝的规矩是"合本"：十条股，每股若干）**，等季风起时出海，去南海诸国换香药、犀角、玳瑁、苏木，回来时在广州抽解（三成）与博买（一成）之后，剩下的归你。这一趟的利可以是一倍，也可以是全亏——**船不回来的那年，你会同时失去本钱、合伙人、以及你在乡里所有的脸面。**你今年三十三岁，你手里已经有两份"合本"的凭据，只差一条真正属于自己的船。你不打算离开体制，你打算**用体制给你的身份，去做体制管不到的事**。',
+          description: '把身家押在季风上。一趟可以翻倍，也可以连船带人全无。',
           attributeBonus: { cha: 1, shi: 1, mou: 1 },
           resourceBonus: { money: 4, qing: -1, health: -1 },
           startingItems: ['item_caoyun_bangtie', 'item_didian_qi', 'item_yanyin'],
@@ -2003,10 +2003,18 @@ export const greatchen: WorldCard = {
         {
           id: 'ambition_fanfu',
           title: '转身做另一个人的敌人',
-          description: '你不打算一开始就站在哪一边，你要的是**先入局、先攒够，再翻一次身**。你给自己定的顺序是：先进一个衙门，学通那一门的规矩；再用三年时间攒下足够的东西——一份账、一个人情、一个把柄；然后把它卖给那个最需要它的人。**本朝的官场里，背叛是最常见的一件事**：同年之间、门生与座师之间、举主与所举之人之间，翻脸的记录在架阁库里有的是。这条路的风险不在道德，在**你翻过脸之后，所有人都会记得你会翻脸**——所以你要么一次翻得足够大，要么永远别再指望有人替你说话。',
+          description: '先入局、攒够，再翻一次身。翻过之后，所有人都记得。',
           attributeBonus: { mou: 2, cha: 1 },
           resourceBonus: { money: 3, qing: -3 },
           startingItems: ['item_juncang_zhang', 'item_duanzu', 'item_zhiqi'],
+        },
+        {
+          id: 'ambition_dishi',
+          title: '做皇子的老师：用一个人，握整个天下',
+          description: '不自己掌权，去做掌权者的老师：握住一位年幼或软弱的皇子，扶他做储君、再扶他登基。他若不受控、被人抢先、或事泄，你就是离间天家的罪人。',
+          attributeBonus: { mou: 2, shi: 2 },
+          resourceBonus: { qing: -1, money: 2, rank: 1 },
+          startingItems: ['item_donggong_zhizha', 'item_yufu', 'item_lian_anben'],
         },
       ],
     },
@@ -2016,7 +2024,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_ledger',
           title: '你手上有一份不该有的册子',
-          description: '三年前你在仓部司值夜，替一个已经死在任上的老吏收拾案卷，在一只破箱底翻出半册账：那是**永熙十七年至二十一年**三镇「军仓本色」的收付记录。册子上一共七十四笔，其中二十九笔的入仓数，比户部的存档少了两成到三成。抄这份册子的人已经死了，据说是酒后落水。你把册子抄了一份，藏在你租的那间屋子的房梁上。你没有告诉任何人——包括你的举主。这份册子能救你，也能杀你，区别只在于你什么时候把它拿出来，以及拿给谁。',
+          description: '你手上有半册不该在你手上的军仓旧账，抄它的人已经死了。',
           attributeBonus: { cha: 2 },
           resourceBonus: { qing: 1, money: -1 },
           startingItems: ['item_juncang_zhang', 'item_lian_anben'],
@@ -2024,7 +2032,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_debt',
           title: '你欠着一笔说不清的债',
-          description: '你母亲病重那年，你在汴梁城西的一家质库（当铺）押了东西，借了三十贯，月息三分。借契上写的债主是一个姓黄的牙人，但你后来知道，黄牙人背后放的是**御史台一个察院御史**的母钱。这笔债你已经还了十九贯，剩下的十一贯，对方不要钱，只要你替他在度支司看一份文书——看是哪一份，什么时候看，都没说。你等了两年，对方一直没来找你。你最怕的不是他来，是他永远不来，那样这笔债就会一直挂着，挂到某一天忽然要用十倍的价钱还。',
+          description: '你欠着一笔说不清的债，债主不要钱，只要你看一份文书。',
           attributeBonus: { mou: 1, shi: 1 },
           resourceBonus: { money: -2, qing: 1 },
           startingItems: ['item_zhiqi', 'item_yaosan'],
@@ -2032,7 +2040,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_name',
           title: '你的名字不在你家的族谱上',
-          description: '你自幼听母亲说父亲是「在边镇做事的」，十五岁那年你在母亲的妆奁底下找到一封信：信上署名的那个从五品武官，与你的姓不同。你后来查过兵部的旧档——那个人的名字在**永熙六年**之后就再没出现过，同一年，朔方镇有一批军官因「私卖军马」被处斩，共十一人。你不知道他是不是其中之一。你只知道你若有一天要用「家世」两个字替自己说话，你就必须先弄清这件事。',
+          description: '家谱上没有你父亲的名字，而他那桩旧案还没结。',
           attributeBonus: { cha: 1, mou: 1 },
           resourceBonus: { qing: 1 },
           startingItems: ['item_jiashu', 'item_yutu'],
@@ -2040,7 +2048,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_witness',
           title: '你见过一次不该看见的事',
-          description: '永熙二十五年冬夜，你替上官送一封急件去皇城，走的是西华门外的夹道。你在夹道尽头看见两个人抬着一只箱子从内库的侧门出来，箱子上有内侍省的封条。抬箱子的人之一，你认得——是殿前司的一个都虞候。你当时低着头走过去了，什么也没说。两年过去，那个都虞候已经升成了殿前司的副都指挥使。他见过你的脸，你也见过他的脸。这件事的全部重量在于：你们都记得。',
+          description: '你见过一次不该看见的事，而对方也清清楚楚看见了你。',
           attributeBonus: { cha: 1, mou: 1 },
           resourceBonus: { qing: 1, health: -1 },
           startingItems: ['item_duanzu', 'item_neishi_yaopai'],
@@ -2048,7 +2056,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_kin',
           title: '你有一个说不出口的亲眷',
-          description: '你的姐姐（或妹妹）在永熙二十一年被选入宫，做一个没有品级的女官，管的是内廷的衣物库。她是你在世上唯一还牵挂的人。你们三年只见了两面，都是借内廷放人出宫采买的机会，在宫墙外的一家茶铺里坐了半个时辰。她告诉过你一件事：内库的衣物库每年领的绢，比实际用掉的多三成，多出来的那三成，经一个姓王的都知的手出宫。**你若要在宫里打听任何消息，她是唯一的门；而这道门一旦被人发现，她就没了。**',
+          description: '宫里有一个与你有关的人，替她递一次话就够要命。',
           attributeBonus: { shi: 1, cha: 1 },
           resourceBonus: { money: 2, qing: -1 },
           startingItems: ['item_neishi_yaopai', 'item_gongfu'],
@@ -2056,7 +2064,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_promise',
           title: '你许过一个不该许的诺',
-          description: '永熙十九年，你还在河东道一个中州做司仓参军。那年冬天，一个老仓吏病死在值房里，死前拉着你的手，让你答应他一件事：**把他藏在仓房夹墙里的一只木匣，交给他女儿，不要看。**你答应了。那只木匣你至今没有交出去——因为他的女儿在永熙二十年嫁去了剑南，你查不到她的下落；也因为你自己在永熙二十一年忍不住打开过一次。匣子里是三十二张借契，借款人是本州前后三任刺史与两位别驾，出借人是本州的**公廨本钱**。**你许过的那个诺言，现在变成了一条随时能救你也随时能杀你的绳子。**你把木匣带回汴梁，寄存在城西一家邸店里，存物的凭据上写的名字是假的。',
+          description: '你答应过一个死人，要把一只匣子交出去，至今没交。',
           attributeBonus: { mou: 1, cha: 1 },
           resourceBonus: { qing: 1, money: -1 },
           startingItems: ['item_zhiqi', 'item_lian_anben'],
@@ -2064,7 +2072,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_killer',
           title: '你替某位大人物压过一桩命案',
-          description: '永熙二十四年夏，汴梁城西的一处曲院里死了一个人——一个替某位大人物管私账的牙人，胸口一处伤口，据说是自己撞在案角上的。那夜里你被叫去，做的是三件事：把验状上「长三寸阔一寸二分」改成「长二寸阔八分」，把一件湿了的衣裳换掉，以及在第二天的日报上把这个人的名字写成「病卒」。你得了**四十贯**，还得了那位大人物的一句话：「**你这个人我记住了。**」两年过去，那位大人物已经升了一级；而你以为已经忘了这件事的人，前几日忽然在街上喊了你的名字。',
+          description: '你替一位大人物压过一桩命案，他记住了你，别人也记得。',
           attributeBonus: { cha: 1, mou: 1, li: 1 },
           resourceBonus: { money: 3, qing: -3 },
           startingItems: ['item_duanzu', 'item_wupin_jianshu', 'item_xunlu'],
@@ -2072,7 +2080,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_forgery',
           title: '有一桩命案上有你的名字',
-          description: '三年前你在一个下县做流外吏员，本县出了一桩人命：一个佃客死在田主的打谷场上。县令判的是「斗殴致死」，你写的是案卷。**你在验状上把死者左肋的旧伤去掉了**——那是田主的家丁早年打的，若写上去，这件案子就从「斗殴」变成「积怨」，田主要抵命。你当时想的是「少一桩事」；如今你明白了：**本朝的案卷在架阁库里放着，二十年后还可以被人打开。**那位田主去年死了，而他的儿子如今在京里做一个从九品的勾当，认得你的脸。',
+          description: '你在验状上改过一处伤，那桩案子的旧档还在库里。',
           attributeBonus: { li: 2, mou: 1 },
           resourceBonus: { qing: -2, money: 2 },
           startingItems: ['item_lian_anben', 'item_muji', 'item_yinxia'],
@@ -2080,7 +2088,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_konge',
           title: '你在边镇吃过空额',
-          description: '永熙二十三年到二十五年，你在朔方镇做过管粮料的勾当。**一营额兵三百七十人，实存二百八十九人。**那八十一人的口粮与冬衣由你经手，一半上缴给领军的都尉，一半与两个粮料官分。你分到的是**两年共七十四贯**——这笔钱你在汴梁买了一处两间的宅子，还替兄弟娶了亲。你逃回京里是因为永熙二十六年镇上换了一位新都尉，一来就点名，点了三天；你没有等到第四天。**本朝军中吃空额是公开的秘密，而你的麻烦在于：你是那个记账的人。**',
+          description: '你在边镇吃过空额，手里还留着一册缺页的粮册。',
           attributeBonus: { li: 2, cha: 1 },
           resourceBonus: { money: 3, qing: -3, health: -1 },
           startingItems: ['item_bianzhen_liangce', 'item_didian_qi', 'item_duandao'],
@@ -2088,7 +2096,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_siyan',
           title: '你替私盐贩子记过账',
-          description: '永熙二十四年到二十六年，你在淮南一个盐场边上的镇子里做账房，替一个姓鲁的盐商记两本账：一本给官，一本给自己。**那两本账的出数差三成**，每一笔「过手钱」只用极简的记号标出（三角是船，圆点是闸夫，横线是保正）。你赚了**一百二十贯**，也从此知道了一件事：**这条河上下每一个闸口的人，都在这三成里有一份。**你离开是因为鲁家的儿子开始防你。你走的时候把那本私账抄了一册带走——当时以为这是保命的东西，如今你越来越觉得，这是一张催命的字据。',
+          description: '你替私盐贩子记过两本账，一本给官，一本给自己。',
           attributeBonus: { cha: 2, li: 1 },
           resourceBonus: { money: 4, qing: -3 },
           startingItems: ['item_siyan_dizhang', 'item_caoyun_bangtie', 'item_jiuhulu'],
@@ -2096,7 +2104,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_gongjin',
           title: '你替宫里的一个人往外递过消息',
-          description: '你在内廷没有职名，但你有一个在内廷管衣物库的姐姐（或是当年一起长大的同伴）。三年前她托你往外递一样东西：**一张写着九个字的纸条**，收纸条的人你至今不知道是谁，你只知道那人在马行街的一家香药铺里等，见到纸条给了你五贯，又让你下月同一日再来。你去了四次，最后一次对方没来。**按本朝之制，"漏泄禁中语"是一条不需要证据的罪名**，皇城司的西院里关着的人，多半落的就是这一条。你把那人的长相记了下来，也把那张纸条的九个字背了下来——你怕的不是被抓，是**有人知道你知道这九个字**。',
+          description: '你替宫里的人往外递过一张纸条，那九个字你还背得出。',
           attributeBonus: { cha: 2, shi: 1 },
           resourceBonus: { money: 3, qing: -2, health: -1 },
           startingItems: ['item_neishi_yaopai', 'item_neiku_gongshi', 'item_xunlu'],
@@ -2104,7 +2112,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_kuzhai',
           title: '你手上有别人寄放的库银',
-          description: '永熙二十五年冬，一个已经外调的同僚把一只匣子寄在你这里，说半年后回来取，里面是**八十贯现钱**。他说这钱是"公廨本钱里借出来的"，说的时候笑了，你也就没多问。半年之后他没有回来，只有一封从剑南寄来的信，说"**匣中物，兄自用之**"。你一文没动，因为你知道**本朝最重的一条罪叫"放库债"**：把官库的钱挪出去放贷，主者徒二年，得利者计赃以盗论。这只匣子如今在你床下，你每次听见邻家的狗叫都会醒。',
+          description: '你床下有一只别人寄放的匣子，里面的钱来路不正。',
           attributeBonus: { li: 1, mou: 1, cha: 1 },
           resourceBonus: { money: 4, qing: -2 },
           startingItems: ['item_zhiqi', 'item_yinxia', 'item_lian_anben'],
@@ -2112,7 +2120,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_xianghui',
           title: '你在香会里替人做过一次保',
-          description: '你是漕河上某段河面香会的"**保人**"之一：凡会里的船出了事，由你与另外两个人出面写具保状，向官府说明"失事缘由"。两年前永熙二十五年秋，一条装了四百石私货的船在浅滩上出事，你替船主写了一张"遇风沉没"的具保状，画了押，得钱六贯。**按本朝的规矩，具保不实者与犯者同罪**——若有人翻出那条船吃水很浅的证据，你这张具保状就是一份自认的供状。你把帮帖带在身上，是因为香会替你养着家；你不敢把它丢掉，是因为**丢帖的人，在这条河上会被人认出来**。',
+          description: '你在香会里替人做过一次保，那张具保状还在别人手里。',
           attributeBonus: { cha: 1, shi: 1, mou: 1 },
           resourceBonus: { money: 2, qing: -2, health: 1 },
           startingItems: ['item_caoyun_bangtie', 'item_siyan_dizhang', 'item_duandao'],
@@ -2120,7 +2128,7 @@ export const greatchen: WorldCard = {
         {
           id: 'secret_taowang',
           title: '你是一个逃籍的人',
-          description: '你如今的籍是假的。永熙十九年淮西大旱，你十一岁，跟着家人往北走；走到汴梁时户口上只剩下你一个，而**本朝的规矩是"逃户三年不归，田没官"**，同时"浮客不能立户、不能应举、不能置田"。十九岁那年你花了**八贯钱**，从一个人手里买了一份"身死未销"的旧籍，顶了那个死人的名字，从此有了一个不是自己的姓名、籍贯与祖父三代。你今年二十四岁，做过脚夫、挑夫、厢军，如今在一个衙门里当差。**你这一生最怕的一件事，是有一天有人拿着一张户籍贴来问你祖父叫什么。**',
+          description: '你如今用的籍是花钱买来的，姓名与祖父都不是你的。',
           attributeBonus: { cha: 1, wu: 1, li: 1 },
           resourceBonus: { money: 1, health: 2, qing: -2 },
           startingItems: ['item_caoxi', 'item_xiangqu_jianshu', 'item_jiashu'],
@@ -2132,16 +2140,16 @@ export const greatchen: WorldCard = {
       options: [
         {
           id: 'kai_yamen',
-          title: '在汴梁的衙门里当差',
-          description: '你在汴梁的衙署里当差——户口册、钱粮册、例案、用印簿，一天到晚都是纸。**这里离中枢最近，也离危险最近**：一张状子往哪一司递、一份文书记在九月二十九还是十月初一，都是你能动的手脚。你的体面是穿着公服进皇城的侧门，门吏见了你不拦；你的代价是**账上的每一个窟窿都会经过你的手，而窟窿不会自己长出来。**你今年二十几岁到三十几岁都有可能，位置在从九品到正八品之间，一年到手十五贯到四十贯。你要么在这间值房里做十年抄账的人，要么把某一笔账查到底。',
+          title: '在京城衙门里当差',
+          description: '在京城衙门当差。案牍、钱粮、例案都从你手上过，你能让一件公事快或慢。',
           attributeBonus: { li: 2, cha: 1 },
           resourceBonus: { rank: 1, money: 1, qing: 1 },
           startingItems: ['item_suanpan', 'item_yinxia', 'item_hanjia_bo'],
         },
         {
           id: 'kai_zhou',
-          title: '在外任州县做官',
-          description: '你在一个中州（或下州）的衙门里当差：或是本州的司户参军、司法参军，或是本县的县丞、主簿、县尉。**你手上是一方百姓的实事**——夏税秋粮、户绝田、争水的械斗、拖了三个月的命案、该修而没有修的陂塘。你不必是清官，也不必是酷吏；你只要知道本朝的一条实情：**一州一县的赋税是定额，而人多地少，缺口只能从别处挤出来。**你身后有长官的考语，面前有胥吏与豪强的默契，还有一本记着前任"再详"的牍文。',
+          title: '在外任做官',
+          description: '在外任做官。赋税、讼案、胥吏、豪强都归你管，定额却不会因你而减。',
           attributeBonus: { li: 1, cha: 1, ming: 1 },
           resourceBonus: { rank: 1, money: 2, qing: 1 },
           startingItems: ['item_wenhou_die', 'item_muji', 'item_lv_chaoben'],
@@ -2149,7 +2157,7 @@ export const greatchen: WorldCard = {
         {
           id: 'kai_bianzhen',
           title: '在边镇吃军粮',
-          description: '你在三镇（朔方、云中、雁门）一带吃军粮：或是营里的押纲校尉，或是节度使幕下的支度官。**边上不讲京里的规矩，只讲两件事——粮与刀。**你熟悉马粪、烽火、冬衣的发放，也知道一营"额兵三百七十人、实存二百八十九人"是什么意思。边地的体面是有人喊你一声"校尉"；代价是**每一封军报背后都有一个被凑出来的数目**，而你经手过其中几笔。你在这条路上可以做成事，也可以再也回不来。',
+          description: '在边镇吃军粮。粮、马、烽火、空额，边上的账比京里更难对。',
           attributeBonus: { wu: 1, li: 1, shi: 1 },
           resourceBonus: { health: 1, money: 2, qing: -1 },
           startingItems: ['item_bingji_ce', 'item_kanhe', 'item_duandao'],
@@ -2157,7 +2165,7 @@ export const greatchen: WorldCard = {
         {
           id: 'kai_caohe',
           title: '在漕河上跑船做买卖',
-          description: '你的日子在河上：一条船、一船货、几个牙人与一段闸口的人情。**漕河上下有几十万人在讨生活**——押纲的、闸夫、纤夫、香会、私贷的、卖吃食的。你的本钱是船契与帮帖，你的体面是"这条河上的人认得你"，你的麻烦是每一次沉船、每一次过闸、每一笔押船钱的利。**没人问你的货是官盐还是私盐，只问你几时到闸。**你今年二十几岁到四十几岁，赚得比吏员多，睡得比吏员少。',
+          description: '在河上跑船做买卖。船、货、闸口、中人，一趟的利与险都算得清。',
           attributeBonus: { cha: 1, mou: 1, li: 1 },
           resourceBonus: { money: 3, health: -1 },
           startingItems: ['item_chuanqi', 'item_caoyun_bangtie', 'item_yanyin'],
@@ -2165,7 +2173,7 @@ export const greatchen: WorldCard = {
         {
           id: 'kai_jianghu',
           title: '在江湖上混',
-          description: '你没有官身，只有手上的本事和一处的规矩。你在一家**信行**（本朝护送货物的行当）做镖师，或在一个帮口里看场子。你懂刀、懂路、懂谁的地界上该给谁面子；你也懂得**在这个天下动手是最后的手段**：一刀砍下去，验状、尸格、里正、差役就都来了，而最后结账的往往不是拿刀的人，是拿印的人。你今年二十几岁，一身伤，工钱按趟结，一趟十五贯到三十贯。',
+          description: '没有官身，只有规矩。护货、看场子、讲面子，刀是最后的手段。',
           attributeBonus: { wu: 2, cha: 1 },
           resourceBonus: { health: 2, money: 1, qing: -1 },
           startingItems: ['item_biaowei_qi', 'item_duandao', 'item_jiuhulu'],
@@ -2173,15 +2181,15 @@ export const greatchen: WorldCard = {
         {
           id: 'kai_siguan',
           title: '在寺庙道观里修行',
-          description: '你有一份度牒，住在某州某寺（或某观）里。**本朝的寺观是天下最会办事的地方之一**：它有自己的田、自己的佃客、自己的库房与账册，还替官府施药、赈济、修桥；度牒可以免役免税免刑，所以荒年时寺里的门槛最高。你的功课不只是念经，还有收租、点库、迎送官客、应付香客。**寺里也有脏事，而且比衙门干净不到哪里去**——你要么把持它，要么被它赶出去。',
+          description: '在寺观里修行。度牒、寺田、香客、官客，清净地方也有账要算。',
           attributeBonus: { cha: 1, ming: 1, li: 1 },
           resourceBonus: { qing: 2, money: 1 },
           startingItems: ['item_duye', 'item_sili_zhang', 'item_yaosan'],
         },
         {
           id: 'kai_tianli',
-          title: '在乡里当个田舍翁或里正',
-          description: '你的世界是三十里内的田、水、坟与族。你或者是族里还有几十亩地的**田舍翁**，或者是被轮派当差的**里正**（本朝的里正一年一换，由中户轮充，做不好要挨板子还要自己赔钱）。你的本事是懂农时、懂水口、懂族里的辈分；你的难处是**官府的定额永远比田里打出来的多**，而差役与摊派只找你，不找族里的老人。你今年三十几岁，手上有一份水利帖文与一本族里的账。',
+          title: '在乡里守着田与族',
+          description: '在乡里守着田与族。水口、徭役、族中的辈分，都是日日要应付的事。',
           attributeBonus: { li: 1, cha: 1, mou: 1 },
           resourceBonus: { health: 1, money: 1, qing: 1 },
           startingItems: ['item_shuili_tie', 'item_zutian_bu', 'item_jiangchi'],
@@ -2189,7 +2197,7 @@ export const greatchen: WorldCard = {
         {
           id: 'kai_wazi',
           title: '在瓦子书会里卖艺',
-          description: '你在汴梁（或某州）的瓦子里卖艺：说书、杂剧、傀儡、影戏、唱曲、相扑，什么都可能。**这一行的体面很薄、本事很真**：一段新话本可以让你三日满座，一句说错的话可以让你从此上不了台。你收的钱叫"缠头"，不入官账，也不算贿；你认识的人从押纲的低品武官到内廷采买的小黄门都有。**本朝的乐籍另编，子弟不得应科举**——这一条写在你的最初，也压在你一生。',
+          description: '在瓦子里卖艺。一段新话本能让人坐满，一句说错的话能让人上不了台。',
           attributeBonus: { ming: 2, cha: 2 },
           resourceBonus: { money: 2, qing: -2 },
           startingItems: ['item_paimu', 'item_jin_chantou', 'item_jiuhulu'],
@@ -2197,39 +2205,39 @@ export const greatchen: WorldCard = {
         {
           id: 'kai_anche',
           title: '在暗处做事',
-          description: '你没有官身，也没有正经行当，你在**别人不敢露面的那一面**做事：赌坊的暗间、质库的下一半借契、私盐的过手钱、替人消灾的中人。你的本事是看人、记数、守口；你的体面是"这个人办事不出声"；你的代价是**本朝的律对这种事的标价很清楚**：私盐一斤徒一年、百斤流三千里；受财枉法十五匹绢就是绞；而"漏泄禁中语"根本不需要证据。你今年三十几岁，手上有一沓借契与一本不能被人看见的账。',
+          description: '在暗处做事。赌坊、私贷、私盐、替人消灾——律条对这些都有明码。',
           attributeBonus: { mou: 1, cha: 2 },
           resourceBonus: { money: 3, qing: -3 },
           startingItems: ['item_zhiying_dan', 'item_siyan_dizhang', 'item_duandao'],
         },
         {
           id: 'kai_liumin',
-          title: '什么都不是的流民或逃户',
-          description: '你没有籍，没有保人，也没有一门固定的手艺。你在城门外的棚子里、在码头的货堆边、在挑担的队伍里过夜。**本朝的规矩对你是最硬的**：逃户三年不归、田没官；浮客不能立户、不能应举、不能置田。你唯一有的是身上的力气、认数的眼、以及**"什么都得现挣"的本事**。你今年二十几岁，已经做过脚夫、挑夫、替人看过货；棚头手里有一张写着你口数的纸，而这张纸决定你明天有没有饭吃。',
+          title: '什么都没有，从头挣',
+          description: '什么都没有，从头挣。没有籍、没有保人，力气与眼力就是本钱。',
           attributeBonus: { cha: 1, mou: 1 },
           resourceBonus: { health: 2, money: -2, qing: -1 },
           startingItems: ['item_caoxi', 'item_kouliang_dan', 'item_tuiqian_tie'],
         },
         {
           id: 'kai_langzhong',
-          title: '朝中一部的郎中（管一个司）',
-          description: '你是尚书省某部的一个郎中，正五品上下，管着一司的事——比如户部仓部司：天下仓廪的账、转般仓的籴粜、漕米到仓的点验，都要经你的手。**你能做什么**：本司的公事由你拟、由你署、由你封，一件文书能不能出这道门，就在你一支笔上；你说一句「此事有旧例可援」，一个死结就能解开。**你不能做什么**：尚书与侍郎在你上面，你的印不能自行上奏，凡事要经本部长官与通进司；四品以上还有一道门槛，你若在这一司坐得太久，考语上会多四个字——「久任不迁」。**你要签字用印的东西**：本司的印与用印簿、本司的「看详」与例案、以及各州送上来请你批「准」或「不准」的状子。',
+          title: '在朝中当权',
+          description: '在朝中当权。你能让一件公事成或不成，上面还有人能推翻你。',
           attributeBonus: { li: 2, shi: 1 },
           resourceBonus: { rank: 2, money: 2, qing: 1 },
           startingItems: ['item_siyin', 'item_yinxia', 'item_lian_anben'],
         },
         {
           id: 'kai_zhuanyun',
-          title: '一路的转运副使',
-          description: '你是盐铁转运使的副手，驻在扬州或某一处转般仓所在的州，从五品到正五品。**你能做什么**：漕米何时起运、船过哪一道闸、纲单由谁验发、脚价钱怎么分派，全在你手上过一遍——你可以让一条船早三天到闸，也可以让它晚三天；三镇军粮的起运也得看你的批。**你不能做什么**：正使在你上面，户部、度支、盐铁三司在你头上；兵不归你调，州县不听你令，你对州县的文书只能「牒」，不能「帖」。**你要签字用印的东西**：纲单与过闸历、脚价钱册、转般仓的收付账，以及每一件「遇风沉没」的勘验状——那三个字上签的是你的名字。',
+          title: '掌一路钱粮的实权',
+          description: '掌一路钱粮的实权。起运、过闸、脚价、核销，都要经你的手。',
           attributeBonus: { li: 1, cha: 1, shi: 1 },
           resourceBonus: { money: 4, rank: 1, qing: -1 },
           startingItems: ['item_gangling', 'item_kanhe', 'item_yanyin'],
         },
         {
           id: 'kai_zhizhou',
-          title: '外任知州（一方长官）',
-          description: '你是一州的长官，正五品上下（上州更高）。**你能做什么**：州内的刑名、钱谷、差役、驿传、仓廪、学校皆归你；五品以下的属官由你辟举或参劾；流刑以下你自己就能断，死刑具案申报；你的一句话能让人下狱，也能让一乡免税。**你不能做什么**：考课由本道观察使写，调任由吏部定，监察由御史台来；兵归本州的都监与巡检，钱粮的定额与上供由三司核定，州仓里能动用的只有「省耗」与「公使钱」那一点余地。**你要签字用印的东西**：州印、每一份状子的判语（只写「准」或「不准」）、上供的解由、囚徒的囚账，以及每月报出去的粮价——**粮价一报上去，就不能再改。**',
+          title: '在一方做主',
+          description: '在一方做主。刑名钱谷你说了算，考课与调任却捏在别人手里。',
           attributeBonus: { shi: 2, li: 1 },
           resourceBonus: { rank: 2, money: 3, qing: 1 },
           startingItems: ['item_zhouyin', 'item_wenhou_die', 'item_yinxia'],
@@ -2470,154 +2478,24 @@ export const greatchen: WorldCard = {
   ],
   story: {
     openerSlot: '开局处境',
-    sceneByOption: {
+    openingSeeds: {
       开局处境: {
-        kai_yamen: `永熙二十七年，九月十九日，申时三刻。汴梁大内西面的户部度支司，七间北房，最里面那间最暗。
-
-你在这间值房里坐了四个时辰，案上摊着洛州含嘉仓今秋的点验簿。应存四千二百石，实存三千六百五十四石，短少的那一行，附注只写了三个字：陈腐、鼠雀、无着。你把这三笔加起来算了第五遍，数目没错，可这三笔加不到一起去——前两笔是耗，第三笔是人。
-
-廊下的木屐声一阵一阵。夜值的吏员在收各处送来的文牍，木牌相碰，铁壶里的水只剩一个底。
-
-你的上官、度支郎中裴无咎站在门口，没有进来。他腰上那七八枚记事木牌垂着，问话的声音不高：「那册子，你看完了没有？」
-
-还没有等你答，你看见他背后廊下还站着一个人。那人穿的是殿前司的服色，腰里没有佩刀——按规矩进这道门不能带兵器——但他手里拿着一个封皮，上面的印是内库的。
-
-这两个人同时出现在这间七间北房，一定不是为了含嘉仓那几百石陈米。
-
-裴无咎的手指按在门框上，指节泛白。他说下一句话之前，先看了一眼背后那个人。`,
-        kai_zhou: `永熙二十七年九月下旬，未时。京西南路商州州衙的二堂，窗纸糊了三层，屋里有一股新刷的石灰味和墨味。
-
-你穿一身青绢公服坐在这里，腰带上的铜銙比你的资格新。堂角的矮几上放着三样东西：一叠夏税折色的呈报，一份没写完的考语，还有一卷用麻线扎着的牍文。
-
-牍文里是前任留给你的三桩事。第一桩，张某与李某争户绝田三十七亩，豪族周家在其中；第二桩，本州夏税折色的差额四百二十贯，三个县都报灾伤；第三桩，城西一桩人命，佃客死在打谷场上，初供说是斗殴，验状上却少了一处旧伤。三件案的批语都是同一句：再详。
-
-堂下吵起来了：两个衙役架着一个穿短褐的老汉，老汉手里攥着半张田契，嘴里喊的是他祖父的名字。你的书吏凑过来，小声说：「明府，周家的人在外头候着，说是来送秋礼的。」又问：「先问这老汉，还是先见周家的人？」
-
-你翻到牍文的最后一页，看见前任在这一页的边角上写了四个小字：「周有旧。」这四个字下面是空的——他没有写下去。县衙的老吏都不认识这位前任，只知道他七年前在这个州做过三个月的主簿，就调走了；而周家的老宅，正在这位主簿当年经手过的一桩户绝案的地界里。
-
-散值的鼓还要两个时辰才敲。这三件事都是你的，一件也躲不开。`,
-        kai_bianzhen: `永熙二十七年九月二十六日，戌时。云中镇外第三烽，一座土台，台上一个火盆，盆里的炭被风吹得发红。
-
-你是这一烽的押纲校尉，管着十个兵。入夜之后风从北面来，带着草籽与牲口的气味。台下的土屋里没人睡——按规矩点烽之前不许睡，可这几天没人真睡。
-
-麻烦有三样。第一样，三日前你派出去的两个斥候在镇北三十里外看见马粪，还是湿的，算来是十来骑。第二样，第二封上报的文书今天应该到了，镇上的批示却要再等两天——从云中镇到汴梁三千一百里，马递十五日，加急十一日，你等不起。第三样，你手下的十个兵已经三个月没领到足额的粮，其中两个人昨天问过你，什么时候能回家。
-
-火一点，三十里外能看见，镇上的都尉会连夜派人上来查；火不点，若今夜真有马队过来，你这一烽就是第一个缺口。
-
-一个老兵把火镰递到你手边，说：「校尉，点不点？」
-
-台下土屋里有人咳嗽，接着是有人翻身的草响。你想起今天下午的一件事：镇上派来的那个书手问你要了三个人的名字，说「上面要点」。你给了他三个名字，其中一个是昨天刚满十六的孤儿。你写他名字的时候，笔停了一下，但你没有改。
-
-你没有立刻接火镰。`,
-        kai_caohe: `永熙二十七年九月二十四日，夜，二更。汴口以东四十里，浅滩边泊着三条漕船，船身相靠，缆绳绷得发响。
-
-你在中间那条船的后舱里，膝上摊着纲单与一叠收条。舱里点了一盏罩纸的灯，灯油味、米味、麻袋味、脚臭混在一起。你的副手蹲在舱口，一直往外看。
-
-麻烦有三样。第一样，船吃水一分一分浅下去；今日下午过那道闸时，你亲眼看见舱底第三块板的接缝处渗水，渗得不快，但一夜能漏掉四五十石。第二样，你带的私货比规定的格内货多出两百石，都压在米袋下面，而明天要过的那个闸口，是本河段上收例钱最狠的一处。第三样，你的纤夫头目姓吴，他刚才提出：这一夜就算计出「遇风沉没」，报上去的核销对你对他都有好处，他只要两成五。
-
-你没有答应，也没有拒绝。灯花爆了一下，舱口的副手回头看你。
-
-舱板底下有一声响，是米袋在挪动——那是船上的老鼠，也可能是有人在重新码货。你今年押过七趟纲，知道这条河上有一句老话：**过闸之前不要问船上有多少米，过了闸之后也不要问少了多少。**可你昨天在洛州卸货的时候，看见码头上那杆官秤被一只脚压着秤尾。
-
-天一亮就要过闸，你必须在这两样之间选一样。`,
-        kai_jianghu: `永熙二十七年十月初二，丑时。京畿，信行的院子，三面土墙一扇门，院里拴着四匹马，两辆大车压着草垫。
-
-你是这家信行的镖师，刚从洛州回来，肩上有一道被绳勒的血痕。你走进仓房时，总铺的曹掌柜正举着灯照三只木箱。
-
-箱子上贴的是某位郎中的封条，写的是药材。撬开的一角里露出的是铁——生铁的条形料，一头还带着铸痕。**本朝的规矩：生铁是禁榷之物，不得随意出境**；而这三只箱子明日一早就要随你的车出城，走白沟那条路去真定。
-
-曹掌柜没有骂人，只把灯举得低一点，让光照在铁上：「这是今早才送上门的。」他又说，仓库里另一位客人还压着十一只箱子，五日内必须送到真定，运费四百二十贯，已经收了一半定钱。
-
-院门外的街上，打更的梆子响到了四更。曹掌柜问你：「这趟货，你押不押？」
-
-你认出那只箱子的封条用纸——和你在洛州见过的一批官文书是同一家的纸。
-
-你走到门口看了一眼那两辆大车：车板下面各钉了一条暗格，是这家信行自己改的，专为夹带。总铺立过一条规矩：**暗格只在总铺点头时才用**，而这一趟，总铺并不知情。你把系在车辕上的号旗解了下来，在手里折了两折。`,
-        kai_siguan: `永熙二十七年九月，一夜大雨之后，辰时。洛州城外三十里，永宁寺的库房，土墙草顶，屋梁上还挂着水珠。
-
-你在库房里蹲着，面前是一囤发了芽的租米，二百余石，铺开来占了半个屋。靠着墙根有一只箱子被压在断梁下面，箱盖裂开，里面的黄纸文书浸了水，一页一页粘在一起。那是三份空名度牒与几家施主的寄库文书。
-
-寺里的租粮账也在这里。你翻到最要紧的两页：连着两年，收数比头一年少了两成，而那两年本州报的正是灾伤蠲免。这两页是前任管库的僧人交到你手上的，他交代过一句话：「你看明白了，就什么都明白了。」三天前他还俗出了寺，去了哪里没人知道。
-
-门外，知客僧催了三遍：前殿已经有两位施主等着看库、点香、写缘簿。住持在廊下站着，没有进来，只隔着门说了一句：「这场雨，把梁压断了。梁是去年的新梁。」
-
-你把湿透的度牒抬起来一张，纸从中间裂开。
-
-库房的角落里还堆着去年的一批旧麻袋，袋口用两种绳打结：一种是寺里惯用的双环结，另一种是单结——单结是本州仓廪的仓吏打的，寺里的人不会这么打。这一点你三年前在别处见过一次，那次的事后来成了本州的一桩旧案，案卷上只写了「耗」一个字。`,
-        kai_tianli: `永熙二十七年十月初五，卯时，天还没全亮。京东路，一片田埂的水口，沟里的水声盖过了人声。
-
-田埂上站着三四十个人，手里握着铁锹、锄头、扁担。你站在他们前面，脚上是一双泥靴，袖里揣着两样东西：一张好几年前县衙发的水利帖文，一本族里的公田簿。
-
-麻烦是水。上游八里的田主今早关了闸——按帖文所定的次序，本该轮到你这边先放三天；对方已经把闸板下了，还带来了族里十几个壮丁，其中一个是里正的表兄。你这边八百亩稻子还有十天才能收割，一旦断水，产量要减三成，而秋税是按亩定额、不因缺水减放的。
-
-自己的族里有人在看你——三十几只眼睛，没有人说话，等的就是你先开口。上游那边站出来一个穿长衫的人，先作了一个揖，说得很客气：他家上游的田也要水，而且他手里也有一张帖文，是去年新任县令批的。
-
-太阳还没出来。你面前只有三条路：争、退、或者把自家的沟渠挖开引水——那样水会淹掉对方在坡下的秧田。
-
-你身后的族叔低声说了一句：「打不得。」他说这话的时候看的是你的手——你的手正按在袖里那张帖文上，纸边已经被汗浸软了。上游那边又有人往闸板那边挪了两步，扁担在肩上换了个姿势。`,
-        kai_wazi: `永熙二十七年十月，亥时。汴梁桑家瓦子，后台一道竹帘，帘外锣鼓声与台下的人声混成一片。
-
-你是这里的说书人韩九。你手上是那块拍木与醒木，桌上摊着今晚要说的一段话本——《错斩崔宁》，讲的是前朝一桩冤狱平反，末几句里要提到一位"错断了人命的官家"。这一段你说了七年，闭着眼都背得出。
-
-麻烦有三样。第一样，前场的柳三爷只说到一半，正在台上拖着，等的是你上去接。第二样，后台管戏箱的刚才小声告诉你，今晚台下第一排坐着一位穿便服的贵人，身边四个随从，进门前先问了一句：「今晚说哪一段？」第三样，与你搭班唱曲的桂娘今天没来——她三天前被一个姓王的勾当叫走了，说是有堂会，至今没有回。有人传话说王勾当那个人脾气不好。
-
-帘外柳三爷的拍木响了两下，是催。
-
-你上台之前必须决定：照原定说，还是临时换一段。
-
-你摸了摸袖袋：里面有一小块墨，还有一样东西——一张写了三行的纸，那是桂娘三天前留在你桌上的，字迹很急，只写了一句「若我三日内不回，把那个段子忘掉」。你把那张纸捏成了一团，又展开，又捏成一团。帘外的拍木响了第三下。`,
-        kai_anche: `永熙二十七年九月，亥时三刻。汴梁城西一条巷子，赌坊后巷的暗间，房里只有一张方桌、一盏罩了纸的灯，灯罩上有一块焦痕。
-
-你是折色铺的账房，也是这间赌坊背后放贷的经手人。桌上散着骰子、纸牌、几只空酒碗。对面两个人：一个姓胡，是扬州盐商的家人，袖子里有半张盐引的存根，输得很急；另一个是城南屠户，姓张。
-
-麻烦有三样。第一样，姓张的已经把身上最后一件皮袄押掉了，现在把一枚铜镜推过来，说这是城里一位官员家里出来的东西。你认出了镜背的款识——半个月前你还在某位郎中新买的宅子里见过同一面镜，挂在正堂。第二样，姓胡的欠条已经攒到第七张，总数一百四十七贯，月息三分，按律在线上，可他明日就要回扬州。第三样，门外的打手咳嗽了一声：巷口来了军巡铺的铺兵，正在巡查。
-
-你必须在灯灭之前做一件事：接哪一样，放哪一样，或者把两个人都留下。
-
-桌角压着一张你今早才写好的条子，上面只记了三个数：一百四十七贯、三分、到期日。你把条子抽出来，用手指按住那三个数，然后抬眼看姓胡的——他袖子里除了盐引的存根，还有半截蜡封的竹筒，筒口的火漆上有一处缺口，缺口的形状像某个官署的印边。`,
-        kai_liumin: `永熙二十七年九月二十日，巳时。汴梁城外西南，一条官道边的流民棚，七十多口人挤在竿子与破席搭的窝棚里，最大的那个棚子里住着十一口。
-
-你是这棚里的新人，三天前才进来。你身上只有一领卷起来的草席，脚上是一双没有后跟的草鞋，怀里什么都没有。
-
-麻烦有三样。第一样，棚里的米只剩两斗，昨夜又来了十七口人，其中五个是孩子。第二样，棚头姓袁，四十来岁，正跟两个穿皂衣的公人说话。公人手里有一张纸，上面记着棚里的口数，说要按口数报上去；但他们这次来的名目不是放粮，是**修汴河的一段堤，要报出能干活的人数**，报了上去，能干活的人就要去上工——一日两升米，一旬一结。第三样，袁棚头回头看了你一眼，招手让你过去。他身边那两个人的目光也跟过来，从头到脚量了你一遍。
-
-远处城门楼上挂着旗，汴河上的漕船正在赶闸——九月是闭河前最后一个月。
-
-袁棚头走近半步，压低声音对你说了两句话：一句是「今日这数，你替我应一声」；另一句是「上工的人，先报能干活的，老人孩子不要报」。他说完就退开了，把那张纸留在你手上。纸上的墨还没干，公人的眼睛盯着的正是你手上那一格空白。你说什么，就决定你明天在这棚里是什么人。`,
-        kai_langzhong: `永熙二十七年九月十八日，辰时。汴梁皇城，尚书省户部正厅。常朝刚散，卯时入、辰时出的那一趟走完，六部的长官们没有回各自的衙门，都坐进了这间厅。
-
-厅里摆的是成排的矮案与蒲团。上首坐着户部尚书韦延，须发全白，手边一只建盏；左首是左侍郎郑覃，正四品，河北旧族的出身。再下是右侍郎与两个员外郎，另有令史一人坐在角落的矮凳上记录，笔尖在纸上沙沙地走。
-
-今日议的是三镇军费该不该按旧额给付。郑覃的话说得很稳：宁予其费，不夺其权；四百万贯与三百二十万贯之间那八十万贯，换的是北边一整年的安静。厅里没人反驳他。
-
-你是仓部郎中，正五品，手上捏着本司出的看详。看详上写着三行数目：三镇额兵十一万四千，实存七万八千，空额三万六千；三万六千人的口粮与冬衣，折钱九十七万贯。你昨夜核到三更，就是要把这三行字当众说出来。
-
-你翻开看详的时候，眼角扫到令史手上那本册子——那是三日前的一稿，抄的是旧数目。你手上的这一稿，昨日才改。
-
-尚书的建盏放了下来，声音不大：仓部，你说。`,
-        kai_zhuanyun: `永熙二十七年九月二十二日，午时。扬州城外，转般仓的码头。雨刚停一阵，风从河面上来，把仓廒檐下的水珠吹成一片。
-
-你站在码头的木台上，脚下是湿的，鞋底打滑。仓廒的门都开着，里头的米堆像几座土黄色的山，民夫挑着担子从你面前过，一担一担往上堆。你身后是仓司的老吏乐成，手上捧着一卷粗麻纸的册子。
-
-押纲官王铎站在台子下面，泥水没过鞋面。他报上来的到仓数是九万二千石；你手上的账写的是十万六千石。一万四千石，在这条河上是一纲半的米，也是一百二十多条人命一年的口粮。
-
-王铎不慌。他从怀里掏出一卷过闸历递上来，每一道闸的格子里都有闸官的押字，从扬州一路押到汴口，密密的一串。你一行一行看下去，看到第五道、第七道、第九道的时候停了——这三道闸的日期是同一天。船不是鸟，过不了。
-
-闸官陈阿四被人从闸上叫来，站在雨里，衣裳全湿，两只手绞在一起，看王铎，也看你。
-
-正使崔涣在城里的官厅等着你的回话。王铎抬头问你：副使要不要现在就把这三道闸的闸官都请来，一并问一问？`,
-        kai_zhizhou: `永熙二十七年九月二十六日，辰时。某州城南门外的驿亭，一座四柱的旧亭子，亭柱上的漆掉了一半。
-
-你是一州的长官，今日率本州属官在这里等巡按御史的车队。通判李孟站在你左手边半步，他是本州人，父亲做过本州的录事参军，城西那条街上一半的铺子都与他家有旧。录事参军捧着本州的去年账册，站在更后面。两个衙役在亭外，手里举着「肃静」的木牌。
-
-御史张缜这一趟来的名目是巡查刑狱与仓廪，但三天前你收到的私信说得很清楚：他要看的是本州去年报的灾伤蠲免。去年报的是十九个村子受灾，蠲免两税七万九千贯；而真正的受灾村子，你上任四个月，已经数出只有十一个。八个村子是虚报的。虚报蠲免的罪名，轻则夺官，重则计赃论罪。
-
-更大的麻烦在道旁。离亭子三十步，靠着土坡跪着十七个百姓，为首的是一个六十多岁、穿麻布短褐的老汉，双手举着一份状子。状子上写的是今年秋旱、请求再免秋税的三十七个名字。御史的车队要从这条道上过，一定看得见他们。
-
-远处的尘土起来了，先是薄薄一线，接着浓了。李孟往你身边靠了半步，声音压得很低：明府，这份状子……跪在最前面的老汉把状子又举高了一点，抬起了头。`,
+        kai_yamen: `衙门的日常是案牍与传唤：文书进来先登记、再分案、再拟意见，一件公事常要在几处之间转上几日。打交道的是书吏、差役、来递状子的人，以及坐在上首决断的那几位。便利是消息来得早、规矩摸得熟；掣肘是每一笔都要留痕，替人担过的事迟早会被人翻出来。体面是账做得干净，麻烦是办不成的事往往只卡在「再详」两个字上。`,
+        kai_zhou: `外任的日常在公堂与田亩之间：催税、断案、修水利、应付巡查。打交道的是胥吏、里正、乡绅与豪强——他们比公文更懂本地，也更会拖。便利是一地的事说了就算，掣肘是定额不会因为这里受灾而减少。体面是差事办得没人挑错，麻烦是催得急了有人骂、催得松了上面问。这里没有一件事能一次办完：今天压下去的矛盾，明年还会从另一处冒出来。`,
+        kai_bianzhen: `边上的日常在营、烽、仓与马场之间：点卯、领粮、换防、算损耗，一样都不能少。打交道的是老兵、押纲的低品武官、往来互市的商人，以及草原上那些随季节移动的骑手。便利是这里的事按粮与刀算，不看京里的脸；掣肘是补给要等、消息要等，等来的还未必是真的。体面是没人敢轻看，麻烦是一笔军账对不上时，先被问的那个人多半是你。`,
+        kai_caohe: `河上的日常是船、闸、货与风信：什么时候起运、在哪一处换纤夫、过哪一道闸要等多久，都得心里有数。打交道的是船户、闸夫、纤夫、押纲的低品武官，以及替买卖牵线的中人。便利是钱来得比衙门快，掣肘是一条船出事就得有人担：沉了赔本，误了期赔信誉。体面是河上的人认你这张脸，麻烦是这条河上下每一个关口都有人要分一份。`,
+        kai_jianghu: `没有官身的日子，靠手上的本事与一处的规矩。平常出没在货栈、脚行与镖路上，打交道的是护货的同行、开店的掌柜、收过路钱的把头，也有官府里管这道门的人。便利是没人拿文书管你，掣肘是出了事没有衙门替你说话。体面是「这个人办事不出声」，麻烦是一旦动手，验状、尸格、差役就都来了，最后结账的往往是拿印的人。`,
+        kai_siguan: `寺观的日子不只是诵经：收租、点库、施药、赈济、迎送官客，件件都要人办。打交道的是佃客、施主、香客、管库的老僧，以及隔三差五来查验的州县差官。便利是度牒能免役免税、寺产有底子，说话比寻常百姓有分量；掣肘是寺里同样要记账、同样有人盯着。体面是山门清净，麻烦是清净的地方也有账要抹平。`,
+        kai_tianli: `乡里的日子跟着农时与族里的辈分走：放水、上役、完税、办社祭，一件接着一件。打交道的是族中的长辈、邻里、佃户，还有下来催差的差役与里正。便利是田与人是自己的，说话在村里管用；掣肘是官府的定额永远比田里打出来的多，而摊派先找到的是管事的那个。体面是族里敬你，麻烦是上游关闸、下游告状时，两边都要你出面。`,
+        kai_wazi: `瓦子的日子在锣鼓与台下的人声里：一段话本能说得满座，也可能被人中途喝倒彩。打交道的是同台的艺人、管戏箱的、勾栏的东家、赏钱的主顾，以及偶尔来看戏的官人与差役。便利是消息杂、来钱快、不必守衙门的规矩；掣肘是乐籍另编，子弟不得应举。体面是台下有人叫好，麻烦是一句话说错，从此就没有台子让你上。`,
+        kai_anche: `暗处的日子在别人不肯露面的那一面：赌坊的暗间、质库的下一半借契、私盐的过手钱、替人消灾的中间人。打交道的是放债的、贩私货的、看场子的，以及偶尔来查一查的公人。便利是不用过明路、来钱快；掣肘是没有一处规矩会替你兜底，律条对这类事的标价写得很清楚。体面是「办事不出声」，麻烦是一旦要拿一个人顶事，最先被想起来的就是你。`,
+        kai_liumin: `没有籍与保人的日子，是从天亮起现挣的：码头、城门、瓦子后巷、修堤的工地，哪里有活就往哪里去。打交道的是棚头、脚行的团头、招工的吏员，也有愿意给一口饭的寻常人家。便利是无牵无挂、说走就走；掣肘是不能立户、不能应举、不能置田，连住店都要多付一份押。体面是没人管你，麻烦是有人要报「能干活的人数」的时候，你必须开口。`,
+        kai_langzhong: `朝里的日常是奏对与案牍：一份公文在几个衙门之间走一圈，落谁的款、用谁的印、谁先看谁后看，都有讲究。消息在廊下比在公文里走得快。这个层级的人手里有能办成事的权力，也有必须打的招呼；体面是从不出错，代价是出一次错就有人替你记着。这个层级最要紧的本事不是做事，是知道哪一件事不该由自己出面；要办的事往往卡在「再议一议」四个字上。`,
+        kai_zhuanyun: `管钱粮的日常是账、船与日子：什么时候起运、哪一批该到、脚价怎么分、损耗怎么核销，件件都要落到纸上。打交道的是押纲的低品武官、仓廪的看吏、沿河的闸官与中人，也有盐商与船户。便利是一路的钱粮都从手上过，说话有人听；掣肘是正使与户部都在上面，州县不听调遣。体面是数目准，麻烦是每一份「遇风沉没」的勘验状上，签的都是你的名字。`,
+        kai_zhizhou: `主政一方的日常是公堂、仓廪与迎送：断案、催税、修陂塘、接上官、见乡绅。打交道的是属官、胥吏、豪强、僧人、商人，还有那些把状子举在头顶的百姓。便利是一地的事你说了就算，流刑以下不必请示；掣肘是考课由别人写、调任由别人定、监察随时会来。体面是地方上有人念你的好，麻烦是虚报的蠲免与真实的灾情之间，那一笔差额总得有人认。`,
       },
     },
-    opening: `（兜底示例。只有当玩家没有选「开局处境」，或所选处境没有配好场景时才用这一段；正式第一幕以 sceneByOption 命中的那一段为准。）\n永熙二十七年，九月十九日，申时三刻。汴梁的秋天来得比西京早，大内西面那一排七间北房的瓦缝里长了草，风从窗纸的破口进来，把案上的纸角吹得一掀一掀。廊下有吏员抱着文书快走，靴底在砖上敲出很轻的响；更远处有人在报更。你手上摊着一册对不上的账——数字没有问题，有问题的是它是怎么走到你手上的。门外有人问你一句话，而你还没想好要不要抬头。`,
+    opening: `永熙二十七年的大晟，立国已三百一十一年。两京十三道，三百二十七州；东京汴梁坊市不闭，夜里也听得见汴河上的号子；西京雍州守着宗庙与旧署，日落即闭市，只剩更鼓。米价一石六百文上下，一碗汤饼八文，一处两间门面的宅子月租一贯。官文书讲「旧管、新收、开除、见在」四栏，讲押缝印，讲例不讲律；一封边报自云中镇到汴梁要十五日，加急也要十一日。天下最要紧的一笔账，是账上的粮与实数之间那两三成的差额；最要紧的一个位置，是尚未定下的储位。四方来朝、市井繁华，底下是财政的窟窿、边军的尾大不掉与朝中的党争。这个天下不催人：米价照涨，党争照打，冬至照办大朝会，云中镇的急递照样在十五天后到。`,
 
     mainQuest: `**以下全是可选的。** 你可以在度支司当一辈子抄账的吏员，把日子过下去，这不算玩错。下面列的不是任务，而是这天下里**存在着的几大方向**——每一个方向里头，都还有无数种活法。
 
@@ -2677,7 +2555,7 @@ export const greatchen: WorldCard = {
       name: '萧元恺',
       description: '大晟当今皇帝，四十一岁，中年男子。清瘦，身量中等偏高，肩背因常年伏案而略向前倾；面白，颧骨高，下颌线条很硬，法令纹深，眼下一道很浅的横纹。他不留长须，只蓄短髭，修得极短。说话时不看人，看人身后的某处；听人说话时，右手拇指会无意识地摩挲左手腕上一串旧玉珠。常服是玄色圆领袍，腰束乌革带，不佩金玉，只挂那串玉珠——穆宗崩前一年赏的，共十四颗，缺了一颗。他在东宫二十六年，是晟室在位最久的太子，做过二十年"说了不算的人"；如今登极十一个月，尚未立太子，也尚未改元。他信账，不信话。',
       personality: '寡言，且极有耐心。他说话常常只说前半句，后半句留给臣下自己接——接对的留下，接错的调走。他一日可召见户部官员数次，不骂人，只反复问同一个数目字，问到对方自己说出"卑职未曾核过"为止。他对自己做太子的二十六年记得极清楚：哪些人来看过他，哪些人没来，哪些人来了却坐了一刻就走。他不报复，但他记得。他对所有人都不完全信任，包括自己的五个儿子。',
-      relationship: '他是你的君。你只在殿上远远见过他三次，其中一次他在问含嘉仓的点验数，问的正是你经手的那一册。你当时站在殿角的第九班，他没有看你——但他把那个数目背下来了。',
+      relationship: '大晟天子，四十一岁，东宫二十六年，即位未改元。信账不信话：问一个数目能问到对方自己说出"未曾核过"。不报复，但记得谁来看过他、谁没来。对所有人都不完全信任，包括自己的儿子。',
       scenario: '大内紫宸殿西偏阁，正在看今秋的漕运奏报，案上摊着三份来自不同衙门的册子',
       present: false,
       location: '汴梁·大内紫宸殿',
@@ -2689,7 +2567,7 @@ export const greatchen: WorldCard = {
       name: '裴无咎',
       description: '户部度支郎中，正五品，四十九岁，中年男子。中等身材，微胖，面圆而须短，两眉很淡，眼皮略厚，看册子的时候眼睛几乎不抬；左手小指缺了半节——永熙二年清查亏空时被一个涉案的仓吏咬断的。他穿朱色公服，束九銙银带，腰上挂着记事的木牌七八枚，走路时木牌相碰有声。他每日卯时三刻到衙，酉时散值，从不早退，也从不迟到；案头永远只有三样东西：笔、册、一盏不续水的茶。他批文书永远只用六个词，批得最快的四个字是「照例办理」。度支司的人都怕他，因为他从不发火，只在看册子的时候把纸翻得比平时慢。',
       personality: '极准，极省字。他把该给人看的东西都筛过一遍再给，但从不撒谎——他只是不说。他判断一件事只看两条：数目对不对，手续全不全。他不用私交用人，也不用私交弃人：他曾把一个跟了他九年的吏员考了"下上"，理由只有一句"他替我改过一个数"。他对下属不亲也不远，用人的标准只有一条：账要能对得上。他心里有一件事瞒了三年——他自己也不确定那件事是不是错。',
-      relationship: '你的上官，也是你的举主。永熙十九年他巡按河东，从七个州的账里挑出了你一个人，具保状把你调进京。按律举主连坐，所以你犯赃他要同罪；反过来，他若要舍你，也不必写一个字——把你调去一个苦缺就够了。你和他之间没有私交，只有一本账。',
+      relationship: '户部度支司郎中，掌天下钱谷的复核。为人极准，记数不用翻册；对下属只问结果不问过程。在更化派与持重派之间走得很稳——他不表态，但他记得每个人表过什么态。',
       scenario: '度支司值房廊下，站在你门口，廊灯把手影投在你的案上',
       present: true,
       location: '汴梁·户部度支司',
@@ -2701,7 +2579,7 @@ export const greatchen: WorldCard = {
       name: '梁珣',
       description: '殿前司副都指挥使，从三品，四十九岁，中年男子，武将。身形壮硕，肩背厚，站定时两脚分得很开；走路时左脚落地略重（永熙二十三年黄花谷的旧伤），上台阶时左手会下意识按一下大腿。面色紫黑，方脸，颌下短须修得整齐，左眉上有一道旧疤，疤的颜色比周围的皮肤浅。着朱色武官公服，束金带十一銙，佩刀不悬，只在腰上挂一枚禁军的铜牌与一条旧马鞭。他也是永熙二十五年冬夜那个抬箱子的人。',
       personality: '沉，不多话，笑起来只动嘴角。他做事讲一个稳字：能不动手就不动手，一旦动手就要一次做绝。他不贪钱——他贪的是"朝廷离不开我"这五个字。他手下的兵服他，因为他从不克扣军饷中的"实额"部分（他扣的是空额，而空额是所有边将都扣的）。他敬重懂规矩的文官，但对不懂兵的文官只有一句：殿下的规矩管不到边上的雪。他心里有一笔账：黄花谷那一仗，报上去的首级数不是他写的，但他签了名。',
-      relationship: '你和他只见过一面。永熙二十五年冬，西华门外的夹道，他抬着箱子，你低着头走过去。他认得你的脸，你也认得他的脸。你们都记得——这是你们之间唯一的、也是最重的一层关系。他如果要动手，绝不会先来找你谈；他如果要保你，也不会说出口。',
+      relationship: '殿前司副都指挥使，掌京城禁军的名册与调发。做事只求一个稳字：能不动手就不动手，动手就做绝。不贪小钱，也不惧文官；对按规矩办事的人给几分面子，对不懂兵的人只有一句"殿下的规矩管不到边上的雪"。',
       scenario: '殿前司衙，正在点验汴梁城内的禁军名册，案上摊着一份四月未销的领粮文册',
       present: true,
       location: '汴梁·殿前司',
@@ -2713,7 +2591,7 @@ export const greatchen: WorldCard = {
       name: '仇士良',
       description: '内侍省都知，正四品，五十四岁，中年男子，宦者。身量矮，肩窄，背却挺得直；皮肤白净无须，眉毛稀，眼角下垂，看人的时候眼珠先动、头后动。常服是紫褐色圆领袍，无带銙，只在衣襟内挂一串钥匙——内库的钥匙，共十九把，用皮绳穿着。他走路没有声音（鞋底是软布的），进门之前必先站一息再推门，人都说这是宫里的规矩，其实是习惯。他掌通进司与内库已有十一年，右手食指的指腹上有一块硬茧——那是翻帖黄翻出来的。',
       personality: '温和，周到，凡事先替对方想一步——这一步永远是他自己不亏的那一步。他从不威胁人，只是让人明白"这件事你办不成"；他也从不贪小钱，他贪的是次序：哪一份奏疏放在最上面、哪一份压在下面、哪一份在进呈之前先"失踪"三天。他最大的本事是让人忘记他是宦官——他能记住六部两百多个官员的字、籍贯、以及他们母亲是否在世。他有一件怕的事：他怕新君真的把那本账合起来。',
-      relationship: '你的文书要经通进司，你递给上官的每一封急件，最后都会经过他的桌子。他没有理由喜欢你，也没有理由害你——除非你翻到内库的账。他已注意到了你：今年八月，你经手的一份点验簿在他的册子上被标了一个很小的墨点。',
+      relationship: '内侍省都知，掌通进司与内库十一年。温和、周到，从不威胁人，只让人明白一件事办不成；贪的不是钱，是次序——哪一份奏疏放在最上面。最大的本事是让人忘记他是宦官。',
       scenario: '大内通进司，正在分拣今日的章奏，把三份放在最上面、两份压在最下面',
       present: false,
       location: '汴梁·大内通进司',
@@ -2725,7 +2603,7 @@ export const greatchen: WorldCard = {
       name: '萧望之',
       description: '门下侍郎，正四品上，五十七岁，老年男子。高大清瘦，背脊极直，坐时也不靠椅背；须发花白而梳得一丝不乱，鬓角用头油抿过。长脸，眉长过目，眼窝深，鼻梁很高；左手常握一卷纸，右手指节枯瘦，写字时手腕悬空。着紫色公服，佩金鱼袋，腰间玉带十三銙。他是永熙十一年的省试主考，历三朝三十年不倒，门生遍布台谏六部。他上朝从不多说一句，只在封驳的时候把「不奉行」三个字写得很正——正到每一个见过的人都会记住他的笔迹。',
       personality: '稳，狠，极重体统。他从不与人争吵，因为争吵意味着他还没有把握。他判断一个人只看两件事：有没有担当，以及能不能对得起自己说过的话。他对更化有信念，但他更明白"更化"这两个字要花多少人的命：三十年前他在建中十七年的清流之狱里保下了七个人，另外四十三个人他没有保——他记得那四十三个名字，写在自己的一本私册上，只给自己看。他对年轻人有耐心，但他的耐心是有期限的：三年。',
-      relationship: '他是更化派的领袖，也是裴无咎的座师一脉。你若在度支司做出成绩，你的名字迟早会出现在他的案上；你若做错了，你的名字会出现在他的封驳文书里。他与你之间隔着一层——裴无咎。要走到他面前，你必须先让裴无咎愿意替你说一句话。',
+      relationship: '门下侍郎，历三朝三十年不倒，永熙十一年省试主考，门生遍布台谏六部。极重体统，从不与人争吵；对更化有信念，也清楚这两个字要花多少人的命。他手边有一本只给自己看的册子，记着三十年前他没能保住的那四十三个人。',
       scenario: '门下省官厅，正在审驳一份关于三镇军费的敕书，案上放着一支停了墨的笔',
       present: false,
       location: '汴梁·门下省',
@@ -2737,7 +2615,7 @@ export const greatchen: WorldCard = {
       name: '崔敬延',
       description: '中书侍郎，正四品上，六十三岁，老年男子。身量不高，微驼，肩上是两块很厚的肉，走路时双手抄在袖里，脚步很慢。须白而长，一直垂到胸前第二颗纽扣；脸圆，眼小而成缝，笑起来眼睛就完全看不见了。着紫色公服，佩金鱼袋；手指粗大，右手拇指戴一枚旧玉扳指——那是他年轻时在河北管田庄骑马留下的东西。博陵崔氏，河北有田庄四十七所，与北狄降将有旧的买卖关系。他在朝三十年，挡掉的事比办成的事多，而他把这件事看成一门本事。',
       personality: '圆，缓，极懂分寸。他不否认任何人的主张是好的，只是说"此事宜缓"。他有一句口头禅：宁予其费，不夺其权。他不是坏人，他是那种认为天下本来就是这样运转的人——他见过两次"更化"，一次在崇宁，一次在元祐，两次都没有好结果（在他看来）。他对年轻人有一种长辈式的耐心，这种耐心最让人难受：他会认真听你说完，点头，然后把你的事排在明年春天。',
-      relationship: '他是持重派的领袖。你要办任何一件要动人、动钱的事，都绕不过他手上的中书省与吏部。他眼下正挡着一件事：三镇"营田自给"之状的处置。他打算"缓议"到明年——而明年改元，一切旧议统统作废。他对你没有敌意，他甚至可能会夸你一句"后生可畏"。',
+      relationship: '中书侍郎，博陵崔氏，河北有四十七所田庄。口头禅是"此事宜缓"，信条是"宁予其费，不夺其权"。对年轻人有一种长辈式的耐心，这种耐心最让人难受：他会认真听人说完，点头，然后把事排在明年。',
       scenario: '中书省官厅，正在与吏部尚书韦缜议事，桌上摆着一份拟"缓议"的贴黄',
       present: true,
       location: '汴梁·中书省',
@@ -2749,7 +2627,7 @@ export const greatchen: WorldCard = {
       name: '葛延年',
       description: '朔方节度使，从三品，五十八岁，老年男子，武将出身。身量高大，肩极宽，两臂粗壮，手背上有三道旧刀疤；面黑多皱，颧骨突出，须短而硬，像一把刷子；右耳上缘缺了一小块（三十一年前初入伍时的旧伤）。他穿的是边镇的褐紫色战袍而非朝服，腰上挂着马鞭而不是带銙，脚上是一双半旧的皮靴，靴口沾着没擦干净的泥。他连任朔方二十五年，从未回过汴梁，上一次见京官是十九年前。他说话嗓门大，不避讳，也不懂什么叫避讳。',
       personality: '直，强硬，看不上文官，但看得上懂账的人。他的逻辑很简单：边上的雪每年都下，刀每年都要磨，朝廷给不给钱是朝廷的事，能不能活着回来是兵的事。他不觉得自己是叛臣，他觉得自己是替朝廷守着北方的那个人——他甚至有一条理由：他镇上的盐池二十五年没有断过向朝廷的解送。他有一件不能碰的事：他儿子去年从马上摔死了，摔死那天他在点营田册。他对别人的痛处毫无感觉，对自己的痛处也一样。',
-      relationship: '你只在军报上见过他的名字。他和你隔着三千一百里、十五天的马递。你若要核三镇的军仓本色，你就是在核他的账单——而他手上有一万八千把刀（实存）。他不知道你是谁。等他终于知道你是谁的时候，多半是在他决定要不要让你活到明年的时候。',
+      relationship: '朔方节度使，行伍出身，连任二十五年，从未回过京城。看不上文官，却看得上懂账的人。他信边上的雪每年都下、刀每年要磨；不认为自己是叛臣，只认为自己是替朝廷守着北方的那个人。',
       scenario: '朔方镇灵州节堂，正在看营田的秋收册，桌角压着一封来自云中镇的信',
       present: false,
       location: '朔方镇·灵州',
@@ -2761,7 +2639,7 @@ export const greatchen: WorldCard = {
       name: '沈越',
       description: '御史中丞，正四品，三十八岁，中年男子。身量中等，清瘦，两肩略窄；面容端正，鼻直，唇薄；下颌一根旧疤（永熙二年在县尉任上捕盗所伤），那道疤很浅，说话时才看得见。眼极亮，看人的时候不太眨。着紫色公服，佩金鱼袋，袖中常带一支极短的炭笔和一张折成四折的粗纸——他在街上看到什么，就记下来。他走的路线固定：卯时入台，午后巡察一两个衙门，酉时回府，夜里抄旧档到三更。他一年穿坏三双鞋。',
       personality: '硬，冷，认死理。他不受贿，也不接受说情，这使他很可怕——一个不受贿的御史在官场上是一个无法报价的东西。他得罪过的人不下四十个，其中三个是三品以上。他有他的短处：他会为了一个"该查清的事"死磕到底，哪怕这件事查下去会毁掉一千个人——包括那些无辜的、只是恰好签过字的人。他对清誉的看重超过性命，但他也知道自己的清誉在被人当成刀用。',
-      relationship: '他手上有一张匿名状，状上那个三品官的名字还没写全。而他正在找一个人，能替他把那三十万贯的赈灾钱在户部的旧账上核出来。**那个人可能是你。**他来找你的时候，不会许你任何好处——他只会把状子给你看一半，然后问你一句话：这个数目，对不对得上。',
+      relationship: '御史中丞，清誉极高，树敌极多。不受贿、不说情，为了一个该查清的事能死磕到底。手边有一张按律不予受理的匿名状：状上的数目字是对的，人名是缺的。他在找一个能把那笔钱在旧账上核对出来的人。',
       scenario: '御史台台院，正在翻永熙十四年的淮西报销旧档，桌上摆着七本册子和一盏快见底的灯',
       present: true,
       location: '汴梁·御史台',
@@ -2773,7 +2651,7 @@ export const greatchen: WorldCard = {
       name: '卢氏',
       description: '大晟皇后，三十六岁，中年妇人。身量修长，肩背极正，走路时衣摆几乎不动；面白，鹅蛋脸，眉细而长，眼形略垂，唇薄而色淡，常年带着一种不动声色的端整——她的脸上很少有表情，但眉毛与嘴角的极细微的移动，能让殿上的女官立刻停下手里的活。着深青色翟衣，佩花钗九树。她出范阳卢氏，其兄卢弼掌殿前司，故她在宫中的分量不只在位号上。她每日在坤宁殿见三批人：女官、内侍、以及替外臣递话的人。',
       personality: '极有分寸，且极能忍。她不与德妃、淑妃争衣饰与座次，只争一件事：谁能见到皇帝。她对儿子萧承勖的教育近乎严苛——十九岁的儿子要学骑射，她让他学；但她更常说的是：你不要在殿上说你在射场上连中十一矢。她比宫里任何人都明白：**册礼那三十万贯，才是她和儿子眼下最要紧的事。**她手上有一份她自己记的册子，记着宫中每一次赏赐的数目——那本册子，记了十一年。',
-      relationship: '你与她隔着整个宫城。但若你需要宫里的消息，唯一可能替你递话的路径，是她坤宁殿里的一个女官——而那条路走一次，你就欠了她一份人情；走两次，你就是她的人。她不会主动找你，她只会让那个女官在某个夜里，问你要一份含嘉仓的点验数。',
+      relationship: '大晟皇后，范阳卢氏，其兄掌殿前司。极有分寸、极能忍：不与德妃淑妃争衣饰座次，只争一件事——谁能见到皇帝。每日在坤宁殿见三批人，手上一本记了十一年的赏赐册。',
       scenario: '大内坤宁殿，正在听女官回禀今冬的绢料支给，案上摊着一本手记的赏赐册',
       present: false,
       location: '汴梁·大内坤宁殿',
@@ -2785,7 +2663,7 @@ export const greatchen: WorldCard = {
       name: '黄四娘',
       description: '汴梁城西的牙人，四十二岁，中年妇人。身量不高，微胖，圆脸，一笑眼角都是细纹；嘴唇厚，说话时手不停，或者数指头，或者拨算盘，或者替人把茶盏推过去。穿赭色布衫，头上只一支木簪，耳朵上一对米粒大的银钉，手腕上却戴着一只很旧的银镯——镯子上有一道裂缝，用红绳缠着。她是城西最灵通的牙人之一，专做盐引、田宅与奴婢三种生意，领有官府的牙帖，岁纳牙税二贯，铺子门口挂着一块写着"黄"字的青布招子。城西那家质库的明面债主就是她——而背后放钱的是御史台一个察院御史的母钱。',
       personality: '热络，健谈，极准。她可以一边与人说笑，一边把对方的家底在心里过一遍；她收钱办事，从不含糊，也从不免费——她说"亲兄弟也要明算账"，说这话的时候她是在提醒你：账要算清。她的规矩只有一条：不替人带话进宫，别的都可以谈。她见过太多人从体面跌到不体面，所以她对谁都很客气，客气得不留一丝真心。她记得你欠她十一贯，记得很清楚，连本带息。',
-      relationship: '你欠她十一贯。两年来她没有来讨，也没有提任何要求。你不知道为什么，所以你每次走过城西都会绕开她铺子的那条街——而她每次见你绕开，都会在铺子里笑一下。她有一个弟弟在漕河上押纲，还有一个相好在殿前司做一个不入流的虞候。这两条线，是她全部的底气。',
+      relationship: '汴梁城西的牙人，专做盐引、田宅与奴婢三种生意，领牙帖、岁纳牙税。热络、健谈、极准，收钱办事从不含糊；只有一条规矩：不替人带话进宫。明面上是城西那家质库的债主，背后放的是御史台一位察院御史的母钱。',
       scenario: '汴梁城西的自家牙铺，正在替一个南边来的盐商找仓，桌上摊着三张盐引与一支旧笔',
       present: true,
       location: '汴梁·城西牙铺',

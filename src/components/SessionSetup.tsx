@@ -793,51 +793,45 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                   )}
 
                   {/*
-                    ── 开场预览 ──
-                    ⚠️ 这里显示的是**这一局真正会用的第一幕**，由玩家在
-                    「开局处境」槽位上的选择决定（`openerSlot` + `sceneByOption`）。
-                    所以不再拿 `story.opening` 当主角 —— 那只是没有专属场景时的兜底示例。
+                    ── 开局处境预览 ──
+                    ⚠️ 这里显示的**不是**这一局的第一幕，而是"这类处境通常是什么样"的**素材**。
+                    第一幕由 AI 结合**你自己填的主角设定**现场创作 ——
+                    所以文案必须说清楚这件事，否则玩家会以为"点进去就是这出戏"，
+                    又会觉得自己的自设被顶掉了（这正是玩家打过回票的那件事）。
                   */}
                   {(() => {
                     const slotLabel = world.story.openerSlot
                     const slot = slotLabel ? world.backgrounds.find(s => s.label === slotLabel) : null
-                    const map = slotLabel ? world.story.sceneByOption?.[slotLabel] : null
+                    const map = slotLabel ? world.story.openingSeeds?.[slotLabel] : null
                     const chosenId = slotLabel ? backgroundChoices[slotLabel] : undefined
                     const opt = slot?.options.find(o => o.id === chosenId)
-                    const scene = (opt && map ? (map[opt.id] ?? map[opt.title] ?? '') : '').trim()
+                    const seed = (opt && map ? (map[opt.id] ?? map[opt.title] ?? '') : '').trim()
                     const carried = (opt?.startingItems || [])
                       .map(id => world.items.find(i => i.id === id)?.name)
                       .filter((x): x is string => !!x)
 
-                    if (scene) {
-                      return (
-                        <div className="pt-4 border-t border-text-muted/20 space-y-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="text-sm font-bold text-accent-lantern">开场</h3>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/10 text-accent-lantern border border-accent-lantern/30">
-                              {slotLabel}：{opt?.title}
-                            </span>
-                            <span className="text-[10px] text-text-muted">
-                              换一个「{slotLabel}」，第一幕就换一个地方
-                            </span>
-                          </div>
-                          <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
-                            {scene}
-                          </p>
-                          {carried.length > 0 && (
-                            <p className="text-[10px] text-text-muted">开局随身：{carried.join('、')}</p>
-                          )}
-                        </div>
-                      )
-                    }
-                    // 没有专属场景 → 显示兜底示例
-                    if (!world.story.opening) return null
                     return (
                       <div className="pt-4 border-t border-text-muted/20 space-y-2">
-                        <h3 className="text-sm font-bold text-accent-lantern">开场（示例）</h3>
-                        <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
-                          {world.story.opening}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm font-bold text-accent-lantern">开局处境</h3>
+                          {opt && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-lantern/10 text-accent-lantern border border-accent-lantern/30">
+                              {slotLabel}：{opt.title}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-text-muted leading-relaxed">
+                          ⓘ 第一幕会由 AI **结合你自己填的主角设定**现场创作，下面是这类处境的素材，
+                          不是写死的剧本。你在「扮演角色」里写的身份与职位**优先于**这里的任何说法。
                         </p>
+                        {seed && (
+                          <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap font-serif">
+                            {seed}
+                          </p>
+                        )}
+                        {carried.length > 0 && (
+                          <p className="text-[10px] text-text-muted">开局随身：{carried.join('、')}</p>
+                        )}
                       </div>
                     )
                   })()}

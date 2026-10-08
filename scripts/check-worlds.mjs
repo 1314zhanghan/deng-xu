@@ -179,20 +179,37 @@ const GATE = {
   */
   minBackgroundSlots: 4,
   minOptionsPerSlot: 8,
-  bgOptionDescCjk: 100,
   /*
-    ── 开场：**各不相同的开场为各不相同的处境服务** ──
-    玩家第二次打回这件事时说得很清楚：
-      「我要的是同一个世界观里，各不相同的开场为各不相同的背景服务，
-        而不是一样的开场因不一样的背景而略有改变。这么多三六九等的人
-        却在干同一个枯燥的工作，完全背离了沙盒。」
-    所以现在要求：世界卡必须指定一个 `openerSlot`，它的**每个选项**都要有
-    一段**完整、彼此不同**的开场场景，而不只是"同一场景的另一种视角"。
+    ⚠️ 这里**故意是低门槛**（曾经是 100 字）。
+    玩家第三次打回时说的是：
+      「背景槽位太详细、太固定了，连详细的背景都有就没有自设主角什么空间了」
+    背景槽位是**方向**，不是履历。写成长篇处境说明，玩家就没有自设的余地了。
+    所以门槛降到"能说清一个方向即可"，**长描述不再被奖励**。
   */
-  sceneCjk: 260,
-  // 场景之间不得高度雷同（相似度兜底，专门防"同一段换几个词"）
+  bgOptionDescCjk: 20,
+  /*
+    ── 开局：**素材**，不是写死的第一幕 ──
+    这件事被打回过三次：
+      1. 开场对所有背景都一样 → 加上背景。
+      2. 改成"同一场景换视角" → 官军商江湖全挤在一间屋。
+      3. 改成"每个处境一段写死的完整开场，并以它为唯一依据" →
+         玩家说：「我的自设主角是**刑部正四品**，开局却固定有俩**仓部**上司」
+         —— 背景槽位把玩家自己写的主角设定顶掉了。
+    所以现在要求的是：每个处境一段**素材**（这类处境的典型场合、会遇到的人的类型、
+    这一行的麻烦与体面），交给 AI 作附加参考；**主角自设设定优先级最高**。
+    ⚠️ 素材里**不得**出现替玩家认亲的固定关系（"你的上司/上峰/同僚"）。
+  */
+  openingSeedCjk: 120,
+  // 素材之间不得高度雷同（相似度兜底，专门防"同一段换几个词"）
   sceneMaxSimilarity: 0.72,
+  /*
+    ⚠️ 替玩家认亲的措辞 —— 这些短语一旦出现在素材里，就说明作者又在
+    替主角安排上司与同僚了，而那正是玩家最反感的一点。
+    用第二人称"你的X"来判定，避免误伤"他的上司是某某"这类**客观**叙述。
+  */
+  forbiddenKinPhrases: ['你的上司', '你的上峰', '你的上官', '你的同僚', '你的顶头上司', '你的直属'],
 }
+
 
 /**
  * 沙盒内容的识别正则。
@@ -245,7 +262,7 @@ for (const exp of EXPECTED) {
     ...(w.lores || []).map(l => l.name + l.description),
     ...(w.backgrounds || []).flatMap(b => b.options.map(o => o.title + (o.description || ''))),
     // 逐处境的开场场景也是实打实的内容，计入全卡字数
-    ...Object.values(w.story?.sceneByOption || {}).flatMap(m => Object.values(m || {})),
+    ...Object.values(w.story?.openingSeeds || {}).flatMap(m => Object.values(m || {})),
     ...(w.characters || []).map(c => c.name + c.description + c.personality + c.relationship),
   ].join('\n')
 
@@ -277,7 +294,7 @@ for (const exp of EXPECTED) {
   /*
     ⚠️ `story.opening` 的长度门槛**必须分情况**。
     旧语义里 opening 就是第一幕本体，所以要求 ≥1200 字是对的；
-    但新语义下开场由 `openerSlot` + `sceneByOption` 决定，opening 只是**兜底示例**——
+    但新语义下开场由 `openerSlot` + `openingSeeds` 决定，opening 只是**兜底示例**——
     这时再要求 1200 字就是自相矛盾：它逼作者往"兜底"里灌水，
     而三个世界（大晟 48 字 / 三邦 84 字）确实因为写对了（写短）而被判不达标。
     **门槛与设计打架时，错的是门槛。**
@@ -403,7 +420,7 @@ for (const exp of EXPECTED) {
 
       /*
         ⚠️ 槽位 label 必须唯一。
-        `backgroundChoices` 与 `sceneByOption` 都是**按 label 做 key 的对象**，
+        `backgroundChoices` 与 `openingSeeds` 都是**按 label 做 key 的对象**，
         两个槽位同名就会互相覆盖 —— 不报错，只是其中一个槽位的选择与开场场景
         永远取不到（静默失效）。
       */
@@ -433,50 +450,82 @@ for (const exp of EXPECTED) {
           if (n < GATE.bgOptionDescCjk) {
             fail(exp.label, '背景选项描述太短', `「${slot.label}／${o.title}」${n} < ${GATE.bgOptionDescCjk} 字`)
           }
+          /*
+            ⚠️ 反向门槛：选项描述**写得太长**会挤掉玩家的自设空间。
+            玩家原话：「背景槽位太详细、太固定了……就没有自设主角什么空间了」。
+            这不是硬错，但值得提醒 —— 用 warn 而不是 fail，
+            因为个别选项确实可能需要多两句话。
+          */
+          if (n > 90) row.longDesc = (row.longDesc || 0) + 1
         }
       }
 
       /*
-        ── 各不相同的开场（本次的核心验收）──
-        要验三件事：
+        ── 开局处境素材（本次的核心验收）──
+        要验四件事：
           1. 世界卡指定了 `openerSlot`，且这个槽位真实存在；
-          2. 该槽位的**每一个**选项都有一段完整开场场景（长度够）；
-          3. 这些场景**彼此确实不同** —— 不只是长度达标，
-             而是不能"同一段换几个词"。用二元组相似度兜底。
-        */
+          2. 该槽位的**每一个**选项都有一段素材（长度够）；
+          3. 这些素材**彼此确实不同**（二元组相似度兜底）；
+          4. ⚠️ **素材里不得替玩家认亲** —— 不得出现"你的上司/上峰/同僚"。
+             玩家第三次打回就是因为这个：自设"刑部正四品"，
+             开局却固定有"俩仓部上司"。
+      */
       const openerLabel = w.story?.openerSlot
       const openerSlot = slots.find(s => s.label === openerLabel)
-      const sceneMap = openerLabel ? w.story?.sceneByOption?.[openerLabel] : undefined
+      const seedMap = openerLabel ? w.story?.openingSeeds?.[openerLabel] : undefined
 
       if (!openerLabel) {
-        fail(exp.label, '没指定开场槽位（openerSlot）',
-          '必须有一个背景槽位负责"开局处境"，否则所有背景又会被塞进同一个场面')
+        fail(exp.label, '没指定处境槽位（openerSlot）',
+          '必须有一个背景槽位描述"主角大致处在什么场合、什么层级"，否则 AI 无从取材')
       } else if (!openerSlot) {
         fail(exp.label, 'openerSlot 指向了不存在的槽位',
           `story.openerSlot="${openerLabel}"，但 backgrounds 里没有这个 label`)
       } else {
         const missing = []
         const tooShort = []
-        const scenes = []
+        const seeds = []
         for (const o of openerSlot.options) {
-          const text = (sceneMap?.[o.id] ?? sceneMap?.[o.title] ?? '').trim()
+          const text = (seedMap?.[o.id] ?? seedMap?.[o.title] ?? '').trim()
           if (!text) { missing.push(o.title); continue }
           const n = cjk(text)
-          if (n < GATE.sceneCjk) tooShort.push(`${o.title}(${n})`)
-          scenes.push({ title: o.title, text })
+          if (n < GATE.openingSeedCjk) tooShort.push(`${o.title}(${n})`)
+          seeds.push({ title: o.title, text })
         }
         row.opener = openerLabel
-        row.scenes = scenes.length
+        row.seeds = seeds.length
 
         if (missing.length) {
-          fail(exp.label, '开场场景没覆盖全部开局处境',
-            `${scenes.length}/${openerSlot.options.length} 已写；缺 ${missing.length} 个：` +
+          fail(exp.label, '开局素材没覆盖全部处境',
+            `${seeds.length}/${openerSlot.options.length} 已写；缺 ${missing.length} 个：` +
             missing.slice(0, 8).join('、') + (missing.length > 8 ? ' …' : ''))
         }
         if (tooShort.length) {
-          fail(exp.label, '开场场景太短',
-            `每条需 ≥${GATE.sceneCjk} 汉字（要能承载时间/地点/他在做什么/在场的人/钩子）：` +
+          fail(exp.label, '开局素材太短',
+            `每条需 ≥${GATE.openingSeedCjk} 汉字（要能说清这类处境的场合、人与麻烦）：` +
             tooShort.slice(0, 8).join('、'))
+        }
+
+        /*
+          ④ 替玩家认亲 —— 这是玩家最反感的一点，直接 fail。
+          只扫 openerSlot 的素材与**全部**背景选项，
+          因为这些正是"替主角安排关系"的高发区。
+        */
+        const kinHits = []
+        const scanKin = (where, text) => {
+          for (const ph of GATE.forbiddenKinPhrases) {
+            if (String(text || '').includes(ph)) kinHits.push(`${where} → 「${ph}」`)
+          }
+        }
+        for (const s of seeds) scanKin(`处境素材「${s.title}」`, s.text)
+        for (const slot of slots) {
+          scanKin(`槽位「${slot.label}」描述`, slot.description)
+          for (const o of slot.options) scanKin(`选项「${o.title}」`, o.description)
+        }
+        if (kinHits.length) {
+          fail(exp.label, '素材替玩家认了亲',
+            '不得出现"你的上司/上峰/同僚"这类固定关系 —— 玩家自设的主角身份优先，' +
+            '关系应由开场现场生成：' + kinHits.slice(0, 6).join('；') +
+            (kinHits.length > 6 ? ` …共 ${kinHits.length} 处` : ''))
         }
 
         /*
@@ -496,7 +545,7 @@ for (const exp of EXPECTED) {
           for (const g of a) if (b.has(g)) inter++
           return inter / (a.size + b.size - inter)
         }
-        const sets = scenes.map(s => ({ title: s.title, set: bigrams(s.text) }))
+        const sets = seeds.map(s => ({ title: s.title, set: bigrams(s.text) }))
         const tooSimilar = []
         for (let i = 0; i < sets.length; i++) {
           for (let j = i + 1; j < sets.length; j++) {
@@ -507,7 +556,7 @@ for (const exp of EXPECTED) {
           }
         }
         if (tooSimilar.length) {
-          fail(exp.label, '开场场景彼此太像（就是"同一段换几个词"）',
+          fail(exp.label, '开局素材彼此太像（就是"同一段换几个词"）',
             tooSimilar.slice(0, 6).join('；') + (tooSimilar.length > 6 ? ` …共 ${tooSimilar.length} 对` : ''))
         }
       }

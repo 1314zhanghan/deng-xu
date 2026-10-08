@@ -1,24 +1,27 @@
 import { describe, it, expect } from 'vitest'
-import { buildOpeningInstruction, describeBackgroundChoices, resolveOpeningScene } from '@/constants/prompts'
+import { buildOpeningInstruction, describeBackgroundChoices, resolveOpeningSeed } from '@/constants/prompts'
 import type { CharacterCard, PlayerCard, WorldCard } from '@/types/cards'
 
 /**
  * 开场指令的回归测试。
  *
- * ## 这段逻辑被玩家打回过**两次**，两次的错法都值得记住
+ * ## 这段逻辑被玩家打回过**三次**，每一次的错法都不同，请全部记住
  *
- * 第一次："选角页挑了半天的背景，开场却一模一样。"
- *   → 根因：`buildOpeningInstruction` 压根没收到背景选择。
+ * 1. 「选角页挑了半天的背景，开场却一模一样。」
+ *    → 根因：`buildOpeningInstruction` 压根没收到背景选择。
+ * 2. 「我要的是同一个世界观里，各不相同的开场为各不相同的背景服务，
+ *    而不是一样的开场因不一样的背景而略有改变。」
+ *    → 根因：我只做了"同一场景 + 换视角"，官军商江湖全挤在同一间屋。
+ * 3. 「背景槽位太详细、太固定了，连详细的背景都有就没有自设主角什么空间了
+ *    （尤其是还**固定了背景与开场官职**）。我的自设主角是**刑部正四品**，
+ *    开局却固定有俩**仓部**上司，这不是很影响代入感吗？」
+ *    → 根因：我把处境写成了第一幕的**唯一依据**，还明令别的背景不许挪动它，
+ *      于是背景槽位**顶掉了玩家自己写的主角设定**。优先级整个反了。
  *
- * 第二次（本次）："我要的是**同一个世界观里，各不相同的开场为各不相同的背景服务**，
- *   而不是一样的开场因不一样的背景而略有改变。这么多三六九等的人
- *   却在干同一个枯燥的工作，完全背离了沙盒。"
- *   → 根因：我只做了"同一场景 + 按背景换视角"（旧 `openingByBackground`），
- *     于是官、军、商、江湖、罪犯全挤在同一间值房里。
- *
- * 所以下面最要紧的两条是：
- *   · **不同开场处境 ⇒ 不同场景**（不是同一场景换词）
- *   · **其余背景只加质感，不得把场景挪走**
+ * 所以下面最要紧的三条是：
+ *   · **主角自设设定优先于背景槽位**（不同自设 ⇒ 不同开场）
+ *   · **处境素材只是素材**，不得成为"第一幕就发生在下面这个场面"的硬剧本
+ *   · **不许替玩家认亲**（不得凭空安上司/同僚，不得给没写过的头衔）
  */
 
 const mkWorld = (over: Partial<WorldCard> = {}): WorldCard => ({
@@ -29,37 +32,36 @@ const mkWorld = (over: Partial<WorldCard> = {}): WorldCard => ({
     {
       label: '开局处境',
       options: [
-        { id: 'office', title: '在值房核账', description: '你是个小吏', startingItems: ['ledger'] },
-        { id: 'frontier', title: '在边镇守烽', description: '你是个队正', startingItems: ['saber'] },
-        { id: 'shop', title: '在城南开店', description: '你是个商人', startingItems: ['abacus'] },
+        { id: 'court', title: '在朝中当权', description: '要害位置上的人', startingItems: ['seal'] },
+        { id: 'local', title: '在外任做官', description: '一方守土', startingItems: ['zhouyin'] },
+        { id: 'jianghu', title: '在江湖上混', description: '没有官身', startingItems: ['saber'] },
       ],
     },
     {
-      label: '出身',
+      label: '官场立场',
       options: [
-        { id: 'hanmen', title: '寒门', description: '家里没钱', startingItems: [] },
-        { id: 'xungui', title: '勋贵', description: '家里有功', startingItems: ['seal'] },
+        { id: 'genghua', title: '更化派', description: '主张变法', startingItems: [] },
+        { id: 'chizhong', title: '持重派', description: '主张守成', startingItems: [] },
       ],
     },
   ],
   attributePoints: 0,
   items: [
-    { id: 'ledger', name: '一本点验簿', description: '', tags: [] },
-    { id: 'saber', name: '一把横刀', description: '', tags: [] },
-    { id: 'abacus', name: '一副算盘', description: '', tags: [] },
-    { id: 'seal', name: '家传印', description: '', tags: [] },
+    { id: 'seal', name: '一枚印', description: '', tags: [] },
+    { id: 'zhouyin', name: '州印', description: '', tags: [] },
+    { id: 'saber', name: '一把刀', description: '', tags: [] },
   ],
   lores: [],
   story: {
-    opening: '（兜底）度支司的值房，申时三刻。',
+    opening: '（基调）汴梁的秋天来得比西京早。',
     mainQuest: '',
     enableStages: false, stages: [], enableChoices: true, urgencyAfterTurns: 0,
     openerSlot: '开局处境',
-    sceneByOption: {
+    openingSeeds: {
       开局处境: {
-        office: '汴梁度支司值房，你面前摊着含嘉仓的点验簿，裴无咎站在门口问你看完了没有。',
-        frontier: '云中镇外第三烽，风把火盆里的炭吹得发红，你手下的十个人等着你决定今夜点不点火。',
-        shop: '城南州桥边你的铺子刚卸下一船货，牙人堵在门口要你签一张三个月后付的契。',
+        court: '朝中的日常是案牍、奏对与同僚之间的分寸；消息在廊下比在公文里走得快。',
+        local: '外任要面对的是一方的钱粮、讼案与胥吏的默契；上头的考课悬在头顶。',
+        jianghu: '没有官身的人靠规矩和拳头吃饭；同行之间讲义气也讲价钱。',
       },
     },
   },
@@ -70,94 +72,102 @@ const mkWorld = (over: Partial<WorldCard> = {}): WorldCard => ({
   ...over,
 })
 
-const player: PlayerCard = {
+const player = (over: Partial<PlayerCard> = {}): PlayerCard => ({
   name: '沈砚', gender: '男', age: '三十', appearance: '', personality: '', background: '', extra: '',
-}
+  ...over,
+})
 const noChars: CharacterCard[] = []
 
-describe('开场指令 · 不同处境必须是不同场面（沙盒，不是同一工位）', () => {
-  it('★ 三个开局处境产出三段互不相同的场景（核心断言）', () => {
+describe('开场指令 · 主角自设优先，背景槽位只是素材', () => {
+  it('★ 主角自述背景必须出现在指令里，且标为最高优先级', () => {
+    const out = buildOpeningInstruction(
+      mkWorld(), player({ background: '刑部正四品，掌一司刑名' }), noChars, { 开局处境: 'court' },
+    )
+    expect(out).toContain('刑部正四品')
+    expect(out).toContain('最高优先级')
+  })
+
+  it('★ 不同自设背景 ⇒ 不同开场指令（这才是玩家要的"自设空间"）', () => {
     const w = mkWorld()
-    const a = buildOpeningInstruction(w, player, noChars, { 开局处境: 'office' })
-    const b = buildOpeningInstruction(w, player, noChars, { 开局处境: 'frontier' })
-    const c = buildOpeningInstruction(w, player, noChars, { 开局处境: 'shop' })
+    const a = buildOpeningInstruction(w, player({ background: '刑部正四品' }), noChars, { 开局处境: 'court' })
+    const b = buildOpeningInstruction(w, player({ background: '工部营缮司主事' }), noChars, { 开局处境: 'court' })
     expect(a).not.toBe(b)
-    expect(b).not.toBe(c)
-    expect(a).not.toBe(c)
-    // 各自带出各自的场面 —— 三段互不包含，是三个地方
-    expect(a).toContain('度支司值房')
-    expect(a).not.toContain('云中镇外第三烽')
-    expect(b).toContain('云中镇外第三烽')
-    expect(b).not.toContain('州桥边')
-    expect(c).toContain('州桥边')
-    expect(c).not.toContain('度支司值房')
+    expect(a).toContain('刑部正四品')
+    expect(b).toContain('工部营缮司主事')
+    expect(a).not.toContain('工部营缮司主事')
   })
 
-  it('★ 非开场槽位的随身物会被带进指令（给场面加质感）', () => {
-    // 开场槽位自己的物品写在场景正文里；这里验的是**别的槽位**的物品
-    const a = buildOpeningInstruction(mkWorld(), player, noChars, { 开局处境: 'office', 出身: 'xungui' })
-    expect(a).toContain('家传印')
-    expect(a).toContain('开局随身')
+  it('★ 处境素材不得被写成"第一幕就发生在这个场面"的硬剧本', () => {
+    const out = buildOpeningInstruction(mkWorld(), player({ background: '刑部正四品' }), noChars, { 开局处境: 'court' })
+    // 素材在，但明确标为附加参考 / 素材而非剧本
+    expect(out).toContain('案牍')
+    expect(out).toContain('附加参考')
+    expect(out).toContain('这是素材，不是剧本')
+    // 不能再出现旧版那种"以它为准 / 就发生在下面这个场面"的说法
+    expect(out).not.toContain('第一幕就发生在下面这个场面')
+    expect(out).not.toContain('请以它为准')
   })
 
-  it('★ 有专属场景时**不再拼接兜底 opening**（否则两幕揉成一幕）', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 开局处境: 'frontier' })
-    expect(out).toContain('云中镇外第三烽')
-    expect(out).not.toContain('（兜底）度支司的值房')
+  it('★ 与主角设定冲突时以主角设定为准（写进了指令）', () => {
+    const out = buildOpeningInstruction(mkWorld(), player({ background: '刑部正四品' }), noChars, { 开局处境: 'court' })
+    expect(out).toContain('一律以主角的设定为准')
   })
 
-  it('★ 其余背景只加质感，不得把场景挪走', () => {
-    const w = mkWorld()
-    const poor = buildOpeningInstruction(w, player, noChars, { 开局处境: 'frontier', 出身: 'hanmen' })
-    const noble = buildOpeningInstruction(w, player, noChars, { 开局处境: 'frontier', 出身: 'xungui' })
-    // 场面仍然只有边镇那一个
-    expect(poor).toContain('云中镇外第三烽')
-    expect(noble).toContain('云中镇外第三烽')
-    // 但两者的"质感"不同（出身被带进去了）
-    expect(poor).toContain('寒门')
-    expect(noble).toContain('勋贵')
-    // 并且明确禁止"因为别的背景把场景挪走"
-    expect(noble).toContain('场景已经由上面的开场处境定死了')
+  it('★ 不许替玩家认亲：明确禁止凭空安上司/同僚与没写过的头衔', () => {
+    const out = buildOpeningInstruction(mkWorld(), player({ background: '刑部正四品' }), noChars, { 开局处境: 'court' })
+    expect(out).toContain('不要凭空给他安上司、下属、同僚或亲戚')
+    expect(out).toContain('也不要给他加一个他没写过的上司')
   })
 
-  it('该处境没写场景时，退回兜底 opening 而不是崩掉', () => {
-    const w = mkWorld()
-    w.story.sceneByOption = { 开局处境: {} }
-    const out = buildOpeningInstruction(w, player, noChars, { 开局处境: 'office' })
-    expect(out).toContain('（兜底）度支司的值房')
+  it('主角没填自设背景时，说明处境可以更大程度充当依据', () => {
+    const out = buildOpeningInstruction(mkWorld(), player(), noChars, { 开局处境: 'local' })
+    expect(out).toContain('主角没有自述背景')
+    expect(out).toContain('外任要面对')
   })
 
-  it('世界卡没配 openerSlot 时，用兜底 opening', () => {
-    const w = mkWorld()
-    delete (w.story as { openerSlot?: string }).openerSlot
-    const out = buildOpeningInstruction(w, player, noChars, { 开局处境: 'office' })
-    expect(out).toContain('（兜底）度支司的值房')
-  })
-
-  it('既没场景也没兜底 opening 时给出自拟指令，不崩', () => {
+  it('没有素材时，退回世界基调，并要求只取氛围不照搬人事', () => {
     const base = mkWorld()
-    const w = mkWorld({ story: { ...base.story, opening: '', sceneByOption: {} } })
-    const out = buildOpeningInstruction(w, player, noChars, {})
-    expect(out).toContain('自行设计')
+    const w = mkWorld({ story: { ...base.story, openingSeeds: {} } })
+    const out = buildOpeningInstruction(w, player(), noChars, { 开局处境: 'court' })
+    expect(out).toContain('汴梁的秋天')
+    expect(out).toContain('不要照搬其中的具体人与事')
+  })
+
+  it('其他槽位只加质感，且不得改主角身份', () => {
+    const out = buildOpeningInstruction(
+      mkWorld(), player({ background: '刑部正四品' }), noChars, { 开局处境: 'court', 官场立场: 'genghua' },
+    )
+    expect(out).toContain('更化派')
+    expect(out).toContain('不要因为它们去改主角的身份与职位')
+  })
+
+  it('在场角色被说明为"客观立场、不是你的谁"，且可以一个都不出场', () => {
+    const chars = [{
+      id: 'c1', name: '裴无咎', gender: '男', age: '五十', appearance: '', personality: '',
+      relationship: '度支司郎中', description: '', presentAtStart: true,
+    }] as unknown as CharacterCard[]
+    const out = buildOpeningInstruction(mkWorld(), player({ background: '刑部正四品' }), chars, { 开局处境: 'court' })
+    expect(out).toContain('裴无咎')
+    expect(out).toContain('不是"你的谁"')
+    expect(out).toContain('也可以一个人都不出场')
   })
 
   it('选了一个不存在的处境 id 不会造成异常', () => {
-    const out = buildOpeningInstruction(mkWorld(), player, noChars, { 开局处境: '不存在' })
-    expect(typeof out).toBe('string')
-    expect(out).toContain('（兜底）')
+    const out = buildOpeningInstruction(mkWorld(), player(), noChars, { 开局处境: '不存在' })
+    expect(out).toContain('汴梁的秋天')
   })
 
-  it('resolveOpeningScene 能解析出槽位/选项/场景', () => {
-    const r = resolveOpeningScene(mkWorld(), { 开局处境: 'shop' })
-    expect(r).toMatchObject({ slot: '开局处境', id: 'shop', title: '在城南开店' })
-    expect(r?.scene).toContain('州桥边')
-    expect(resolveOpeningScene(mkWorld(), {})).toBeNull()
+  it('resolveOpeningSeed 解析出槽位/选项/素材', () => {
+    const r = resolveOpeningSeed(mkWorld(), { 开局处境: 'local' })
+    expect(r).toMatchObject({ slot: '开局处境', id: 'local', title: '在外任做官' })
+    expect(r?.seed).toContain('外任要面对')
+    expect(resolveOpeningSeed(mkWorld(), {})).toBeNull()
   })
 
   it('describeBackgroundChoices 解析出分类/选项/说明/携带物', () => {
-    const picked = describeBackgroundChoices(mkWorld(), { 开局处境: 'frontier', 出身: 'hanmen' })
+    const picked = describeBackgroundChoices(mkWorld(), { 开局处境: 'court', 官场立场: 'genghua' })
     expect(picked).toHaveLength(2)
-    expect(picked[0]).toMatchObject({ label: '开局处境', id: 'frontier', title: '在边镇守烽' })
-    expect(picked[0].items).toEqual(['一把横刀'])
+    expect(picked[0]).toMatchObject({ label: '开局处境', id: 'court', title: '在朝中当权' })
+    expect(picked[0].items).toEqual(['一枚印'])
   })
 })

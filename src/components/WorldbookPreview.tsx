@@ -219,46 +219,41 @@ export function WorldbookPreview({
           {world.story?.opening && (
             <Panel
               icon={<BookOpen size={14} />}
-              title="开场（示例）"
-              hint={
-                // 有逐处境的开场场景时要说清楚：下面那些才是真正的第一幕
-                world.story.sceneByOption && Object.keys(world.story.sceneByOption).length > 0
-                  ? '真正的第一幕按你选的「开局处境」而定，见下方'
-                  : undefined
-              }
+              title="开场基调"
+              hint="第一幕由 AI 依据「你自设的主角」＋所选处境现场创作，这一段只是世界的氛围参考"
             >
               <Prose text={world.story.opening} />
             </Panel>
           )}
 
           {/*
-            ── 各不相同的开场 ──
-            这是本作"沙盒"最直接的体现：**同一世界观下，不同的处境对应不同的第一幕**，
-            而不是所有人挤在同一处、只是看的角度不同。
-            所以把每一段完整开场都摊开 —— 玩家一眼就知道自己想从哪儿开始。
+            ── 各不相同的开局处境 ──
+            这里展示的是**素材**（这类处境通常是什么样），不是写死的第一幕。
+            所以要明说：真正的开场由 AI 结合你自设的主角现场创作 ——
+            否则玩家会以为"点进去就是这出戏"，又会觉得自己的设定被顶掉了。
           */}
           {(() => {
             const slotLabel = world.story?.openerSlot
             if (!slotLabel) return null
             const slot = (world.backgrounds || []).find(s => s.label === slotLabel)
-            const map = world.story?.sceneByOption?.[slotLabel]
+            const map = world.story?.openingSeeds?.[slotLabel]
             if (!slot || !map) return null
             const rows = slot.options
-              .map(o => ({ title: o.title, scene: (map[o.id] ?? map[o.title] ?? '').trim() }))
-              .filter(r => r.scene)
+              .map(o => ({ title: o.title, seed: (map[o.id] ?? map[o.title] ?? '').trim() }))
+              .filter(r => r.seed)
             if (!rows.length) return null
             return (
               <Panel
                 icon={<Sparkles size={14} />}
-                title={`开场：${slotLabel}（${rows.length} 种互不相同的开局）`}
-                hint="在选角页选哪个，第一幕就从哪里开始"
+                title={`开局处境：${slotLabel}（${rows.length} 种）`}
+                hint="这些只是素材 —— 具体第一幕由 AI 结合你自己写的主角设定现场创作"
               >
                 <div className="space-y-4">
                   {rows.map(r => (
                     <div key={r.title} className="border-l-2 border-accent-lantern/30 pl-3">
                       <div className="text-xs text-text-primary font-serif mb-1">{r.title}</div>
                       <p className="text-[11px] text-text-secondary leading-relaxed whitespace-pre-wrap">
-                        {r.scene}
+                        {r.seed}
                       </p>
                     </div>
                   ))}

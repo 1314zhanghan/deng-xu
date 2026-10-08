@@ -538,16 +538,16 @@ export function CardEditor() {
               </div>
 
               {/*
-                「各不相同的开场」—— 只读展示 + 选择开场槽位。
-                它按「槽位 → 选项」组织，用 textarea 硬编几十段不现实，
-                所以编辑器把**开场槽位的覆盖情况**列给作者看，
-                正文由作者在数据文件里写。对本作的内置世界足够，
-                也避免了一个没人会用的复杂表单。
+                「开局处境」—— 只读展示 + 选择处境槽位。
+                ⚠️ 这里写的是**素材**（这类处境通常是什么样），**不是写死的第一幕**。
+                第一幕由 AI 结合玩家自设的主角现场创作 ——
+                所以文案不能说成"专属第一幕"，否则作者会往这里写剧本，
+                又会把玩家的自设顶掉。
               */}
               {(() => {
                 const slotLabel = draft.story.openerSlot
                 const slots = draft.backgrounds || []
-                const map = slotLabel ? draft.story.sceneByOption?.[slotLabel] : undefined
+                const map = slotLabel ? draft.story.openingSeeds?.[slotLabel] : undefined
                 const openerSlot = slots.find(s => s.label === slotLabel)
                 const rows = openerSlot
                   ? openerSlot.options.map(o => ({
@@ -559,24 +559,24 @@ export function CardEditor() {
                 return (
                   <div className="p-4 bg-surface/20 border border-text-muted/20 rounded space-y-3">
                     <SectionTitle>
-                      各不相同的开场
+                      开局处境（素材）
                       <span className="ml-2 text-[10px] font-normal text-text-muted">
                         {openerSlot
-                          ? `${covered} / ${rows.length} 个处境已有专属第一幕${covered < rows.length ? '（缺的退回兜底开场）' : ''}`
-                          : '未指定开场槽位'}
+                          ? `${covered} / ${rows.length} 个处境已有素材`
+                          : '未指定处境槽位'}
                       </span>
                     </SectionTitle>
 
                     <Field
-                      label="开场槽位"
-                      hint="哪个背景槽位决定「主角此刻在做什么、身处何地」。它的每个选项应对应一段完整、彼此不同的开场场景。留空则统一用上面的兜底开场。"
+                      label="处境槽位"
+                      hint="哪个背景槽位描述「主角大致处在什么场合、什么层级」。它的每个选项应给一段素材（这类处境通常的样子），不要写成固定剧本、也不要预设具体官职与上司 —— 玩家的自设优先。"
                     >
                       <select
                         className={inputCls}
                         value={slotLabel || ''}
                         onChange={e => patchStory({ openerSlot: e.target.value || undefined })}
                       >
-                        <option value="">（不指定，用兜底开场）</option>
+                        <option value="">（不指定）</option>
                         {slots.map(s => (
                           <option key={s.label} value={s.label}>
                             {s.label}（{s.options.length} 项）
@@ -592,7 +592,7 @@ export function CardEditor() {
                             <span className="text-text-primary">{r.title}</span>
                             {r.text
                               ? <span className="text-text-secondary"> —— {r.text}</span>
-                              : <span className="text-accent-forge"> —— 未写（会退回兜底开场）</span>}
+                              : <span className="text-accent-forge"> —— 未写（AI 只按世界基调创作）</span>}
                           </div>
                         ))}
                       </div>
