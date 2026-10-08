@@ -100,7 +100,30 @@ const check = (l, ok, extra = '') => { results.push({ l, ok }); console.log(`  $
 
 await send('Runtime.enable'); await send('Page.enable')
 await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 950, deviceScaleFactor: 1, mobile: false })
-await send('Page.navigate', { url: SITE }); await sleep(8000)
+await send('Page.navigate', { url: SITE }); await sleep(2000)
+
+/*
+  ⚠️ 等**条件**，不要等时间。
+  这里原先是一句固定 `await sleep(8000)`，紧接着就调用 `__uiStore`。
+  本地机器快，8 秒绰绰有余；但 CI 的机器要加载 440 KB 主包 + 468 KB 世界数据
+  再跑完 React 初始化，8 秒不够 —— 于是 `__uiStore` 还没挂上就被调用，
+  整个套件以 `THREW ReferenceError: __uiStore is not defined` 收场。
+  **"固定等待"的典型症状就是本地永远过、CI 随机红。**
+  （同类缺陷在 heroes.mjs 里也修过一次，教训是一样的。）
+*/
+{
+  const t0 = Date.now()
+  let ready = false
+  while (Date.now() - t0 < 40000) {
+    if (await ev(`typeof __uiStore !== 'undefined' && !!__uiStore.getState().llm`)) { ready = true; break }
+    await sleep(400)
+  }
+  if (!ready) {
+    console.error('❌ 40 秒内 __uiStore 仍未就绪 —— 页面可能根本没加载出来')
+    fake.close(); process.exit(1)
+  }
+  console.log(`  页面就绪（__uiStore 已挂上，用时 ${Date.now() - t0}ms）`)
+}
 
 /**
  * 发一次生成请求，返回**引擎会显示给玩家的那句话**。

@@ -579,6 +579,25 @@ scripts/
 | `node scripts/render-offline.mjs map` | **不用浏览器**出地图/立绘对照图（几秒） |
 | `node scripts/render-offline.mjs xcheck` | 离线与浏览器渲染结果一致性（需 dev server） |
 
+### ⚠️ 写走查的一条铁律：**等条件，不要等时间**
+
+这条已经咬过我三次，每次的症状都是"**本地永远过、CI 随机红**"：
+
+| 次数 | 位置 | 症状 | 修法 |
+|---|---|---|---|
+| 1 | `heroes.mjs` | 本地全绿，CI 挂 18 项 | 全改成 `waitFor(条件)` |
+| 2 | `main-menu.mjs` | 「我的主角」断言失败 | 探针的匹配表过期（不是时序） |
+| 3 | `error-paths.mjs` / `mobile.mjs` | `THREW ReferenceError: __uiStore is not defined`、`Cannot read properties of null (reading 'querySelectorAll')` | 把 `sleep(8000)` / `sleep(9000)` 换成等 store 与内置世界就绪 |
+
+第 3 次的机理值得记住：两个套件在 `Page.navigate` 后**固定等 8/9 秒**就用
+`__uiStore` / `__libraryStore`。本地加载 440 KB 主包 + 468 KB 世界数据绰绰有余；
+CI 慢机器上不够 → store 还没挂上 → 套件直接抛异常收场。
+而 `mobile.mjs` 又因为 `document.querySelector('nav')` 返回 null 而二次抛错，
+`ev()` 把异常变成 `'THREW …'` 字符串，`JSON.parse` 再炸一次 —— 报错信息因此很难读。
+
+**所以：新写走查时，第一个断言之前必须先等一个"页面真的就绪"的条件**
+（store 存在、世界加载完、目标元素出现）。`waitFor` 的模式见 `heroes.mjs` 顶部。
+
 ### 走查写在"画廊"里的部分
 
 `map-gallery.mjs` / `npc-fidelity.mjs` / `sprite-gallery.mjs` 会**渲染对照图**到

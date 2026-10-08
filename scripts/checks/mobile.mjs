@@ -99,7 +99,34 @@ await send('Page.navigate', { url: SITE }); await sleep(3000)
 await ev(`(()=>{const k='pale-notes-ui';let v={};try{v=JSON.parse(localStorage.getItem(k)||'{}')}catch(e){}
   v.state=v.state||{};v.state.llm=Object.assign({provider:'deepseek',baseUrl:'https://api.deepseek.com/v1',narrativeModel:'deepseek-chat',analysisModel:'deepseek-chat',temperature:0.8},v.state.llm||{},{apiKey:'sk-mob'});
   v.state.isApiKeyModalOpen=false;localStorage.setItem(k,JSON.stringify(v));return 1})()`)
-await send('Page.navigate', { url: SITE }); await sleep(9000)
+await send('Page.navigate', { url: SITE }); await sleep(2000)
+
+/*
+  ⚠️ 等**条件**，不要等时间（同 error-paths.mjs 的教训）。
+  这里原先固定等 9 秒，然后 launchGame() 立刻用 `__libraryStore` / `__gameStore`。
+  CI 慢机器上 9 秒不够：store 未挂 → 起局失败 → 底栏 nav 不存在
+  → tapByLabel 里 `nav.querySelectorAll` 抛 `Cannot read properties of null`。
+  另外内置世界是**懒加载**的，`worlds[0]` 可能在 store 就绪后仍为空，
+  所以这里连"世界真的加载进来了"一起等。
+*/
+{
+  const t0 = Date.now()
+  let ready = false
+  while (Date.now() - t0 < 45000) {
+    const ok = await ev(`typeof __libraryStore !== 'undefined'
+      && typeof __gameStore !== 'undefined'
+      && typeof __sessionStore !== 'undefined'
+      && (__libraryStore.getState().worlds || []).length > 0`)
+    if (ok) { ready = true; break }
+    await sleep(400)
+  }
+  if (!ready) {
+    console.error('❌ 45 秒内 store 或内置世界仍未就绪')
+    try { ws.close(); edge.kill(); removeProfile(PROFILE) } catch {}
+    process.exit(1)
+  }
+  console.log(`  页面就绪（store 与内置世界已加载，用时 ${Date.now() - t0}ms）`)
+}
 
 /** 直接在 store 里起一局，跳过选角（本测试只关心手机端交互） */
 async function launchGame() {
@@ -145,12 +172,17 @@ console.log('\n=== 2) 点底栏「物品」→ 面板真的弹出来 ===')
 async function tapByLabel(label) {
   const box = await ev(`(()=>{
     const nav = document.querySelector('nav');
+    // nav 还没渲染出来时不要抛错 —— 返回 null 让调用方给出可读的失败原因
+    if (!nav) return null;
     const b = [...nav.querySelectorAll('button')].find(x => (x.textContent||'').trim().includes(${JSON.stringify(label)}));
     if (!b) return null;
     const r = b.getBoundingClientRect();
     return JSON.stringify({ x: Math.round(r.left + r.width/2), y: Math.round(r.top + r.height/2) });
   })()`)
   if (!box) return 'no-button'
+  // 页面 eval 抛错时 ev() 会返回 'THREW …' 字符串，这里要挡住，
+  // 否则 JSON.parse 会把它当 JSON 解析再抛一次（CI 上就是这么炸的）
+  if (typeof box !== 'string' || !box.startsWith('{')) return 'eval-failed:' + String(box).slice(0, 80)
   const { x, y } = JSON.parse(box)
   await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 })
   await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 })
