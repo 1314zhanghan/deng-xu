@@ -15,23 +15,37 @@ export function StatusBar() {
 
   return (
     <div className="w-full bg-zinc-900 border-b border-zinc-800 text-xs font-mono text-zinc-400 select-none relative z-30">
-      {/* Mobile Collapsed View */}
-      <div className="md:hidden flex items-center justify-between p-2 px-4 h-10">
+      {/*
+        ⚠️ 手机端折叠行原先**只显示"就绪"两个字**，白白占掉一整行高度（h-10）——
+        而"我在哪、现在什么时候"恰恰是玩家最常需要的信息，却要点开才能看到。
+        现在：
+          · 正在生成 → 显示状态消息（那时它最重要）
+          · 空闲     → 显示「位置 · 时间」，把这一行用起来
+        展开后仍是完整的四项（位置/时间/身份/章节）。
+      */}
+      <div className="md:hidden flex items-center justify-between px-4 h-9 gap-2">
         {statusMessage ? (
-           <div className="flex items-center gap-2 text-amber-500 animate-pulse">
-            <Loader2 className="w-3 h-3 animate-spin" />
-            <span>{statusMessage}</span>
+          <div className="flex items-center gap-2 text-amber-500 animate-pulse min-w-0">
+            <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+            <span className="truncate">{statusMessage}</span>
           </div>
         ) : (
-           <div className="flex items-center gap-2 text-zinc-500">
-             <span className="w-2 h-2 rounded-full bg-zinc-700"></span>
-             <span>就绪</span>
-           </div>
+          <div className="flex items-center gap-3 min-w-0 text-zinc-500">
+            <span className="flex items-center gap-1.5 min-w-0">
+              <MapPin className="w-3 h-3 shrink-0" />
+              <span className="text-zinc-300 truncate">{location || '未知之处'}</span>
+            </span>
+            <span className="flex items-center gap-1.5 shrink-0">
+              <Clock className="w-3 h-3" />
+              <span>{formatTime(time)}</span>
+            </span>
+          </div>
         )}
-        
-        <button 
+
+        <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 hover:bg-zinc-800 rounded text-zinc-500"
+          className="p-1 hover:bg-zinc-800 rounded text-zinc-500 shrink-0"
+          aria-label={isExpanded ? '收起状态栏' : '展开状态栏'}
         >
           {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>

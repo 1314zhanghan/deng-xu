@@ -348,530 +348,6 @@
           ]
         },
         {
-          "label": "营生",
-          "options": [
-            {
-              "id": "bg_path_hr",
-              "title": "在人事与档案上做事",
-              "description": "核对编制、归置卷宗。手边放着全渊最完整的一批纸：职级、处置记录、婚配与配额。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 1,
-                "nerve": 0,
-                "access": 1
-              },
-              "resourceBonus": {
-                "energy": 0,
-                "credit": 320,
-                "standing": 8
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_paper_ledger",
-                "item_crt_terminal",
-                "item_coverall"
-              ]
-            },
-            {
-              "id": "bg_path_security",
-              "title": "在治安与巡逻上做事",
-              "description": "查闸机、控人群、写现场记录。成绩不看抓了多少人，看记录写得干不干净。",
-              "attributeBonus": {
-                "might": 2,
-                "wits": 0,
-                "charm": 0,
-                "nerve": 2,
-                "access": 1
-              },
-              "resourceBonus": {
-                "health": 10,
-                "energy": 10,
-                "credit": 280,
-                "standing": 6
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_steel_boots",
-                "item_coverall",
-                "item_bio_wristband"
-              ]
-            },
-            {
-              "id": "bg_path_research",
-              "title": "在技术与实验上做事",
-              "description": "清洗数据、抄参数、删掉没有价值的片段。删掉的东西你偷偷记了下来。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 3,
-                "charm": 0,
-                "nerve": 1,
-                "access": 1
-              },
-              "resourceBonus": {
-                "energy": 0,
-                "credit": 620,
-                "standing": 10
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_personal_terminal",
-                "item_coded_note",
-                "item_sedative_ampoule"
-              ]
-            },
-            {
-              "id": "bg_path_collect",
-              "title": "跟着采集队做事",
-              "description": "穿三十四公斤的防护服练窗口期，还没真正出过站。签过一份\"余额留给谁\"。",
-              "attributeBonus": {
-                "might": 2,
-                "wits": 1,
-                "charm": 1,
-                "nerve": 2,
-                "access": 0
-              },
-              "resourceBonus": {
-                "health": 10,
-                "energy": 15,
-                "credit": 400,
-                "standing": 5
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_rebreather",
-                "item_geiger_counter",
-                "item_steel_boots",
-                "item_coverall"
-              ]
-            },
-            {
-              "id": "bg_path_audit",
-              "title": "在账目与审计上做事",
-              "description": "复核流水与抄录时间。账不会说谎，写字的人会——所以只信时间戳。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 3,
-                "charm": 0,
-                "nerve": 1,
-                "access": 1
-              },
-              "resourceBonus": {
-                "energy": 0,
-                "credit": 480,
-                "standing": 9
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_paper_ledger",
-                "item_crt_terminal",
-                "item_personal_terminal"
-              ]
-            },
-            {
-              "id": "bg_path_discipline",
-              "title": "在调查与核对上做事",
-              "description": "问话、誊抄、写便笺。法律没有规定辩护权，而你的笔迹也要归档。",
-              "attributeBonus": {
-                "might": 1,
-                "wits": 2,
-                "charm": 1,
-                "nerve": 2,
-                "access": 2
-              },
-              "resourceBonus": {
-                "energy": 0,
-                "credit": 540,
-                "standing": 12
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_personal_terminal",
-                "item_coded_note",
-                "item_sedative_ampoule"
-              ]
-            },
-            {
-              "id": "bg_job_broker",
-              "title": "做掮客与转手的买卖",
-              "description": "让东西动起来：抽成 12%，报价不解释。最怕下游被查时说出一个工号。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 2,
-                "nerve": 2,
-                "access": 1
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 1800,
-                "standing": -6
-              },
-              "startingItems": [
-                "item_coffee_token",
-                "item_credit_chip",
-                "item_pipe_map",
-                "item_coded_note"
-              ]
-            },
-            {
-              "id": "bg_job_pipewalker",
-              "title": "钻管廊与通风道干活",
-              "description": "按工单挣钱，爬完一次咳一天。台账上写\"传感器漂移\"，你的本子上是三个振动值。",
-              "attributeBonus": {
-                "might": 2,
-                "wits": 1,
-                "charm": 0,
-                "nerve": 1,
-                "access": 1
-              },
-              "resourceBonus": {
-                "health": -5,
-                "energy": 5,
-                "credit": 300,
-                "standing": 3
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_dust_mask",
-                "item_ear_plugs",
-                "item_pipe_map"
-              ]
-            },
-            {
-              "id": "bg_job_rationclerk",
-              "title": "在配给点上记账",
-              "description": "核对谁领了、谁替谁领。你的笔能让人少领 140 千卡，也能让他明天再来。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 1,
-                "nerve": 1,
-                "access": 1
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 340,
-                "standing": 6
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_paper_ledger",
-                "item_ration_stub",
-                "item_wired_phone"
-              ]
-            },
-            {
-              "id": "bg_job_nurse",
-              "title": "在医务室与暗处之间做医护",
-              "description": "白天在正规医务室，晚上处理不能进医务室的人。风险按第六十三条与第七十一条并算。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 1,
-                "nerve": 3,
-                "access": 0
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": -5,
-                "credit": 900,
-                "standing": -3
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_sedative_ampoule",
-                "item_nano_patch",
-                "item_clinic_key"
-              ]
-            },
-            {
-              "id": "bg_job_undertaker",
-              "title": "替人办后事",
-              "description": "替人凑材料、争那 20%、把遗体送进回收线。不收钱，只收\"记名\"。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 1,
-                "charm": 3,
-                "nerve": 2,
-                "access": 0
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 260,
-                "standing": 8
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_mourn_stub",
-                "item_paper_ledger",
-                "item_coded_note"
-              ]
-            },
-            {
-              "id": "bg_job_gambler",
-              "title": "靠换班与消息挣钱",
-              "description": "不下矿、不坐班，用三个班次与三个人分别作保，总有一头是空的。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 1,
-                "charm": 3,
-                "nerve": 2,
-                "access": 0
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": -5,
-                "credit": 620,
-                "standing": -4
-              },
-              "startingItems": [
-                "item_shift_chit",
-                "item_credit_chip",
-                "item_contraband_cigarette",
-                "item_ration_stub"
-              ]
-            }
-          ]
-        },
-        {
-          "label": "隐秘",
-          "options": [
-            {
-              "id": "bg_secret_echo",
-              "title": "你是回声的联络人",
-              "description": "替回声投递手抄件，两个位置，做过七次。你从不知道另一条线是谁。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 1,
-                "charm": 1,
-                "nerve": 2,
-                "access": 0
-              },
-              "resourceBonus": {
-                "energy": 0,
-                "credit": 150,
-                "standing": -4
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_coded_note",
-                "item_pipe_map",
-                "item_forged_badge"
-              ]
-            },
-            {
-              "id": "bg_secret_laundry",
-              "title": "你替黑市洗贡献点",
-              "description": "替人过账：转三次手，来源就模糊了。你抽 9%，也替人保管过额度。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 2,
-                "nerve": 1,
-                "access": 1
-              },
-              "resourceBonus": {
-                "credit": 1200,
-                "standing": -6
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_credit_chip",
-                "item_coffee_token",
-                "item_paper_ledger"
-              ]
-            },
-            {
-              "id": "bg_secret_sample",
-              "title": "你藏着一份地表样本",
-              "description": "一小瓶土，四十七克，缝在内衬里。按第八十八条处理，处置是注销工牌。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 0,
-                "nerve": 3,
-                "access": 0
-              },
-              "resourceBonus": {
-                "credit": 120,
-                "standing": -2
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_lead_case",
-                "item_unknown_seed",
-                "item_coded_note"
-              ]
-            },
-            {
-              "id": "bg_secret_forged",
-              "title": "你伪造过职级档案",
-              "description": "假工牌用了十七个月。有人把它收进抽屉，此后每月付他 60 点。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 1,
-                "charm": 2,
-                "nerve": 1,
-                "access": 2
-              },
-              "resourceBonus": {
-                "credit": -180,
-                "standing": -5
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_forged_badge",
-                "item_credit_chip",
-                "item_pipe_map"
-              ]
-            },
-            {
-              "id": "bg_secret_secondauth",
-              "title": "你的工牌里有一段不属于你的权限",
-              "description": "一段不记录的权限，覆盖第 41 至 90 层。给你权限的人也在看你怎么用。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 1,
-                "charm": 0,
-                "nerve": 2,
-                "access": 3
-              },
-              "resourceBonus": {
-                "credit": 220,
-                "standing": 5
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_personal_terminal",
-                "item_pipe_map",
-                "item_bio_wristband"
-              ]
-            },
-            {
-              "id": "bg_secret_78c",
-              "title": "你见过第 78-C 机房的封条被换",
-              "description": "封条完好，背面却有旧压痕。你写了\"完好\"，没写那 1.4 摄氏度。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 0,
-                "nerve": 2,
-                "access": 1
-              },
-              "resourceBonus": {
-                "credit": 260,
-                "standing": 3
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_coded_note",
-                "item_paper_ledger",
-                "item_crt_terminal"
-              ]
-            },
-            {
-              "id": "bg_secret_stool",
-              "title": "你替纪律监察部做过一次线人",
-              "description": "一次主动说明换来提前半年，代价是 41 个人的额度与一个你认得的工号。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 1,
-                "nerve": 1,
-                "access": 2
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 480,
-                "standing": 10
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_wire_recorder",
-                "item_coded_note",
-                "item_personal_terminal"
-              ]
-            },
-            {
-              "id": "bg_secret_signature",
-              "title": "你手里有一条人命的签字",
-              "description": "一份调整单的第二联，折成四折。它是证据，也是一份不生效的自首书。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 0,
-                "nerve": 3,
-                "access": 1
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 420,
-                "standing": -2
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_coded_note",
-                "item_paper_ledger",
-                "item_grey_pass"
-              ]
-            },
-            {
-              "id": "bg_secret_deathcert",
-              "title": "你伪造过一份死亡登记",
-              "description": "把死亡日期改后四十天，让最后一笔补贴发下去。档案里从此多了一条记录。",
-              "attributeBonus": {
-                "might": 0,
-                "wits": 2,
-                "charm": 1,
-                "nerve": 2,
-                "access": 0
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 200,
-                "standing": -3
-              },
-              "startingItems": [
-                "item_workbadge",
-                "item_death_cert",
-                "item_paper_ledger",
-                "item_mourn_stub"
-              ]
-            },
-            {
-              "id": "bg_secret_101",
-              "title": "你从第 101 层的封堵段里拿过东西",
-              "description": "从三厘米的裂缝里钩出两件东西。风是暖的，而图纸说那里没有热源。",
-              "attributeBonus": {
-                "might": 1,
-                "wits": 2,
-                "charm": 0,
-                "nerve": 3,
-                "access": 1
-              },
-              "resourceBonus": {
-                "health": 0,
-                "energy": 0,
-                "credit": 180,
-                "standing": -1
-              },
-              "startingItems": [
-                "item_sealed_sample",
-                "item_pipe_map",
-                "item_coded_note",
-                "item_workbadge"
-              ]
-            }
-          ]
-        },
-        {
           "label": "立场",
           "options": [
             {
@@ -1122,7 +598,7 @@
             {
               "id": "bg_scene_office",
               "title": "在行政与审批线上做事",
-              "description": "坐在办公室里签文件的人。能退回材料、能让一件事再等十一天，但上面还有两层人能推翻你。",
+              "description": "坐在办公室里签文件、归档名册的人。能退回材料、能让一件事再等十一天，但上面还有两层人能推翻你。",
               "attributeBonus": {
                 "might": 0,
                 "wits": 2,
@@ -1145,8 +621,8 @@
             },
             {
               "id": "bg_scene_industry",
-              "title": "在重工业区上工",
-              "description": "在高温、粉尘与噪音里上工。配给比办公室多，命比办公室短；工段里认师傅，也认班次。",
+              "title": "在车间与管廊之间上工",
+              "description": "在高温、粉尘与机器噪音里上工，或者钻进一米一内径的通风道。配给比办公室多，命比办公室短。",
               "attributeBonus": {
                 "might": 2,
                 "wits": 1,
@@ -1169,8 +645,8 @@
             },
             {
               "id": "bg_scene_service",
-              "title": "在配给点与生活服务上做事",
-              "description": "所有人的吃、住、看病都从你桌前过。你的笔能让人少领 140 千卡，也能让他明天再来。",
+              "title": "在配给点与账目上做事",
+              "description": "所有人的吃、住、看病与每一笔配给都从你桌前过。你的笔能让人少领 140 千卡，也能让他明天再来。",
               "attributeBonus": {
                 "might": 0,
                 "wits": 1,
@@ -1357,6 +833,78 @@
                 "item_ration_stub",
                 "item_forged_badge",
                 "item_algae_brick"
+              ]
+            },
+            {
+              "id": "bg_scene_security",
+              "title": "在治安与巡逻上做事",
+              "description": "查闸机、控人群、写现场记录。成绩不看抓了多少人，看记录写得干不干净。",
+              "attributeBonus": {
+                "might": 2,
+                "wits": 0,
+                "charm": 0,
+                "nerve": 2,
+                "access": 1
+              },
+              "resourceBonus": {
+                "health": 10,
+                "energy": 10,
+                "credit": 280,
+                "standing": 6
+              },
+              "startingItems": [
+                "item_workbadge",
+                "item_steel_boots",
+                "item_coverall",
+                "item_bio_wristband"
+              ]
+            },
+            {
+              "id": "bg_scene_medic",
+              "title": "在医务室与暗处之间做医护",
+              "description": "白天在正规医务室，晚上处理不能进医务室的人。风险按第六十三条与第七十一条并算。",
+              "attributeBonus": {
+                "might": 0,
+                "wits": 2,
+                "charm": 1,
+                "nerve": 3,
+                "access": 0
+              },
+              "resourceBonus": {
+                "health": 0,
+                "energy": -5,
+                "credit": 900,
+                "standing": -3
+              },
+              "startingItems": [
+                "item_workbadge",
+                "item_sedative_ampoule",
+                "item_nano_patch",
+                "item_clinic_key"
+              ]
+            },
+            {
+              "id": "bg_scene_undertaker",
+              "title": "替人办后事",
+              "description": "替人凑材料、争那 20%、把遗体送进回收线。不收钱，只收\"记名\"。",
+              "attributeBonus": {
+                "might": 0,
+                "wits": 1,
+                "charm": 3,
+                "nerve": 2,
+                "access": 0
+              },
+              "resourceBonus": {
+                "health": 0,
+                "energy": 0,
+                "credit": 260,
+                "standing": 8
+              },
+              "startingItems": [
+                "item_workbadge",
+                "item_mourn_stub",
+                "item_paper_ledger",
+                "item_coded_note"
               ]
             },
             {
@@ -1910,9 +1458,9 @@
         "openerSlot": "开局处境",
         "openingSeeds": {
           "开局处境": {
-            "bg_scene_office": "日常是案牍：一份文件在几个部门之间走一圈，谁先看、谁后看、落谁的款、用谁的印，都有讲究；消息在走廊里比在公文里走得快。打交道的多是同级办事的人、来催件的班组代表，以及靠材料吃饭的中层。体面是从不出错，代价是出一次错就有人替你记着。手里有能办成事的权力，也有必须打的招呼；想办的事常常卡在\"再议一议\"四个字上。",
-            "bg_scene_industry": "日常在作业面上：高温、粉尘、机器的低频噪音，一班十二小时，中间两次休息。打交道的是班组长、抬工、检修工，以及来收数的记账员。体面在于配给足、工段里认人；麻烦在于事故与\"责任落实到人\"这句话，落到班组一级就落到个人头上。想办的事大多得靠人情换：一次换班、一片滤芯、一个轻省的岗位。这一层的班次最紧，也最短命。",
-            "bg_scene_service": "日常在窗口与柜台后面：配给表、住房登记、门诊排期、食堂进出货，全都从手边过一遍。打交道的是排队的人、替领的人、来核数的记账员，以及偶尔来\"看一看\"的监察人员。体面在于没人敢跟你吵；麻烦在于这个位置人情债最密，每天都要在按表办与给人方便之间选一次。便利是消息快、路好走，掣肘是每一笔都要留痕。",
+            "bg_scene_office": "日常是案牍：一份文件在几个部门之间走一圈，谁先看、谁后看、落谁的款、用谁的印，都有讲究；编制、考核与调动这类人和档案的事也压在同一批人手上。打交道的多是同级办事的人、来催件的班组代表，以及靠材料吃饭的中层。体面是从不出错，代价是出一次错就有人替你记着。手里有能办成事的权力，也有必须打的招呼；想办的事常常卡在\"再议一议\"四个字上。",
+            "bg_scene_industry": "日常在作业面、管廊与台前：高温、粉尘、机器的低频噪音，一班十二小时；也有人钻进一米一内径、温度四十度的通风道，或者坐在台前抄参数、清洗数据。打交道的是班组长、抬工、检修工，以及来收数的记账员。体面在于配给足、工段里认人；麻烦在于事故与\"责任落实到人\"这句话，落到班组一级就落到个人头上。想办的事大多得靠人情换：一次换班、一片滤芯、一个轻省的岗位。这一层的班次最紧，也最短命。",
+            "bg_scene_service": "日常在窗口与台账后面：配给表、住房登记、门诊排期、食堂进出货，以及每天要核一遍的领取记录，全都从手边过一遍。打交道的是排队的人、替领的人、来核数的记账员，以及偶尔来\"看一看\"的监察人员。体面在于没人敢跟你吵；麻烦在于这个位置人情债最密，每天都要在按表办与给人方便之间选一次。便利是消息快、路好走，掣肘是每一笔都要留痕，差额也要说得清。",
             "bg_scene_discipline": "日常是记录与核对：问话很短，停顿很长，答话要一字不落抄下来。打交道的是被核对的人、同科室的人，以及来调卷宗的其他部门。体面在于没人愿意让你久等；麻烦在于每一次落笔都在替一套没有辩护环节的流程工作，而笔迹也要归档。便利是通行权限高，掣肘是任何一次判断失误都会被抽样翻出来。",
             "bg_scene_farm": "日常在水边与架下：测水温、看溶氧、抄苗情，红蓝光底下待久了，看东西都偏黄。打交道的是农艺师、互助会照看的孩子、来收配给单的人。体面在于饿不着；麻烦在于全渊的口粮价格跟着这里的水温走，减产三天内就会变成别人的骂声。便利是能接触到最基础也最要紧的东西，掣肘是停机与上报都要有人签字。",
             "bg_scene_scavenger": "日常在没有编号的路上：爬梯、通风管、夹层，替人捎信、捎药、捎一件过不了闸机的东西。打交道的是守梯的人、等消息的家属，以及同样没有号的人。体面在于没有考勤表能记你；麻烦在于没有一张名单会保你，被认定未授权位移时，没有人听你解释那封信是谁的。便利是能从任何门缝里过去，掣肘是每一条路都要用肺和膝盖换。",
@@ -1920,6 +1468,9 @@
             "bg_scene_surface": "日常在气闸与通道之间：检查装备、等窗口期、把带回来的东西交出去，然后什么也不问。打交道的是队友、清点的人、家属，以及把报告收走的人。体面在于待遇最好、家属有优先权；麻烦在于伤亡率，以及出站前那句\"余额留给谁\"的例行记录。便利是能看见别人一辈子看不见的东西，掣肘是看见之后不许说。",
             "bg_scene_workshop": "日常在角落的台子前：修旧终端、改不合规格的零件、替人办手续、替人看一张看不懂的纸。打交道的是慕名来的人、送货来的人，以及来问\"这东西哪来的\"的人。体面在于别人不会的东西你会；麻烦在于接下的每一件东西都带着来路，而你必须替对方保密。便利是不用排班，掣肘是活儿大半在灰色地带。",
             "bg_scene_nobody": "日常在别人看不见的地方：找活儿、找住处、找一口热的，替人跑腿挣当天的钱。打交道的是同样没有号的人、偶尔施舍的熟人，以及来清人的治安员。体面在于制度管不到你；麻烦在于所有的门都假定你有一个可以追溯的过去，而你什么都没有。便利是能把任何东西带过任何闸机，掣肘是每一样筹码都是即时的。",
+            "bg_scene_security": "日常在闸机、街面与治安站之间：查牌、控人群、写现场记录，一次聚集要在 20 分钟内解散。打交道的是违规的人、来要说法的人、同队的人，以及事后调记录的其他部门。体面在于制服能让人自动让路；麻烦在于动手必须有记录支撑，记录写得不好，责任就落在执笔的人身上。便利是消息灵、通行不限，掣肘是每一次处置都要有人签名。",
+            "bg_scene_medic": "日常在诊室与宿舍之间：白天看门诊、换药、开处方，晚上处理那些不能进医务室的人。打交道的是工伤的人、不敢报案的人、来查药品流向的人，以及替你顶班的同事。体面在于手艺能换人情；麻烦在于非法医疗的处置依据是第六十三条与第七十一条并用，一旦被认定没有警告环节。便利是能接触到从废弃物口流出的药品，掣肘是每一支药都要能说清来路。",
+            "bg_scene_undertaker": "日常在宿舍、班组与回收线之间：替一户人家把死亡手续办完，凑材料、找签字、争那 20% 的余额返还。打交道的是死者家属、班组长、配给点的记账员，以及偶尔来核对名册的人。体面在于浅层认你，因为谁都可能用到你；麻烦在于手上的本子是一份没有账目的账，上面记着谁欠谁、谁家半年里死了两个人。便利是消息比别人早一步，掣肘是每一笔都要有指印。",
             "bg_scene_deputy": "日常在会议与批件之间：定方向、分任务、看下面报上来的数，再决定哪一件先办。打交道的是同级、上级，以及来要资源的其他部门。体面在于不用排队、一个电话就能让人加班；麻烦在于不能决定总额，也不能拒绝一场与你无关的会，签字位随时可以被收回。便利是能看到全局，掣肘是每个决定都要落到纸上。",
             "bg_scene_bureau_chief": "日常在案卷与谈话之间：决定一个案子是结、是转、还是写进建议，也决定谁先被问、谁可以回家。打交道的是被查的人、手下的人、来打招呼的同级，以及盯着你的审计与上级。体面在于没人敢让你久等；麻烦在于你也在被记，每一次\"缓议\"都有人数着。便利是权限极高，掣肘是每一份建议都会归档，同科室的人也在记你的笔迹。",
             "bg_scene_allocator": "日常在调度板与电话之间：配给表、住房额度、班次表，三张表决定一整片人今天怎么过。打交道的是各层来的办事员、会签的兄弟部门，以及来问\"今晚有没有饭\"的班组。体面在于人人都跟你打招呼；麻烦在于你动不了总额，也不能改任何一条标准，每一次调整都要有依据，而依据将来就是证据。便利是消息最先到你这里，掣肘是差额得由你去补。"
@@ -2233,74 +1784,73 @@
       ],
       "backgrounds": [
         {
-          "label": "出身",
+          "label": "来路",
           "options": [
             {
-              "id": "bg_hanmen",
-              "title": "寒门举子",
-              "description": "家里没有做官的人。你读过书、会算账，靠替人写字和等一个缺过日子。",
+              "id": "road_hanmen_keju",
+              "title": "寒门科举",
+              "description": "家里没有人做官。你靠一场考试上来，本钱只有同榜那几个人。",
               "attributeBonus": {
                 "li": 2,
-                "cha": 1
+                "ming": 1
               },
               "resourceBonus": {
-                "money": 2,
-                "qing": 1
+                "rank": 1,
+                "qing": 2
               },
               "startingItems": [
-                "item_suanpan",
-                "item_lv_chaoben",
-                "item_yinxia"
+                "item_chushen_wenshu",
+                "item_tongyin",
+                "item_suanpan"
               ]
             },
             {
-              "id": "bg_shihuan",
-              "title": "士族子弟",
-              "description": "族里有人做过官。你一开口就有人认得你的姓，代价是族里要你办事。",
+              "id": "road_shihuan_mengyin",
+              "title": "士族门荫",
+              "description": "族里做过官，你一入仕就有人认得你的姓——这条路也通向姻亲与座主。",
               "attributeBonus": {
                 "shi": 2,
                 "ming": 1
               },
               "resourceBonus": {
-                "money": 5,
-                "rank": 1,
-                "qing": 1
+                "money": 4,
+                "rank": 1
               },
               "startingItems": [
                 "item_yufu",
                 "item_gongfu",
-                "item_jiashu"
+                "item_sujuan_pingfeng"
               ]
             },
             {
-              "id": "bg_xungui",
-              "title": "勋贵之后",
-              "description": "军功人家出身。你懂马、懂刀、认识几个能带兵的人，文书却写得不好。",
+              "id": "road_xungui_jungong",
+              "title": "勋贵军功",
+              "description": "军功人家的子弟。你的官身从马上来，文书上的功夫比刀差。",
               "attributeBonus": {
                 "wu": 2,
                 "shi": 1
               },
               "resourceBonus": {
-                "health": 2,
-                "money": 3
+                "health": 1,
+                "money": 2
               },
               "startingItems": [
-                "item_kanhe",
                 "item_qidougong",
+                "item_kanhe",
                 "item_jiuhulu"
               ]
             },
             {
-              "id": "bg_shangjia",
-              "title": "商贾之子",
-              "description": "家里做买卖。你识数、识货、识人；钱来得快，清誉来得慢。",
+              "id": "road_shangjia_juan",
+              "title": "商贾捐纳",
+              "description": "家里有钱，出身是买来的。只能做小官，也常被派去办最难的差事。",
               "attributeBonus": {
-                "cha": 2,
-                "mou": 1
+                "cha": 1,
+                "li": 1
               },
               "resourceBonus": {
-                "money": 8,
-                "qing": -1
+                "money": 5,
+                "qing": -2
               },
               "startingItems": [
                 "item_yanyin",
@@ -2309,9 +1859,9 @@
               ]
             },
             {
-              "id": "bg_huanguan",
+              "id": "road_huanguan_neiting",
               "title": "内侍养子",
-              "description": "在宫墙里长大。走路不出声、听话听后半句，腰上有一块能进衙门的牌子。",
+              "description": "在宫墙里长大，走内廷的路进来。官阶不高，消息最灵。",
               "attributeBonus": {
                 "shi": 2,
                 "cha": 1
@@ -2322,37 +1872,36 @@
               },
               "startingItems": [
                 "item_neishi_yaopai",
-                "item_juncang_zhang",
-                "item_yaosan"
+                "item_neiku_gongshi",
+                "item_yufu"
               ]
             },
             {
-              "id": "bg_jiangmen",
+              "id": "road_jiangmen_yigu",
               "title": "将门遗孤",
-              "description": "父辈是边镇军官，死于旧案。你会骑射、认得军中号令，家世是一笔糊涂账。",
+              "description": "父辈是边镇军官，死于旧案。你会骑射，家世是一笔糊涂账。",
               "attributeBonus": {
                 "wu": 2,
-                "shi": 1
+                "li": 1
               },
               "resourceBonus": {
                 "health": 1,
-                "money": 2,
+                "money": 1,
                 "qing": -1
               },
               "startingItems": [
                 "item_qidougong",
                 "item_yutu",
-                "item_jiuhulu"
+                "item_duandao"
               ]
             },
             {
-              "id": "bg_zongshi",
+              "id": "road_zongshi_pangzhi",
               "title": "宗室旁支",
-              "description": "国姓，但离嫡系很远。你领一份不多的食禄，也被规矩框住：不许典兵，不许做谏官。",
+              "description": "国姓，离嫡系很远。领着食禄，也被规矩框住，不能典兵。",
               "attributeBonus": {
                 "shi": 1,
-                "ming": 1,
-                "li": 1
+                "ming": 1
               },
               "resourceBonus": {
                 "rank": 1,
@@ -2361,18 +1910,18 @@
               },
               "startingItems": [
                 "item_yudie",
-                "item_sujuan_pingfeng",
-                "item_gongfu"
+                "item_gongfu",
+                "item_yinxia"
               ]
             },
             {
-              "id": "bg_zaifu_menren",
+              "id": "road_menren_jianju",
               "title": "宰相门生之家",
-              "description": "父辈与朝中一位大员有旧。你手上有他当年写的几页手札——是门路，也是把柄。",
+              "description": "父辈与朝中大员有旧。你靠一封手札上来，也被那封手札绑住。",
               "attributeBonus": {
                 "ming": 1,
                 "shi": 1,
-                "mou": 1
+                "cha": 1
               },
               "resourceBonus": {
                 "money": 2,
@@ -2380,32 +1929,33 @@
               },
               "startingItems": [
                 "item_xianren_shouzha",
-                "item_donggong_zhizha",
+                "item_wupin_jianshu",
                 "item_yinxia"
               ]
             },
             {
-              "id": "bg_zhouli_zhijia",
+              "id": "road_zhouli_liuyi",
               "title": "州县吏员之家",
-              "description": "父辈是州县的吏员。你有一县十年的钱粮与讼案抄本，比新来的官更懂地方。",
+              "description": "父辈是吏员，你从抄写熬上来。懂实务，缺一个体面的出身。",
               "attributeBonus": {
-                "li": 2,
+                "li": 3,
                 "cha": 1
               },
               "resourceBonus": {
-                "money": 1,
+                "rank": -1,
+                "money": 2,
                 "qing": 1
               },
               "startingItems": [
                 "item_zhou_xian_andu",
-                "item_muji",
+                "item_lian_anben",
                 "item_suanpan"
               ]
             },
             {
-              "id": "bg_jianghu",
-              "title": "匠户世代",
-              "description": "编在匠籍的人家。手艺好、身份低：不得应举、不得改业，尺子比人管用。",
+              "id": "road_jianghu_shouyi",
+              "title": "匠户技艺",
+              "description": "编在匠籍，不得应举。你靠一双手被官府收用，尺子比人情管用。",
               "attributeBonus": {
                 "cha": 2,
                 "li": 1
@@ -2421,12 +1971,11 @@
               ]
             },
             {
-              "id": "bg_liumin",
-              "title": "流民出身",
-              "description": "从荒年里活下来的人。没有籍、没有保人，什么都得现挣，也什么都不怕丢。",
+              "id": "road_liumin_toujun",
+              "title": "流民投军",
+              "description": "荒年里活下来的，用别人的名字入了军籍。力气与眼力就是本钱。",
               "attributeBonus": {
-                "wu": 1,
-                "cha": 1,
+                "wu": 2,
                 "mou": 1
               },
               "resourceBonus": {
@@ -2437,13 +1986,13 @@
               "startingItems": [
                 "item_caoxi",
                 "item_xiangqu_jianshu",
-                "item_duandao"
+                "item_bingji_ce"
               ]
             },
             {
-              "id": "bg_zuichen",
+              "id": "road_zuichen_jianju",
               "title": "罪臣之后",
-              "description": "父辈被抄没。你可以读书应举，但三代之内不许做御史，也不许做谏官。",
+              "description": "父辈被抄没。你可以应举，却三代不许做御史与谏官。",
               "attributeBonus": {
                 "mou": 1,
                 "cha": 1,
@@ -2451,234 +2000,23 @@
               },
               "resourceBonus": {
                 "qing": -1,
-                "money": 1
+                "money": 1,
+                "rank": 1
               },
               "startingItems": [
                 "item_chaomo_wenshu",
-                "item_donggong_zhizha",
-                "item_lv_chaoben"
-              ]
-            }
-          ]
-        },
-        {
-          "label": "入仕之途",
-          "options": [
-            {
-              "id": "path_keju",
-              "title": "科举正途",
-              "description": "考出来的出身。你的本钱是同榜的那几个人，负担也是他们。",
-              "attributeBonus": {
-                "li": 2,
-                "ming": 1
-              },
-              "resourceBonus": {
-                "rank": 1,
-                "qing": 2
-              },
-              "startingItems": [
-                "item_chushen_wenshu",
-                "item_tongyin",
-                "item_yinxia"
-              ]
-            },
-            {
-              "id": "path_liuyi",
-              "title": "吏员入流",
-              "description": "在衙门里熬出来的。你比谁都懂实务，也比谁都缺一个\"出身\"。",
-              "attributeBonus": {
-                "li": 3,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "rank": -1,
-                "money": 2,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_lian_anben",
-                "item_suanpan",
-                "item_lv_chaoben"
-              ]
-            },
-            {
-              "id": "path_jianju",
-              "title": "上官举荐",
-              "description": "被一位大员看中举荐。他护着你，也能随时把你切下来。",
-              "attributeBonus": {
-                "cha": 2,
-                "li": 1
-              },
-              "resourceBonus": {
-                "rank": 1,
-                "money": 2
-              },
-              "startingItems": [
                 "item_jianju_zhuang",
-                "item_lian_anben",
-                "item_kanhe"
-              ]
-            },
-            {
-              "id": "path_junn",
-              "title": "军功叙用",
-              "description": "靠一场仗换来的官身。身上有伤，心里有一笔没算完的账。",
-              "attributeBonus": {
-                "wu": 2,
-                "shi": 1
-              },
-              "resourceBonus": {
-                "rank": 1,
-                "health": -1,
-                "money": 2
-              },
-              "startingItems": [
-                "item_qidougong",
-                "item_yutu",
-                "item_jiuhulu"
-              ]
-            },
-            {
-              "id": "path_juan",
-              "title": "捐纳入官",
-              "description": "花钱买的出身。只能做小官，被人背后另叫一个名字。",
-              "attributeBonus": {
-                "cha": 1,
-                "wu": 1,
-                "li": 1
-              },
-              "resourceBonus": {
-                "money": 4,
-                "qing": -2,
-                "rank": 1
-              },
-              "startingItems": [
-                "item_muji",
-                "item_yinxia",
-                "item_tongyin"
-              ]
-            },
-            {
-              "id": "path_bishu",
-              "title": "门荫之外的旁支",
-              "description": "荫补的名额给了兄弟。你读书、等机会，也替人抄书糊口。",
-              "attributeBonus": {
-                "li": 2,
-                "ming": 1
-              },
-              "resourceBonus": {
-                "money": -1,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_chushen_wenshu",
-                "item_lv_chaoben",
-                "item_suanpan"
-              ]
-            },
-            {
-              "id": "path_muliao",
-              "title": "幕僚（未入流而掌实权）",
-              "description": "没有品级，却掌实权。你替人办事、替人说话，身份挂在别人的门上。",
-              "attributeBonus": {
-                "li": 2,
-                "mou": 2
-              },
-              "resourceBonus": {
-                "money": 3,
-                "rank": -1,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_shihuan_jiugui",
-                "item_yinxia",
-                "item_xunlu"
-              ]
-            },
-            {
-              "id": "path_yinqin",
-              "title": "姻亲之荫",
-              "description": "靠妻族的门路入仕。路走得顺，背后的话也听得见。",
-              "attributeBonus": {
-                "shi": 2,
-                "ming": 1
-              },
-              "resourceBonus": {
-                "rank": 1,
-                "money": 3,
-                "qing": -1
-              },
-              "startingItems": [
-                "item_wupin_jianshu",
-                "item_gongfu",
-                "item_didian_qi"
-              ]
-            },
-            {
-              "id": "path_yinhuo",
-              "title": "因祸得官",
-              "description": "一场变故让你进了体制，得官的过程不便细说，也说不清。",
-              "attributeBonus": {
-                "cha": 2,
-                "wu": 1
-              },
-              "resourceBonus": {
-                "money": 2,
-                "qing": 1,
-                "rank": 1
-              },
-              "startingItems": [
-                "item_zhiqi",
-                "item_tongyin",
-                "item_lv_chaoben"
-              ]
-            },
-            {
-              "id": "path_neiting",
-              "title": "内廷承奉",
-              "description": "走内廷的路进来。官阶不高，但你能决定一份文书先给谁看。",
-              "attributeBonus": {
-                "shi": 2,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "money": 3,
-                "rank": -1,
-                "qing": -3
-              },
-              "startingItems": [
-                "item_neishi_yaopai",
-                "item_neiku_gongshi",
-                "item_yufu"
-              ]
-            },
-            {
-              "id": "path_maipu",
-              "title": "投状自鬻（毛遂自荐）",
-              "description": "自己写信把自己荐出去。没有同年、没有座师，只有一份知遇。",
-              "attributeBonus": {
-                "cha": 2,
-                "li": 2
-              },
-              "resourceBonus": {
-                "rank": -1,
-                "money": 1,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_wupin_jianshu",
-                "item_suanpan",
-                "item_xunlu"
+                "item_jiashu"
               ]
             }
           ]
         },
         {
-          "label": "官场立场",
+          "label": "立场与野心",
           "options": [
             {
-              "id": "stance_genghua",
-              "title": "更化派",
+              "id": "line_genghua_nengchen",
+              "title": "更化派·把账查到底",
               "description": "要核账、要清田、要把权收回来。得罪的人会排成一长串。",
               "attributeBonus": {
                 "li": 2,
@@ -2690,14 +2028,14 @@
               },
               "startingItems": [
                 "item_lian_anben",
-                "item_shihuan_jiugui",
-                "item_yinxia"
+                "item_hanjia_bo",
+                "item_chenmi_yang"
               ]
             },
             {
-              "id": "stance_chizhong",
-              "title": "持重派",
-              "description": "守成法、少改动。你挡得住别人的事，却始终拿不出钱来。",
+              "id": "line_chizhong_wen",
+              "title": "持重派·只求安稳",
+              "description": "守成法、少改动，只求三年一任平安过完；挡得住事，也拿不出钱。",
               "attributeBonus": {
                 "mou": 1,
                 "li": 2
@@ -2709,13 +2047,13 @@
               },
               "startingItems": [
                 "item_shihuan_jiugui",
-                "item_gongfu",
-                "item_yinxia"
+                "item_zutian_bu",
+                "item_gongfu"
               ]
             },
             {
-              "id": "stance_neiting",
-              "title": "内廷派",
+              "id": "line_neiting_quan",
+              "title": "内廷派·借势往上",
               "description": "靠着宫里那条门路做事。来钱快，名声差，翻脸也快。",
               "attributeBonus": {
                 "shi": 2,
@@ -2726,15 +2064,15 @@
                 "qing": -3
               },
               "startingItems": [
-                "item_neiku_gongshi",
                 "item_neishi_yaopai",
+                "item_neiku_gongshi",
                 "item_yinxia"
               ]
             },
             {
-              "id": "stance_bianzhen",
-              "title": "边镇派",
-              "description": "替边上说话。你信粮与刀，不信京里那套公文往来。",
+              "id": "line_bianzhen_dipan",
+              "title": "边镇派·去挣一块地盘",
+              "description": "替边上说话，想离开京城，用账与军报换一块真正归你管的地方。",
               "attributeBonus": {
                 "wu": 1,
                 "shi": 2
@@ -2750,13 +2088,12 @@
               ]
             },
             {
-              "id": "stance_caoyun",
-              "title": "漕运商帮",
-              "description": "和河上的人打交道。不上书、不谈国事，只谈货与闸。",
+              "id": "line_caoyun_fujia",
+              "title": "漕运商帮·攒一份产业",
+              "description": "和河上的人打交道。不上书、不谈国事，只谈货、闸与身家。",
               "attributeBonus": {
                 "cha": 1,
-                "shi": 1,
-                "mou": 1
+                "shi": 1
               },
               "resourceBonus": {
                 "money": 5,
@@ -2769,47 +2106,27 @@
               ]
             },
             {
-              "id": "stance_qingliu",
-              "title": "清流（不惜丢官）",
-              "description": "只写事实与数目。你会得罪人，也可能因此被记住。",
+              "id": "line_qingliu_tongchu",
+              "title": "清流·捅到御前",
+              "description": "只写事实与数目。不惜丢官，把某一件事摆到皇帝面前。",
               "attributeBonus": {
                 "ming": 2,
                 "cha": 1
               },
               "resourceBonus": {
                 "qing": 4,
-                "money": -2,
-                "rank": -1
+                "money": -2
               },
               "startingItems": [
                 "item_lv_chaoben",
-                "item_gongfu",
-                "item_duanzu"
+                "item_duanzu",
+                "item_gongfu"
               ]
             },
             {
-              "id": "stance_kaoke",
-              "title": "只求考课中上",
-              "description": "不站队，只求三年一任平安过完，考语上别有难听的字。",
-              "attributeBonus": {
-                "li": 2,
-                "mou": 1
-              },
-              "resourceBonus": {
-                "qing": 2,
-                "money": 1,
-                "rank": 1
-              },
-              "startingItems": [
-                "item_shihuan_jiugui",
-                "item_suanpan",
-                "item_xunlu"
-              ]
-            },
-            {
-              "id": "stance_quanchen",
+              "id": "line_quanchen",
               "title": "想做权臣",
-              "description": "让事情离了你就办不成。慢慢来，位置比名声要紧。",
+              "description": "让事情离了你就办不成。位置比名声要紧，慢慢来。",
               "attributeBonus": {
                 "mou": 2,
                 "shi": 1
@@ -2825,7 +2142,26 @@
               ]
             },
             {
-              "id": "stance_jianchen",
+              "id": "line_dishi",
+              "title": "做皇子的老师：用一个人，握整个天下",
+              "description": "不自己掌权，去做掌权者的老师：先让一位软弱的皇子离不开你，再扶他做储君、继位。他若不受控、被人抢先、或事泄，你就是离间天家的罪人。",
+              "attributeBonus": {
+                "mou": 2,
+                "shi": 2
+              },
+              "resourceBonus": {
+                "qing": -1,
+                "money": 2,
+                "rank": 1
+              },
+              "startingItems": [
+                "item_donggong_zhizha",
+                "item_yufu",
+                "item_lian_anben"
+              ]
+            },
+            {
+              "id": "line_jianchen",
               "title": "想做奸臣",
               "description": "该拿的拿、该办的办，只问值多少、什么时候要、谁来担。",
               "attributeBonus": {
@@ -2843,145 +2179,8 @@
               ]
             },
             {
-              "id": "stance_shuiying",
-              "title": "谁赢跟谁",
-              "description": "不表态，只看最后落在谁手上，以及他记不记得你先到。",
-              "attributeBonus": {
-                "cha": 2,
-                "shi": 1
-              },
-              "resourceBonus": {
-                "money": 2,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_xunlu",
-                "item_suanpan",
-                "item_lian_anben"
-              ]
-            }
-          ]
-        },
-        {
-          "label": "志向",
-          "options": [
-            {
-              "id": "ambition_nengchen",
-              "title": "做能臣，把账查到底",
-              "description": "把账查到底。要很多年，得罪一串人，账会干净一点。",
-              "attributeBonus": {
-                "cha": 2,
-                "li": 1
-              },
-              "resourceBonus": {
-                "qing": 2,
-                "money": -1
-              },
-              "startingItems": [
-                "item_juncang_zhang",
-                "item_hanjia_bo",
-                "item_chenmi_yang"
-              ]
-            },
-            {
-              "id": "ambition_quanchen",
-              "title": "让某位皇子离不开我",
-              "description": "在储位未定的时候站到某一位身边，让他离不开你。",
-              "attributeBonus": {
-                "mou": 2,
-                "shi": 1
-              },
-              "resourceBonus": {
-                "money": 2,
-                "qing": 1,
-                "rank": 1
-              },
-              "startingItems": [
-                "item_yufu",
-                "item_donggong_zhizha",
-                "item_lian_anben"
-              ]
-            },
-            {
-              "id": "ambition_bianchen",
-              "title": "去云中镇挣一块自己的地盘",
-              "description": "离开京城，用账与军报换一块真正归你管的地方。",
-              "attributeBonus": {
-                "wu": 1,
-                "mou": 1,
-                "shi": 1
-              },
-              "resourceBonus": {
-                "money": 2,
-                "health": 1
-              },
-              "startingItems": [
-                "item_bianzhen_liangce",
-                "item_kanhe",
-                "item_yutu"
-              ]
-            },
-            {
-              "id": "ambition_fujia",
-              "title": "在漕河上挣一份产业",
-              "description": "一条船、一间邸店、一张盐引，攒一副不怕丢官的身家。",
-              "attributeBonus": {
-                "cha": 1,
-                "shi": 1,
-                "li": 1
-              },
-              "resourceBonus": {
-                "money": 5,
-                "qing": -1
-              },
-              "startingItems": [
-                "item_didian_qi",
-                "item_yanyin",
-                "item_caoyun_bangtie"
-              ]
-            },
-            {
-              "id": "ambition_qingliu",
-              "title": "把一件事捅到御前",
-              "description": "不惜丢官，把某一件事摆到皇帝面前，让天下人都知道。",
-              "attributeBonus": {
-                "ming": 2,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "qing": 4,
-                "money": -2,
-                "health": -1
-              },
-              "startingItems": [
-                "item_lian_anben",
-                "item_duanzu",
-                "item_gongfu"
-              ]
-            },
-            {
-              "id": "ambition_richang",
-              "title": "只求把日子过稳",
-              "description": "田不被占、族里有后辈、考课别落在中下。别的不管。",
-              "attributeBonus": {
-                "li": 1,
-                "mou": 1,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "qing": 2,
-                "money": 2,
-                "rank": 1
-              },
-              "startingItems": [
-                "item_zutian_bu",
-                "item_jiashu",
-                "item_suanpan"
-              ]
-            },
-            {
-              "id": "ambition_kuli",
-              "title": "做酷吏：用最简单的手段把事办成",
+              "id": "line_kuli",
+              "title": "做酷吏",
               "description": "用最直接的手段把事办成。见效最快，名声也坏得最快。",
               "attributeBonus": {
                 "li": 2,
@@ -2994,340 +2193,45 @@
               },
               "startingItems": [
                 "item_muji",
-                "item_duandao",
+                "item_yanshuang_fu",
                 "item_lv_chaoben"
               ]
             },
             {
-              "id": "ambition_meili",
-              "title": "靠魅力做事：让人愿意替你办",
-              "description": "不用刀也不用账本，用人：让人愿意替你跑一趟、担一句。",
+              "id": "line_meili_haishang",
+              "title": "靠魅力或做海商",
+              "description": "不用刀也不用账本，用人；或把身家押在季风上，一趟翻倍或全无。",
               "attributeBonus": {
-                "ming": 2,
-                "shi": 2
-              },
-              "resourceBonus": {
-                "money": 2,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_jiuhulu",
-                "item_gongfu",
-                "item_xunlu"
-              ]
-            },
-            {
-              "id": "ambition_haishang",
-              "title": "做海商：把身家押在广州的季风上",
-              "description": "把身家押在季风上。一趟可以翻倍，也可以连船带人全无。",
-              "attributeBonus": {
-                "cha": 1,
+                "ming": 1,
                 "shi": 1,
-                "mou": 1
-              },
-              "resourceBonus": {
-                "money": 4,
-                "qing": -1,
-                "health": -1
-              },
-              "startingItems": [
-                "item_caoyun_bangtie",
-                "item_didian_qi",
-                "item_yanyin"
-              ]
-            },
-            {
-              "id": "ambition_fanfu",
-              "title": "转身做另一个人的敌人",
-              "description": "先入局、攒够，再翻一次身。翻过之后，所有人都记得。",
-              "attributeBonus": {
-                "mou": 2,
                 "cha": 1
               },
               "resourceBonus": {
                 "money": 3,
-                "qing": -3
+                "qing": -1
               },
               "startingItems": [
-                "item_juncang_zhang",
-                "item_duanzu",
-                "item_zhiqi"
+                "item_paimu",
+                "item_jin_chantou",
+                "item_chuanqi"
               ]
             },
             {
-              "id": "ambition_dishi",
-              "title": "做皇子的老师：用一个人，握整个天下",
-              "description": "不自己掌权，去做掌权者的老师：握住一位年幼或软弱的皇子，扶他做储君、再扶他登基。他若不受控、被人抢先、或事泄，你就是离间天家的罪人。",
+              "id": "line_shuiying_fanfu",
+              "title": "谁赢跟谁·或转身",
+              "description": "不表态，只看最后落在谁手上；也可以先入局，再翻一次身。",
               "attributeBonus": {
-                "mou": 2,
-                "shi": 2
-              },
-              "resourceBonus": {
-                "qing": -1,
-                "money": 2,
-                "rank": 1
-              },
-              "startingItems": [
-                "item_donggong_zhizha",
-                "item_yufu",
-                "item_lian_anben"
-              ]
-            }
-          ]
-        },
-        {
-          "label": "隐秘",
-          "options": [
-            {
-              "id": "secret_ledger",
-              "title": "你手上有一份不该有的册子",
-              "description": "你手上有半册不该在你手上的军仓旧账，抄它的人已经死了。",
-              "attributeBonus": {
-                "cha": 2
-              },
-              "resourceBonus": {
-                "qing": 1,
-                "money": -1
-              },
-              "startingItems": [
-                "item_juncang_zhang",
-                "item_lian_anben"
-              ]
-            },
-            {
-              "id": "secret_debt",
-              "title": "你欠着一笔说不清的债",
-              "description": "你欠着一笔说不清的债，债主不要钱，只要你看一份文书。",
-              "attributeBonus": {
-                "mou": 1,
-                "shi": 1
-              },
-              "resourceBonus": {
-                "money": -2,
-                "qing": 1
-              },
-              "startingItems": [
-                "item_zhiqi",
-                "item_yaosan"
-              ]
-            },
-            {
-              "id": "secret_name",
-              "title": "你的名字不在你家的族谱上",
-              "description": "家谱上没有你父亲的名字，而他那桩旧案还没结。",
-              "attributeBonus": {
-                "cha": 1,
+                "cha": 2,
                 "mou": 1
-              },
-              "resourceBonus": {
-                "qing": 1
-              },
-              "startingItems": [
-                "item_jiashu",
-                "item_yutu"
-              ]
-            },
-            {
-              "id": "secret_witness",
-              "title": "你见过一次不该看见的事",
-              "description": "你见过一次不该看见的事，而对方也清清楚楚看见了你。",
-              "attributeBonus": {
-                "cha": 1,
-                "mou": 1
-              },
-              "resourceBonus": {
-                "qing": 1,
-                "health": -1
-              },
-              "startingItems": [
-                "item_duanzu",
-                "item_neishi_yaopai"
-              ]
-            },
-            {
-              "id": "secret_kin",
-              "title": "你有一个说不出口的亲眷",
-              "description": "宫里有一个与你有关的人，替她递一次话就够要命。",
-              "attributeBonus": {
-                "shi": 1,
-                "cha": 1
               },
               "resourceBonus": {
                 "money": 2,
                 "qing": -1
               },
               "startingItems": [
-                "item_neishi_yaopai",
-                "item_gongfu"
-              ]
-            },
-            {
-              "id": "secret_promise",
-              "title": "你许过一个不该许的诺",
-              "description": "你答应过一个死人，要把一只匣子交出去，至今没交。",
-              "attributeBonus": {
-                "mou": 1,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "qing": 1,
-                "money": -1
-              },
-              "startingItems": [
+                "item_juncang_zhang",
                 "item_zhiqi",
-                "item_lian_anben"
-              ]
-            },
-            {
-              "id": "secret_killer",
-              "title": "你替某位大人物压过一桩命案",
-              "description": "你替一位大人物压过一桩命案，他记住了你，别人也记得。",
-              "attributeBonus": {
-                "cha": 1,
-                "mou": 1,
-                "li": 1
-              },
-              "resourceBonus": {
-                "money": 3,
-                "qing": -3
-              },
-              "startingItems": [
-                "item_duanzu",
-                "item_wupin_jianshu",
                 "item_xunlu"
-              ]
-            },
-            {
-              "id": "secret_forgery",
-              "title": "有一桩命案上有你的名字",
-              "description": "你在验状上改过一处伤，那桩案子的旧档还在库里。",
-              "attributeBonus": {
-                "li": 2,
-                "mou": 1
-              },
-              "resourceBonus": {
-                "qing": -2,
-                "money": 2
-              },
-              "startingItems": [
-                "item_lian_anben",
-                "item_muji",
-                "item_yinxia"
-              ]
-            },
-            {
-              "id": "secret_konge",
-              "title": "你在边镇吃过空额",
-              "description": "你在边镇吃过空额，手里还留着一册缺页的粮册。",
-              "attributeBonus": {
-                "li": 2,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "money": 3,
-                "qing": -3,
-                "health": -1
-              },
-              "startingItems": [
-                "item_bianzhen_liangce",
-                "item_didian_qi",
-                "item_duandao"
-              ]
-            },
-            {
-              "id": "secret_siyan",
-              "title": "你替私盐贩子记过账",
-              "description": "你替私盐贩子记过两本账，一本给官，一本给自己。",
-              "attributeBonus": {
-                "cha": 2,
-                "li": 1
-              },
-              "resourceBonus": {
-                "money": 4,
-                "qing": -3
-              },
-              "startingItems": [
-                "item_siyan_dizhang",
-                "item_caoyun_bangtie",
-                "item_jiuhulu"
-              ]
-            },
-            {
-              "id": "secret_gongjin",
-              "title": "你替宫里的一个人往外递过消息",
-              "description": "你替宫里的人往外递过一张纸条，那九个字你还背得出。",
-              "attributeBonus": {
-                "cha": 2,
-                "shi": 1
-              },
-              "resourceBonus": {
-                "money": 3,
-                "qing": -2,
-                "health": -1
-              },
-              "startingItems": [
-                "item_neishi_yaopai",
-                "item_neiku_gongshi",
-                "item_xunlu"
-              ]
-            },
-            {
-              "id": "secret_kuzhai",
-              "title": "你手上有别人寄放的库银",
-              "description": "你床下有一只别人寄放的匣子，里面的钱来路不正。",
-              "attributeBonus": {
-                "li": 1,
-                "mou": 1,
-                "cha": 1
-              },
-              "resourceBonus": {
-                "money": 4,
-                "qing": -2
-              },
-              "startingItems": [
-                "item_zhiqi",
-                "item_yinxia",
-                "item_lian_anben"
-              ]
-            },
-            {
-              "id": "secret_xianghui",
-              "title": "你在香会里替人做过一次保",
-              "description": "你在香会里替人做过一次保，那张具保状还在别人手里。",
-              "attributeBonus": {
-                "cha": 1,
-                "shi": 1,
-                "mou": 1
-              },
-              "resourceBonus": {
-                "money": 2,
-                "qing": -2,
-                "health": 1
-              },
-              "startingItems": [
-                "item_caoyun_bangtie",
-                "item_siyan_dizhang",
-                "item_duandao"
-              ]
-            },
-            {
-              "id": "secret_taowang",
-              "title": "你是一个逃籍的人",
-              "description": "你如今用的籍是花钱买来的，姓名与祖父都不是你的。",
-              "attributeBonus": {
-                "cha": 1,
-                "wu": 1,
-                "li": 1
-              },
-              "resourceBonus": {
-                "money": 1,
-                "health": 2,
-                "qing": -2
-              },
-              "startingItems": [
-                "item_caoxi",
-                "item_xiangqu_jianshu",
-                "item_jiashu"
               ]
             }
           ]
@@ -4712,12 +3616,12 @@
       ],
       "backgrounds": [
         {
-          "label": "出身",
+          "label": "来路",
           "options": [
             {
-              "id": "imperial_clerk",
-              "title": "帝国文书房抄写员",
-              "description": "在行省做过几年抄写的识字人。他能看出不同年代的墨色与字距，也知道契书上哪一处最要紧；体面是走到哪个村子都有人请他写状纸，掣肘是他改不了官册，出过一件事之后行省不再用他。",
+              "id": "prov_revenue_clerk",
+              "title": "行省抄写人，替农户改过一处日期",
+              "description": "在行省官署抄过六年文书，识得不同年代的墨色与字距。他为一位农户改过一处日期，事被查出来，没有再被官府用过；如今替商人、牧户与外族写契书状纸。",
               "attributeBonus": {
                 "lore": 2,
                 "guile": 1
@@ -4728,13 +3632,14 @@
               "startingItems": [
                 "clerk_seal",
                 "contract_kit",
-                "ink_pouch"
+                "ink_pouch",
+                "trampled_accuser"
               ]
             },
             {
-              "id": "highland_mule",
-              "title": "高地赶驮人",
-              "description": "赶了十年驮队的人，走王国与帝国之间的羊毛道。他走过十七个收税点，知道哪个山口何时封、哪条小路没有税卡；不识字，但背得下契约全文。体面是没人敢短他的账，掣肘是货不属于他，一趟白跑就赔掉一个冬天。",
+              "id": "prov_highland_mule",
+              "title": "半血赶驮人，驮筐底下带过不该带的东西",
+              "description": "半血，在栅外长大，赶了十年驮队，走王国与帝国之间的羊毛道。他背得下契约全文而不识字；替人捎过一次没写进货单的布包，钱给得很多，从此再没走过那条路上的同一个宿站。",
               "attributeBonus": {
                 "craft": 1,
                 "guile": 1,
@@ -4752,9 +3657,9 @@
               ]
             },
             {
-              "id": "free_city_dropped",
-              "title": "联邦钱庄的落第伙计",
-              "description": "在维克斯的钱庄里做过四年伙计，会算贴现、认得汇票上的真假笔迹。他离开的原因是一笔自己垫钱的错账——钱庄不许伙计与客户之间有私人往来。体面是他懂行里的门道，掣肘是这条街上的老钱庄都记得他的脸。",
+              "id": "prov_league_clerk",
+              "title": "钱庄伙计，旧册上有过一个熟人的名字",
+              "description": "在维克斯的钱庄做了四年伙计，会算贴现、认得汇票上的真假笔迹，也因为自己垫钱平过一笔错账被赶出来。他见过一个熟人被写进「旧册」，从此绕开那条街走。",
               "attributeBonus": {
                 "lore": 1,
                 "guile": 2
@@ -4766,13 +3671,15 @@
                 "ledger_book",
                 "abacus",
                 "silver_scale",
-                "bridge_note"
+                "bridge_note",
+                "dead_mans_papers",
+                "privateer_ledger"
               ]
             },
             {
-              "id": "oath_family",
-              "title": "烛誓团的次子",
-              "description": "在烛誓团做过护送骑士的人。他的本事不是拔剑，是让两个已经要动手的人在界碑前把话说完；亮出一枚戒指就能在王国法庭上作证。体面是各地都请他到场见证，掣肘是他只能保「送到」，保不了「活着送到」。",
+              "id": "prov_highland_retainer",
+              "title": "高地护送骑士，保过一场没保住的约",
+              "description": "旗士家的次子，在烛誓团做过七年护送与见证。他保的是一次「送到」，人死在半路而他不算失约——这件事他很少提起，靠一枚山誓戒指在王国法庭上作证，替人调解也替人站场。",
               "attributeBonus": {
                 "faith": 2,
                 "blade": 1
@@ -4789,9 +3696,9 @@
               ]
             },
             {
-              "id": "greenland_scholar",
-              "title": "灰野边上的草药先生",
-              "description": "在灰野边上走街串巷的行医人，会辨药、接骨、缝合，也能判断哪些伤救不了。他给兽人商队治过伤，会说几句乌尔语。体面是走哪都有人请他进屋，掣肘是医术有上限，而他师父留下的三张药方还缺一味灰野才有的盐晶。",
+              "id": "prov_greenland_scholar",
+              "title": "灰野草药先生，欠着一笔救命钱",
+              "description": "在灰野边上走街串巷的行医人，会辨药、接骨、缝合，也给兽人商队治过伤。他病倒时有人替他垫过一笔钱，字条上写着「你得记住是你欠我的」，至今没还上。",
               "attributeBonus": {
                 "craft": 2,
                 "lore": 1
@@ -4802,141 +3709,15 @@
               },
               "startingItems": [
                 "herb_kit",
-                "travel_cloak"
-              ]
-            },
-            {
-              "id": "nameless_bastard",
-              "title": "来历不清的人",
-              "description": "身份说不清的人。他见过三张写着他出身的文书，三张互相矛盾，而三张都要命。他做过搬运、守夜、替人顶罪，口音会随地方变。体面是没人能把他钉在某个位置上，掣肘是也没人替他说话，而有人正在找他。",
-              "attributeBonus": {
-                "guile": 2,
-                "blade": 1
-              },
-              "resourceBonus": {
-                "coin": 3,
-                "renown": -1
-              },
-              "startingItems": [
-                "false_papers",
-                "whetstone",
-                "dull_sword"
-              ]
-            },
-            {
-              "id": "gnome_keyholder",
-              "title": "涅恩巷子里的持钥人",
-              "description": "侏儒巷子里做小额汇兑与消息的人。他手上的钥匙能开十几个柜子，一笔钱一笔消息都记在自己的账上。体面是三方的人都用得着他，掣肘是他的身高让门吏的眼睛总飘到别人身上，而巷子正在吵要不要走出去开钱庄。",
-              "attributeBonus": {
-                "guile": 2,
-                "lore": 1
-              },
-              "resourceBonus": {
-                "coin": 5
-              },
-              "startingItems": [
-                "keeper_keys",
-                "ledger_book",
-                "ink_pouch"
-              ]
-            },
-            {
-              "id": "elf_season_keeper",
-              "title": "林缘的守季人",
-              "description": "在银椴林最外一圈记录物候的精灵。他记雪水、记花期、记人类在界石外砍了几棵树，整片林子对外缘的判断都靠这份记录。体面是被议事会需要，掣肘是一旦离开记录就断，而他有一年的事没有写进记录里。",
-              "attributeBonus": {
-                "lore": 2,
-                "faith": 1
-              },
-              "resourceBonus": {
-                "coin": 2,
-                "renown": 1
-              },
-              "startingItems": [
-                "season_tablet",
-                "elf_starchart",
-                "travel_cloak"
-              ]
-            },
-            {
-              "id": "old_folk_wanderer",
-              "title": "走出洞去的旧民",
-              "description": "从地下火塘走到地表的旧民。他听着岩石的响就知道哪里能挖，矮人的石语行会因此雇他探浅层。体面是这一手别人学不会，掣肘是地表让他白天睁不开眼、睡觉必须挨着墙，而且他所属的族正在被统计。",
-              "attributeBonus": {
-                "lore": 1,
-                "craft": 2
-              },
-              "resourceBonus": {
-                "health": -1,
-                "renown": -1,
-                "coin": 1
-              },
-              "startingItems": [
-                "old_folk_shard",
-                "herb_kit",
-                "flint_kit"
-              ]
-            },
-            {
-              "id": "iron_kin_smith",
-              "title": "右手有烙印的铁裔匠户",
-              "description": "编在行省匠籍里的铁裔铁匠。他打得出比人类工匠好得多的农具，右手那个烙印是他的许可，也是他的限令——不许打兵器。体面是手艺硬、不缺活干，掣肘是两边都不完全认他，回铁砧堡认祖要先补三百年的行会费。",
-              "attributeBonus": {
-                "craft": 3
-              },
-              "resourceBonus": {
-                "coin": 2,
-                "renown": -1
-              },
-              "startingItems": [
-                "iron_kin_brand",
-                "whetstone",
-                "dwarf_ledger"
-              ]
-            }
-          ]
-        },
-        {
-          "label": "际遇",
-          "options": [
-            {
-              "id": "guarantor",
-              "title": "你替人做了保人",
-              "description": "替人作保、而被保的人死在盐路上的人。保费四百马克，被保人的遗产抵不到九十，剩下的全落在他身上。债主从不打人，只是隔两个月来一次，坐下喝茶，说一句「不急」。体面是有人愿意等，掣肘是每个决定背后都压着三百马克。",
-              "attributeBonus": {
-                "faith": 1,
-                "lore": 1
-              },
-              "resourceBonus": {
-                "coin": -4,
-                "renown": 1
-              },
-              "startingItems": [
+                "travel_cloak",
                 "debt_letter",
-                "clerk_seal"
+                "dragon_tongue_token"
               ]
             },
             {
-              "id": "one_dragon_word",
-              "title": "你听过龙的一句话",
-              "description": "听过一串不是雷也不是风的长音的人。他会哼那串声音的长短高低，却不知道意思，而每年都有人愿意为它出钱。体面是他握着一件别人拿不走的东西，掣肘是知道这件事的两个人都叫他再也别提。",
-              "attributeBonus": {
-                "lore": 2,
-                "faith": 1
-              },
-              "resourceBonus": {
-                "renown": 1,
-                "coin": 2
-              },
-              "startingItems": [
-                "elf_starchart",
-                "sealed_wax"
-              ]
-            },
-            {
-              "id": "siege_survivor",
-              "title": "你守过一次城",
-              "description": "在一座被围了五十七天的小城里活下来的人。围到第四十二天城里开始有人失踪，他做过一件从没细说过的事：划掉过名单上的三户人家。体面是活下来的人都认得那枚赏功印，掣肘是他不再睡在只有一个出口的屋里。",
+              "id": "prov_siege_survivor",
+              "title": "守过城的军需，划掉过名单上的三户",
+              "description": "在一座被围了五十七天的小城里管过分粮名册。围到第四十二天城里开始有人失踪，他把三户人家从名单上划掉了；解围后领到一枚赏功印，同城活下来的人都认得它。",
               "attributeBonus": {
                 "command": 2,
                 "blade": 1,
@@ -4953,82 +3734,9 @@
               ]
             },
             {
-              "id": "forged_the_seal",
-              "title": "你伪造过一次印章",
-              "description": "刻过一枚行会检定印的人。那枚印七个月后才被发现，而用它的人破产上吊了。他有一手极好的仿刻手艺，也有一件随时能毁掉他的把柄。体面是手上有别人求不到的技艺，掣肘是从此看见那类印章就手心出汗。",
-              "attributeBonus": {
-                "craft": 2,
-                "guile": 2
-              },
-              "resourceBonus": {
-                "coin": 5,
-                "renown": -2
-              },
-              "startingItems": [
-                "graver_knife",
-                "false_papers",
-                "sealed_wax"
-              ]
-            },
-            {
-              "id": "medicine_owe",
-              "title": "有人替你付过一笔救命钱",
-              "description": "病倒在路边、被人垫钱救回一条命的人。垫钱的是个走单帮的药商，留了一张字条，写明「钱可以慢慢还，但你得记住是你欠我的」。体面是命还在，掣肘是这笔钱一直没还上，而字条上的字迹稳得不像赶路的人写的。",
-              "attributeBonus": {
-                "faith": 1,
-                "lore": 1,
-                "craft": 1
-              },
-              "resourceBonus": {
-                "coin": -2,
-                "health": 1
-              },
-              "startingItems": [
-                "herb_kit",
-                "debt_letter"
-              ]
-            },
-            {
-              "id": "named_in_a_letter",
-              "title": "有人在一封信里点了你的名字",
-              "description": "收到过一封没有署名、也没称呼的信的人。信上只有一句话与一个日期，末尾却写着他母亲的名字与他小时候的绰号。体面是有人记得他最要紧的三件事，掣肘是他不知道那个人是谁，也不知道去不去赴那个日子。",
-              "attributeBonus": {
-                "guile": 1,
-                "faith": 1,
-                "lore": 1
-              },
-              "resourceBonus": {
-                "coin": 2,
-                "renown": 1
-              },
-              "startingItems": [
-                "sealed_wax",
-                "ink_pouch",
-                "travel_cloak"
-              ]
-            },
-            {
-              "id": "guild_apprentice",
-              "title": "抄书行会的学徒",
-              "description": "在抄书行会做了几年学徒的人。他抄过契书、状纸与遗嘱，知道名字写错一行、字歪一寸就要重抄。体面是识得出别人的字，掣肘是行会只留十一个人，而带他的人一病，学徒年限就要另起。",
-              "attributeBonus": {
-                "lore": 2,
-                "craft": 1
-              },
-              "resourceBonus": {
-                "coin": 1,
-                "renown": 1
-              },
-              "startingItems": [
-                "contract_kit",
-                "ink_pouch",
-                "scholar_token"
-              ]
-            },
-            {
-              "id": "mercenary_discharged",
-              "title": "被解散的雇佣兵",
-              "description": "从一支散了的雇佣队里出来的人。队伍曾按合同就地征收过一座城的过路税自偿，那件事在联邦法庭上站得住，却让他们在那片地面上再也接不到活。体面是有一批老兵认得那面断旗，掣肘是手上的钱只够撑二十来天。",
+              "id": "prov_mercenary_discharged",
+              "title": "散了的雇佣兵，队里按条款收过一座城的税",
+              "description": "在铜钉广场被雇走，跟一支三百人的队伍往东干了两年零一个季度。雇主逾期未付，队长按合同就地征收了一座镇的过路税自偿；队伍散了，他分到十九马克和一面断旗。",
               "attributeBonus": {
                 "blade": 2,
                 "command": 1
@@ -5041,13 +3749,14 @@
                 "broken_banner",
                 "patched_mail",
                 "dull_sword",
-                "whetstone"
+                "whetstone",
+                "muster_roll"
               ]
             },
             {
-              "id": "fugitive_scribe",
-              "title": "从教会逃出来的抄经人",
-              "description": "从堂区档案房跑出来的人。他抄过婚配登记与遗嘱，也见过登记簿上被刮改的三处痕迹；他把这件事说给了一个不该说的人。体面是识得出旧档上的改动，掣肘是审判官手上的名单里有一个教会的抄经人。",
+              "id": "prov_fugitive_scribe",
+              "title": "从教会档案房逃出来的抄经人",
+              "description": "在堂区抄了四年婚配登记与遗嘱，见过登记簿上被刮改的三处痕迹。他把这件事说给了一个不该说的人，从此用假名过活，靠替人写字挣零钱，不敢在一处连住十天。",
               "attributeBonus": {
                 "lore": 2,
                 "guile": 1
@@ -5059,208 +3768,82 @@
               "startingItems": [
                 "heretic_notes",
                 "ink_pouch",
-                "false_papers"
+                "false_papers",
+                "scholar_token",
+                "graver_knife"
               ]
             },
             {
-              "id": "tax_farmer_agent",
-              "title": "铜湾的收账人",
-              "description": "替联邦一家钱庄在破产男爵的地界上收渡口与铁矿收入的人。他带一份有法律效力的委任书，不给收据就不收钱，因此有农奴绕开男爵直接交给他。掣肘是这份活让人恨，而男爵病重后两边都在争那两处渡口。",
+              "id": "prov_old_folk_wanderer",
+              "title": "走出洞去的旧民，替矮人探浅层的洞",
+              "description": "旧民，从地下的火塘搬到地表，白天睁不开眼，睡觉必须挨着墙。他听着岩石的响就知道哪里能挖，矮人的石语行会因此雇他探浅层；安置点正在统计这一族还剩多少人。",
               "attributeBonus": {
-                "lore": 2,
-                "command": 1
+                "lore": 1,
+                "craft": 2
               },
               "resourceBonus": {
-                "coin": 4,
-                "renown": -1
-              },
-              "startingItems": [
-                "tax_farming_writ",
-                "ledger_book",
-                "clerk_seal"
-              ]
-            }
-          ]
-        },
-        {
-          "label": "秘密",
-          "options": [
-            {
-              "id": "know_heir_truth",
-              "title": "你知道那份登记簿上少了谁",
-              "description": "手里有两页从教会登记簿上抄下来的原文的人。被刮掉的三个人姓氏都与皇室沾亲，而保管那本簿子的老神父死在自家井里，官府说是失足。体面是这两页纸可能值一大笔钱，掣肘是它也能让人同样「失足」。",
-              "attributeBonus": {
-                "lore": 2,
-                "guile": 1
-              },
-              "resourceBonus": {
+                "health": -1,
                 "renown": -1,
-                "coin": 2
+                "coin": 1
               },
               "startingItems": [
-                "heretic_notes",
-                "clerk_seal"
+                "old_folk_shard",
+                "herb_kit",
+                "flint_kit"
               ]
             },
             {
-              "id": "saw_the_priest",
-              "title": "你见过那个死了的术士",
-              "description": "见过那个疯死在牢里的术士的人。那人蹲在桥洞下画同一种纹路，说过一句「材料簿上有两个手，我只有一个」，意思是有人在材料上替他签过名。体面是他握着一个三方都想抹掉的把柄，掣肘是说给谁听都不安全。",
+              "id": "prov_gnome_keyholder",
+              "title": "涅恩持钥人，账上压着两边的柜子",
+              "description": "侏儒，在巷子里做小额汇兑与消息生意，一笔钱一笔消息都记在自己的账上。他的钥匙能开十几个柜子，族里正为「要不要走出去开钱庄」吵得不可开交。",
               "attributeBonus": {
                 "guile": 2,
                 "lore": 1
               },
               "resourceBonus": {
-                "coin": 1,
-                "renown": -1
+                "coin": 5
               },
               "startingItems": [
-                "heretic_notes",
-                "herb_kit"
-              ]
-            },
-            {
-              "id": "the_third_seal",
-              "title": "你手上有一枚来路不明的蜡模",
-              "description": "手上有一枚蜡模的人。它压出来的印和王室文书上的印章只差一笔，刻得准到只有见过真印的人才做得出来；黑市上一枚卖三十马克，而卖过它的人里有两个后来死了。体面是它比印章本身更值钱，掣肘是它也能要命。",
-              "attributeBonus": {
-                "craft": 1,
-                "guile": 2
-              },
-              "resourceBonus": {
-                "coin": 3,
-                "renown": -1
-              },
-              "startingItems": [
-                "sealed_wax",
-                "graver_knife",
-                "false_papers"
-              ]
-            },
-            {
-              "id": "sold_your_village",
-              "title": "你所在的村子被登记成了别人的牧地",
-              "description": "手上有一份抄错了四至的旧档抄本的人。凭那份抄本，一片耕地被登记成了牧地，而受益的一方同时是一桩牧场权官司的被告。体面是这份抄本能同时改两桩案子，掣肘是拿出来就要站在两方中间。",
-              "attributeBonus": {
-                "lore": 1,
-                "faith": 2
-              },
-              "resourceBonus": {
-                "renown": 1,
-                "coin": -1
-              },
-              "startingItems": [
-                "contract_kit",
-                "debt_letter",
+                "keeper_keys",
+                "ledger_book",
                 "ink_pouch"
               ]
             },
             {
-              "id": "elf_debt",
-              "title": "你替一位精灵背了一笔账",
-              "description": "替精灵做过中间人、又替对方赔了钱的人。弓材受潮、买方拒收，那位精灵留下一句「我不会为一场雨负责」就走了。体面是他成了少数在精灵那里有债权的人类，掣肘是这份债权按精灵的算法还在「这个季节内」。",
+              "id": "prov_elf_season_keeper",
+              "title": "林缘守季人，有一年没写进记录",
+              "description": "精灵，在银椴林最外一圈记录雪水、花期与人类砍了几棵树。他越过内环去石桥市住过一个月，这件事没有写进记录；而议事会正在收每一位守季人的外缘陈述。",
               "attributeBonus": {
-                "lore": 1,
-                "guile": 1
+                "lore": 2,
+                "faith": 1
               },
               "resourceBonus": {
-                "coin": -3,
+                "coin": 2,
                 "renown": 1
               },
               "startingItems": [
+                "season_tablet",
                 "elf_starchart",
-                "debt_letter"
+                "travel_cloak",
+                "boundary_charm"
               ]
             },
             {
-              "id": "burned_the_granary",
-              "title": "你替人烧过一座粮栈",
-              "description": "替人烧过一座粮栈的人。本意只是烧掉一批受潮的麦子去报损，火却大了，塌了半堵墙，烧死一个在仓里过夜的老脚夫——他口袋里还有三文钱，是准备第二天买饼的。体面是老板还愿意找他，掣肘是他至今不知道那人姓什么。",
+              "id": "prov_iron_kin_smith",
+              "title": "铁裔匠户，右手有烙印的炉前工",
+              "description": "编在行省匠籍里的铁裔铁匠，打得出比人类工匠好得多的农具，也有一页从账会抄来的铁板。那个烙印是许可也是限令：可以开炉，不许打兵器；回铁砧堡认祖要先补三百年的行会费。",
               "attributeBonus": {
-                "guile": 2,
-                "craft": 1
-              },
-              "resourceBonus": {
-                "coin": 3,
-                "renown": -2
-              },
-              "startingItems": [
-                "flint_kit",
-                "false_papers",
-                "graver_knife"
-              ]
-            },
-            {
-              "id": "sold_the_proof",
-              "title": "你卖过一份不该卖的族属证明",
-              "description": "把一张真的族属证明卖给过三个人的经手者。第三个人用它在城门被看出墨迹太新，关了四个月，出来时人已经废了一半。体面是那笔钱解过一次急，掣肘是他自己也没有族属，而这事在栅外已经传开了。",
-              "attributeBonus": {
-                "guile": 2,
-                "lore": 1
-              },
-              "resourceBonus": {
-                "coin": 3,
-                "renown": -2
-              },
-              "startingItems": [
-                "false_papers",
-                "clerk_seal",
-                "dead_mans_papers"
-              ]
-            },
-            {
-              "id": "bought_a_dead_name",
-              "title": "你的名字是从一个死人身上买来的",
-              "description": "用着一个不属于自己的名字的人。那个名字连同通行文书、一枚印与十七芬尼，都是从灰野边上的一具尸首身上得来的。体面是这个名字至今没人来认，掣肘是行省正在重造户籍册，而重造要有人上门按手印。",
-              "attributeBonus": {
-                "guile": 2,
-                "faith": -1,
-                "lore": 1
+                "craft": 3
               },
               "resourceBonus": {
                 "coin": 2,
-                "renown": -2
+                "renown": -1
               },
               "startingItems": [
-                "dead_mans_papers",
-                "sealed_wax",
-                "whetstone"
-              ]
-            },
-            {
-              "id": "sold_the_stolen_cow",
-              "title": "你把一头偷来的牛卖到了三座城之外",
-              "description": "经手卖掉过一头来历不明的牛的人。牛身上有盐部人的烙印，被转手卖去了三座城之外；他留下一块带蹄印的干泥，蹄铁缺了一枚钉。掣肘是那头牛是有人按约放给龙的，而全城只有这块泥能指向它去了哪边。",
-              "attributeBonus": {
-                "craft": 1,
-                "guile": 2
-              },
-              "resourceBonus": {
-                "coin": 4,
-                "renown": -2
-              },
-              "startingItems": [
-                "mules_footprint",
-                "mule_contract",
-                "salt_hide_pack"
-              ]
-            },
-            {
-              "id": "peeled_the_oath",
-              "title": "你替人剥过一份誓约的凭据",
-              "description": "从墙上撬过一块刻着「未结之账」的石板的人。他把那块换成了刻着别的字的，做得很干净，只留下背面一道裂缝。体面是矮人的账会查过一遍也没查出来，掣肘是那页相关的账会铁板如今在他身上。",
-              "attributeBonus": {
-                "craft": 2,
-                "guile": 1
-              },
-              "resourceBonus": {
-                "coin": 2,
-                "renown": -2
-              },
-              "startingItems": [
-                "settlement_tablet",
+                "iron_kin_brand",
+                "whetstone",
                 "dwarf_ledger",
-                "graver_knife"
+                "settlement_tablet"
               ]
             }
           ]
@@ -5866,15 +4449,6 @@
           ]
         },
         {
-          "id": "graver_knife",
-          "name": "刻印用的细钢刀",
-          "description": "一把刃宽不到三分的小钢刀，配三支不同角度的刀头，用来在金属或硬蜡上刻字与刻纹。这是仿刻印章的唯一工具，做得好的人能在两三天里刻出一枚让人看不出破绽的印（前提是他见过真印）。这把刀被布裹着，放在你行囊最里层，你从不在人前拿出来。",
-          "tags": [
-            "工具",
-            "违禁"
-          ]
-        },
-        {
           "id": "heretic_notes",
           "name": "抄在薄皮上的两页记录",
           "description": "两页薄皮，用极小的字抄着一段婚配登记与一段材料出入库的记载，抄写得极为工整，因为抄的人当时在怕。这两页纸不能拿去公开（公开就等于承认你偷抄过教会档案），但可以拿去换——换钱、换人情、换一条命。纸张被折过四折，折痕已经发白。",
@@ -5902,15 +4476,6 @@
           ]
         },
         {
-          "id": "orc_bow",
-          "name": "兽人短弓与三支箭",
-          "description": "一张用兽筋与硬木层压的短弓，弓身短、拉力大，适合在马背上使用。这张弓是盐部的一位牧民换给你的（换的是一把好铁刀），弓臂内侧刻着六道短痕，那是它的主人用它打到的猎物数。三支箭的箭头是铁的，这在兽人那里已经算奢侈。",
-          "tags": [
-            "武器",
-            "兽人"
-          ]
-        },
-        {
           "id": "elf_starchart",
           "name": "精灵星图残页",
           "description": "一片薄如纸的树皮，上面用极细的刻纹记着一段星象与几个日期。精灵用它来判断「季节」的转换，也就是他们那套以世纪为单位的历法。人类看不懂，但知道它值钱——石桥市有人愿意出二十马克收这样的残页，收去做什么没有人说得清。",
@@ -5926,15 +4491,6 @@
           "tags": [
             "凭证",
             "矮人"
-          ]
-        },
-        {
-          "id": "khaki_coat",
-          "name": "灰野行商的防尘长袍",
-          "description": "一件厚重的麻布长袍，染成灰褐色，前襟加了一层可以擦掉盐尘的粗布。灰野的盐尘会钻进衣服的每一道缝，会在两天里把一件好衣服磨成破布，所以走那条路的人只穿这种衣服。长袍内侧有两个暗袋，一个放钱，一个放水囊。",
-          "tags": [
-            "行装",
-            "灰野"
           ]
         },
         {
@@ -5974,30 +4530,12 @@
           ]
         },
         {
-          "id": "privateer_ledger",
-          "name": "私掠船的流水账",
-          "description": "一本用油布包过的皮面账簿，记的是一艘不挂旗的船在两年里的进出：哪一票货、在哪个海峡取的、分给谁多少、以及哪几笔不便写名目的收入只画了一道横线。账里的数字都是真的，但名字多半是假的，所以它既是钱，也是把柄——拿着它的人可以勒索船主，也可以被船主灭口。",
-          "tags": [
-            "账簿",
-            "违禁"
-          ]
-        },
-        {
           "id": "broken_banner",
           "name": "一面折断过的旗",
           "description": "一面三尺宽的三角旗，布是深红的，中央的纹样已经褪成灰色，旗杆断在离旗面一掌的地方。这面旗属于一支在三年前被打散的雇佣队，剩下的人一半改行、一半还在铜钉广场上等活。旗子留着不算荣誉，更像是凭据：举着它，同队的老兵认你；举着它，当年雇你们的那一方也认你。",
           "tags": [
             "信物",
             "雇佣兵"
-          ]
-        },
-        {
-          "id": "dragon_tongue_token",
-          "name": "龙代言人的传话木牌",
-          "description": "一块两指宽的黑木牌，正面只刻了一道横线，背面刻着一个小小的分叉，那是代言家族用来标记「话已经传过」的记号。这种牌子从不用于交易，也不值钱，但各方使节都认得它：见到它的人会请你坐下、倒水，然后安静地等你说完，因为上一次有人拿着它走进城，是一座界碑被挪回原位的时候。",
-          "tags": [
-            "凭证",
-            "代言家族"
           ]
         },
         {
@@ -6115,15 +4653,6 @@
           ]
         },
         {
-          "id": "muster_roll",
-          "name": "一份画了圈的募兵名册",
-          "description": "一张名册，写着一个村子应出的丁口，其中十一行的名字旁边画了圈——圈的意思是「已经交过钱免役」。剩下没画圈的七个人里，有两个是寡妇的儿子。募兵官给你这份名册的意思是：你自己看着办。名册的边角被翻得起了毛，说明这个问题已经被翻来覆去看过很多遍，而每一次翻动都是一个决定。",
-          "tags": [
-            "凭证",
-            "募兵"
-          ]
-        },
-        {
           "id": "recruit_plaque",
           "name": "铜钉广场的招募木牌",
           "description": "一块约两尺长的木板，正面用炭写着本队的条件：一日三芬尼、包吃、阵亡抚恤四个月饷、作战地域限帝国东境。牌子的下缘钉着九枚铜钉，那是队伍打过的仗数，也是它还剩多少老兵的另一种记法。举着这块牌子站在铜钉广场上的人，一天里要报三十次价，也要听完三十个人讲他们自己的难处。",
@@ -6188,6 +4717,42 @@
             "工具",
             "违禁",
             "刻石"
+          ]
+        },
+        {
+          "id": "graver_knife",
+          "name": "刻印用的细钢刀",
+          "description": "一把刃宽不到三分的小钢刀，配三支不同角度的刀头，用来在金属或硬蜡上刻字与刻纹。这是仿刻印章唯一的工具，做得好的人能在两三天里刻出一枚看不出破绽的印，前提是他见过真印。这把刀被布裹着，放在行囊最里层，从不在人前拿出来。",
+          "tags": [
+            "工具",
+            "违禁"
+          ]
+        },
+        {
+          "id": "dragon_tongue_token",
+          "name": "龙代言人的传话木牌",
+          "description": "一块两指宽的黑木牌，正面只刻一道横线，背面刻一个小小的分叉，是代言家族用来标记「话已经传过」的记号。这种牌子从不用于交易，也不值钱，但各方使节都认得它：见到它的人会请你坐下、倒水，然后安静地等你说完。",
+          "tags": [
+            "凭证",
+            "代言家族"
+          ]
+        },
+        {
+          "id": "privateer_ledger",
+          "name": "私掠船的流水账",
+          "description": "一本用油布包过的皮面账簿，记的是一艘不挂旗的船两年里的进出：哪一票货、在哪个海峡取的、分给谁多少，以及哪几笔不便写名目的收入只画了一道横线。账里的数字都是真的，名字多半是假的，所以它既是钱，也是把柄。",
+          "tags": [
+            "账簿",
+            "违禁"
+          ]
+        },
+        {
+          "id": "muster_roll",
+          "name": "一份画了圈的募兵名册",
+          "description": "一张名册，写着一个村子应出的丁口，其中十一行的名字旁边画了圈——圈的意思是已经交过钱免役。剩下没画圈的七个人里，有两个是寡妇的儿子。募兵官把这份名册递过来，意思是：你自己看着办。",
+          "tags": [
+            "凭证",
+            "募兵"
           ]
         },
         {
@@ -7050,129 +5615,8 @@
           ]
         },
         {
-          "label": "不能说的家事",
+          "label": "体面与门路",
           "options": [
-            {
-              "id": "fam_lock_room",
-              "title": "家里有一间不开门的屋子",
-              "description": "家里有一间屋子永远锁着。你从锁眼往里看过一次，里面干净得像有人刚走。",
-              "attributeBonus": {
-                "frost": 1,
-                "candle": 2
-              },
-              "resourceBonus": {
-                "nerve": -1
-              }
-            },
-            {
-              "id": "fam_missing_year",
-              "title": "有一年在你家里是空的",
-              "description": "你家的相册里缺了一年，前后都在。那一年的登记也很干净，老仆人说太太身体不好。",
-              "attributeBonus": {
-                "candle": 2,
-                "key": 1
-              },
-              "resourceBonus": {
-                "nerve": -1,
-                "threads": 1
-              }
-            },
-            {
-              "id": "fam_debt_paper",
-              "title": "一张用姓氏抵押出去的旧借据",
-              "description": "家里的体面是借来的。抵押物不是房子，是姓氏，而债主已经来敲过一次门。",
-              "attributeBonus": {
-                "key": 2,
-                "frost": 1
-              },
-              "resourceBonus": {
-                "purse": -3,
-                "face": 1
-              }
-            },
-            {
-              "id": "fam_sister_away",
-              "title": "有一个被送走的姐妹",
-              "description": "有一个人十七岁那年“去乡下调养”，此后再没见过。家里给过三种说法。",
-              "attributeBonus": {
-                "frost": 2,
-                "salt": 1
-              },
-              "resourceBonus": {
-                "nerve": -1,
-                "face": 1
-              }
-            },
-            {
-              "id": "fam_second_will",
-              "title": "家里有两份遗嘱",
-              "description": "旧箱子里有两份遗嘱：公开的那份给长子，另一份没有日期，给一个没听说过的名字。",
-              "attributeBonus": {
-                "key": 2,
-                "mirror": 1
-              },
-              "resourceBonus": {
-                "threads": 1,
-                "face": -1
-              }
-            },
-            {
-              "id": "fam_mother_silence",
-              "title": "你母亲从来不提她的娘家",
-              "description": "你母亲从不提娘家。她带进来的那个姓氏，在邓威克任何一本名录上都查不到。",
-              "attributeBonus": {
-                "frost": 1,
-                "mirror": 1,
-                "candle": 1
-              },
-              "resourceBonus": {
-                "threads": 1
-              }
-            },
-            {
-              "id": "fam_paid_notice",
-              "title": "家里付过一笔\"封口费\"",
-              "description": "家里每年两次付给同一个人一笔钱，名目写“旧例”。账房说这栏从他进这门起就有。",
-              "attributeBonus": {
-                "candle": 2,
-                "rift": 1
-              },
-              "resourceBonus": {
-                "purse": 1,
-                "nerve": -1
-              }
-            },
-            {
-              "id": "fam_twin_grave",
-              "title": "族谱上有一个双生的名字",
-              "description": "族谱上你的名字旁边还有一个名字，墨色比别处新，像是后来补上去的。",
-              "attributeBonus": {
-                "mirror": 2,
-                "rift": 1
-              },
-              "resourceBonus": {
-                "nerve": -1
-              }
-            }
-          ]
-        },
-        {
-          "label": "体面对你意味着什么",
-          "options": [
-            {
-              "id": "fa_ruined_once",
-              "title": "你毁过一次，正在往回走",
-              "description": "你从名单上掉下来过，正在往回走。你比谁都清楚体面要一件一件买回来。",
-              "attributeBonus": {
-                "mirror": 2,
-                "frost": 1
-              },
-              "resourceBonus": {
-                "face": -3,
-                "nerve": 1,
-                "threads": 1
-              }
-            },
             {
               "id": "fa_unquestioned",
               "title": "从来没有人查过你",
@@ -7227,33 +5671,6 @@
               }
             },
             {
-              "id": "fa_priest_of_it",
-              "title": "你靠体面吃饭",
-              "description": "你的活是替别人保管体面：安排婚事、挑措辞、把不该被看见的事挪出记录。",
-              "attributeBonus": {
-                "key": 2,
-                "mirror": 1
-              },
-              "resourceBonus": {
-                "purse": 3,
-                "threads": 2,
-                "nerve": -1
-              }
-            },
-            {
-              "id": "fa_two_names",
-              "title": "你有两个名字，两个都算真的",
-              "description": "你用两个名字过日子，两个都算真的。麻烦是有一个人两边都见过你。",
-              "attributeBonus": {
-                "mirror": 2,
-                "key": 1
-              },
-              "resourceBonus": {
-                "face": -1,
-                "threads": 2
-              }
-            },
-            {
               "id": "fa_open_secret",
               "title": "你有一个所有人都知道、但没有人说的秘密",
               "description": "你的事在小圈子里不是秘密。请柬少了，座位往边上挪，没有人当面说什么。",
@@ -7267,12 +5684,7 @@
                 "nerve": 1,
                 "threads": 1
               }
-            }
-          ]
-        },
-        {
-          "label": "门路",
-          "options": [
+            },
             {
               "id": "th_family_solicitor",
               "title": "一位家族的律师",
@@ -7312,30 +5724,6 @@
               }
             },
             {
-              "id": "th_telegraph_clerk",
-              "title": "电报局的报务员",
-              "description": "报务员。手上过几百条消息，记性极好，欠你一次，每次见你都笑得很客气。",
-              "attributeBonus": {
-                "bell": 2
-              },
-              "resourceBonus": {
-                "threads": 2,
-                "purse": -1
-              }
-            },
-            {
-              "id": "th_actress",
-              "title": "一位剧院的女演员",
-              "description": "剧院里的人。台上的一切都是假的，后台的一切都是真的，她两边都熟。",
-              "attributeBonus": {
-                "mirror": 2
-              },
-              "resourceBonus": {
-                "threads": 2,
-                "face": 1
-              }
-            },
-            {
               "id": "th_church_warden",
               "title": "一位堂区的执事",
               "description": "一位堂区执事。管救济名单和出生死亡册子，愿意在某一栏旁“暂时不写日期”。",
@@ -7359,102 +5747,31 @@
                 "threads": 3,
                 "face": 1
               }
-            },
-            {
-              "id": "th_society_member",
-              "title": "某位结社的引荐人",
-              "description": "某个结社的引荐人。他不说团体的名字，只说什么时候去、穿什么、走哪道门。",
-              "attributeBonus": {
-                "rift": 1,
-                "key": 1
-              },
-              "resourceBonus": {
-                "threads": 3,
-                "face": -1
-              }
             }
           ]
         },
         {
-          "label": "说不出口的那件事",
+          "label": "家事与牵挂",
           "options": [
             {
-              "id": "ex_extra_hour",
-              "title": "有一个小时你不记得",
-              "description": "有一段时间你完全不记得。不是模糊，是没有，而钟点跟你记得的对不上。",
+              "id": "fam_lock_room",
+              "title": "家里有一间不开门的屋子",
+              "description": "家里有一间屋子永远锁着。你从锁眼往里看过一次，里面干净得像有人刚走。",
               "attributeBonus": {
-                "rift": 2
-              },
-              "resourceBonus": {
-                "nerve": -2
-              }
-            },
-            {
-              "id": "ex_own_hand",
-              "title": "你自己的笔迹写了你没写过的话",
-              "description": "笔记本里有一段你没写过的话，字是你的，连收笔的习惯都一样，日期在下周。",
-              "attributeBonus": {
+                "frost": 1,
                 "candle": 2
-              },
-              "resourceBonus": {
-                "nerve": -2
-              }
-            },
-            {
-              "id": "ex_seen_once",
-              "title": "你曾经认出一个不该出现的人",
-              "description": "同一个人你见过两次，两次都死在你面前，第二次穿的是四年前那件衣服。",
-              "attributeBonus": {
-                "candle": 1,
-                "rift": 1
-              },
-              "resourceBonus": {
-                "nerve": -2,
-                "threads": 1
-              }
-            },
-            {
-              "id": "ex_street_shorter",
-              "title": "有一条街短了一截",
-              "description": "你每天走的那条街少了一截。铺子没换，人没搬，所有人说一直是这样的。",
-              "attributeBonus": {
-                "rift": 2
               },
               "resourceBonus": {
                 "nerve": -1
               }
             },
             {
-              "id": "ex_letter_unwritten",
-              "title": "你收到过一封自己写的信",
-              "description": "你收到过一封自己写的信，信里说出了只有你一个人知道的一天。",
+              "id": "fam_missing_year",
+              "title": "有一年在你家里是空的",
+              "description": "你家的相册里缺了一年，前后都在。那一年的登记也很干净，老仆人说太太身体不好。",
               "attributeBonus": {
-                "candle": 1,
-                "frost": 1
-              },
-              "resourceBonus": {
-                "nerve": -2
-              }
-            },
-            {
-              "id": "ex_room_extra_door",
-              "title": "你住过的房间多了一扇门",
-              "description": "你住过的一间房多出一扇门，上了漆，和这家别的门一样，而房东说它一直在。",
-              "attributeBonus": {
-                "rift": 1,
+                "candle": 2,
                 "key": 1
-              },
-              "resourceBonus": {
-                "nerve": -2
-              }
-            },
-            {
-              "id": "ex_dream_waking",
-              "title": "你的梦比你先到",
-              "description": "你的梦有时早到一天。都是些琐碎东西，而其中有一次成了真的。",
-              "attributeBonus": {
-                "bell": 1,
-                "candle": 1
               },
               "resourceBonus": {
                 "nerve": -1,
@@ -7462,22 +5779,56 @@
               }
             },
             {
-              "id": "ex_borrowed_face",
-              "title": "有人用过你的脸",
-              "description": "有人用过你的名字与你的脸：借过钱、签过租约、在晚宴上跟人吵过架。",
+              "id": "fam_debt_paper",
+              "title": "一张用姓氏抵押出去的旧借据",
+              "description": "家里的体面是借来的。抵押物不是房子，是姓氏，而债主已经来敲过一次门。",
               "attributeBonus": {
-                "mirror": 2
+                "key": 2,
+                "frost": 1
               },
               "resourceBonus": {
-                "face": -2,
+                "purse": -3,
+                "face": 1
+              }
+            },
+            {
+              "id": "fam_sister_away",
+              "title": "有一个被送走的姐妹",
+              "description": "有一个人十七岁那年“去乡下调养”，此后再没见过。家里给过三种说法。",
+              "attributeBonus": {
+                "frost": 2,
+                "salt": 1
+              },
+              "resourceBonus": {
+                "nerve": -1,
+                "face": 1
+              }
+            },
+            {
+              "id": "fam_paid_notice",
+              "title": "家里付过一笔\"封口费\"",
+              "description": "家里每年两次付给同一个人一笔钱，名目写“旧例”。账房说这栏从他进这门起就有。",
+              "attributeBonus": {
+                "candle": 2,
+                "rift": 1
+              },
+              "resourceBonus": {
+                "purse": 1,
                 "nerve": -1
               }
-            }
-          ]
-        },
-        {
-          "label": "牵挂",
-          "options": [
+            },
+            {
+              "id": "fam_twin_grave",
+              "title": "族谱上有一个双生的名字",
+              "description": "族谱上你的名字旁边还有一个名字，墨色比别处新，像是后来补上去的。",
+              "attributeBonus": {
+                "mirror": 2,
+                "rift": 1
+              },
+              "resourceBonus": {
+                "nerve": -1
+              }
+            },
             {
               "id": "ti_sister",
               "title": "一个在疗养院里的姐妹",
@@ -7504,43 +5855,6 @@
               }
             },
             {
-              "id": "ti_promise_dead",
-              "title": "对一个死人许过的诺",
-              "description": "你在一张床边答应过一件事，办到一半。剩下的那半需要钱、签字或者一笔脏交易。",
-              "attributeBonus": {
-                "frost": 1,
-                "salt": 2
-              },
-              "resourceBonus": {
-                "nerve": 1
-              }
-            },
-            {
-              "id": "ti_co_debtor",
-              "title": "一个跟你绑在一起的债务人",
-              "description": "你和一个人共同签过一份很大的借据，他还在还。上月他没来，而他那一半算你的。",
-              "attributeBonus": {
-                "key": 2
-              },
-              "resourceBonus": {
-                "purse": -3,
-                "threads": 1
-              }
-            },
-            {
-              "id": "ti_old_house",
-              "title": "一所你回不去的老宅",
-              "description": "你名下有座空着的老宅，每年付税与看房人的钱，而你租住在别处。",
-              "attributeBonus": {
-                "frost": 2
-              },
-              "resourceBonus": {
-                "purse": -1,
-                "face": 1,
-                "nerve": -1
-              }
-            },
-            {
               "id": "ti_mentor",
               "title": "一个提携过你的人",
               "description": "有一个人把你从最低处带起来，你欠他的不是钱。他现在老了，或者麻烦了。",
@@ -7562,19 +5876,6 @@
               "resourceBonus": {
                 "nerve": 1,
                 "face": -2
-              }
-            },
-            {
-              "id": "ti_partner",
-              "title": "一个知道你太多事的同伴",
-              "description": "有一个人跟你一起办过那件事。每隔几个月见一次，只确认谁还在、谁在查。",
-              "attributeBonus": {
-                "mirror": 1,
-                "key": 1
-              },
-              "resourceBonus": {
-                "threads": 2,
-                "nerve": -1
               }
             }
           ]
@@ -7814,105 +6115,9 @@
               ]
             },
             {
-              "id": "sit_undertaker",
-              "title": "在殡仪这一行做事",
-              "description": "在殡仪这一行做事。你什么都见，最要紧的是不急、不问、不说。",
-              "attributeBonus": {
-                "frost": 3
-              },
-              "resourceBonus": {
-                "face": 2,
-                "threads": 1,
-                "nerve": 1
-              },
-              "startingItems": [
-                "item_undertaker_book",
-                "item_black_armband",
-                "item_reference_letter"
-              ]
-            },
-            {
-              "id": "sit_theatre",
-              "title": "在剧院后台做事",
-              "description": "在剧院后台做事。台上的一切都是假的，后台的一切都是真的。",
-              "attributeBonus": {
-                "mirror": 2,
-                "rift": 1
-              },
-              "resourceBonus": {
-                "threads": 2,
-                "face": 1
-              },
-              "startingItems": [
-                "item_theatre_pass",
-                "item_mirror_shard",
-                "item_mask_veil"
-              ]
-            },
-            {
-              "id": "sit_opium_house",
-              "title": "在东区开一间茶室",
-              "description": "在东区开一间茶室。白天是茶，夜里上楼要介绍，账要记三本。",
-              "attributeBonus": {
-                "frost": 1,
-                "mirror": 1,
-                "salt": 1
-              },
-              "resourceBonus": {
-                "purse": 3,
-                "threads": 2,
-                "face": -2
-              },
-              "startingItems": [
-                "item_opium_tin",
-                "item_house_keys",
-                "item_ledger_book",
-                "item_laudanum_bottle"
-              ]
-            },
-            {
-              "id": "sit_lamplighter",
-              "title": "在街上管灯",
-              "description": "在街上管灯。七条街一百四十一盏，哪一盏亮早了都是事。",
-              "attributeBonus": {
-                "bell": 1,
-                "rift": 1,
-                "candle": 1
-              },
-              "resourceBonus": {
-                "threads": 1,
-                "nerve": 1
-              },
-              "startingItems": [
-                "item_lamplighter_tool",
-                "item_pit_token",
-                "item_forgotten_watch"
-              ]
-            },
-            {
-              "id": "sit_housemaid",
-              "title": "在大户人家当仆人",
-              "description": "在大户人家当仆人。你知道这栋房子每一扇门什么时候开，而听见的要忘掉。",
-              "attributeBonus": {
-                "frost": 1,
-                "candle": 1,
-                "salt": 1
-              },
-              "resourceBonus": {
-                "threads": 2,
-                "face": 1,
-                "purse": 1
-              },
-              "startingItems": [
-                "item_reference_letter",
-                "item_house_keys",
-                "item_necklace_lock"
-              ]
-            },
-            {
               "id": "sit_cabman",
-              "title": "在街上赶车",
-              "description": "在街上赶车。认识全城的街、门牌和常客的作息，靠一个“不问”活着。",
+              "title": "在街上跑腿",
+              "description": "在街上跑腿。认识全城的街、门牌和常客的作息，靠一个“不问”活着。",
               "attributeBonus": {
                 "bell": 1,
                 "salt": 1,
@@ -7920,12 +6125,12 @@
               },
               "resourceBonus": {
                 "purse": 1,
-                "threads": 1,
+                "threads": 2,
                 "body": 1
               },
               "startingItems": [
                 "item_cab_license",
-                "item_pit_token",
+                "item_lamplighter_tool",
                 "item_flask"
               ]
             },
@@ -7944,34 +6149,14 @@
               },
               "startingItems": [
                 "item_wharf_token",
-                "item_warrant_paper",
+                "item_workhouse_paper",
                 "item_flask"
               ]
             },
             {
-              "id": "sit_chimney_sweep",
-              "title": "爬烟道讨生活",
-              "description": "爬烟道讨生活。这一行人命最短、工钱最少，规矩最老。",
-              "attributeBonus": {
-                "salt": 1,
-                "rift": 2
-              },
-              "resourceBonus": {
-                "body": 1,
-                "purse": 1,
-                "nerve": 1,
-                "face": -2
-              },
-              "startingItems": [
-                "item_sweep_brush",
-                "item_workhouse_paper",
-                "item_small_tin"
-              ]
-            },
-            {
               "id": "sit_pawnbroker",
-              "title": "在三球巷坐柜台",
-              "description": "在三球巷坐柜台。一天收三十件赎二十件，最要紧的本事是看人。",
+              "title": "在柜台后面做生意",
+              "description": "在柜台后面做生意。一天收三十件赎二十件，最要紧的本事是看人。",
               "attributeBonus": {
                 "key": 1,
                 "frost": 1,
@@ -7986,7 +6171,8 @@
                 "item_pawn_ticket",
                 "item_house_keys",
                 "item_scales",
-                "item_ledger_book"
+                "item_ledger_book",
+                "item_small_tin"
               ]
             },
             {
@@ -8506,7 +6692,7 @@
         {
           "id": "item_reference_letter2",
           "name": "主家写的推荐信",
-          "description": "一封由女主人亲笔写的推荐信，措辞很客气：「该女仆在本宅服务四年，品行端正，针线尚可。」**这封信真正的分量在最后半句**：在韦兰，一位太太提到一个女仆的\"品行\"，等于给了她在下一户人家站住脚的机会；而如果这封信里只有\"服务四年\"，那就等于什么都没说。信纸是带水印的好纸，折成三折。",
+          "description": "一封由女主人亲笔写的推荐信，写的是「该女仆在本宅服务四年，品行端正，针线尚可」。**分量全在最后半句**：在韦兰，一位太太提到一个女仆的品行，等于给了她在下一户人家站住脚的机会；只写“服务四年”，就等于什么都没说。",
           "tags": [
             "凭证",
             "谋生",
@@ -8584,16 +6770,6 @@
           ]
         },
         {
-          "id": "item_seal_wax",
-          "name": "一块深红封蜡与封缄针",
-          "description": "一小块深红色的封蜡、一根封缄针、以及一枚属于你自己的印（上面是一个简单的方框纹，没有家徽）。**封蜡在韦兰是一种很重的表态**：它意味着\"这份东西没有被人看过，而且我认这里面的每一个字\"。伪造封缄是重罪，所以也没人愿意用别人的蜡；而一块用过的蜡如果被人重新熔过，颜色会深一点，行家一眼看得出来。",
-          "tags": [
-            "工具",
-            "凭证",
-            "体面"
-          ]
-        },
-        {
           "id": "item_coded_ledger",
           "name": "一本用货名记账的簿子",
           "description": "一本油布包过的皮面账簿，记的是两年里的进出：哪一票货、在哪一处取的、分给谁多少，以及哪几笔不便写名目的收入只画了一道横线。**账里的数字都是真的，名字多半是假的**，所以它既是钱，也是把柄——拿着它的人可以勒索船主，也可以被船主灭口。最后一页有一行被撕掉了三分之一。",
@@ -8662,16 +6838,10 @@
             "sit_attorney": "在法院巷做法律，一天在事务所、法院与当事人家里跑：文书、遗嘱、婚约、契据与诉状，都是别人的财产、姓氏与体面。打交道的是书记员、公证人、银行账房、对方的事务律师，以及那些拿着几十年前的旧纸来问\"这个还有用吗\"的人。便利在于文件里什么都有：谁欠谁、谁在什么时候改过一栏、哪一份纸的水印与日期不符；掣肘是这一行快不了，而很多人付不起慢下来的钱。",
             "sit_teacher": "教书的日子按课表与点名册过：一节课六十几个孩子，点名、提问、收作业、家访，一周还要交一次册子给督学。打交道的是孩子、家长、教区督学，以及来学校挑人的工厂管事。便利是这一行的门槛低、名分正，你可以进任何一条巷子而不被怀疑；掣肘是津贴按实到人数算，而少一个孩子往往只是因为家里搬了、进厂了、或者死了。这一行给不了孩子前程，但能给一个孩子三年的时间。",
             "sit_notary": "公证的日子是一份接一份：租约、授权书、婚约、遗嘱，核对名字、日期、水印、印章，然后登进簿子。打交道的是来签字的双方、见证人、事务律师、以及替人跑腿的伙计。这一行全部的力气都压在一枚钢模上：盖上它、登进簿子，一份文件在法律上就存在了；不盖，谁也不能怪你。最要紧的功夫是日期，最容易得罪人的也是日期——你说一句\"这份纸对不上\"，有两家人当天晚上就要吵架。",
-            "sit_undertaker": "殡仪这一行见的是别人家最难看的一天：铺子、马车、黑纱、花圈、账目，一场体面要摆给活人看，一场不体面也要办完。打交道的是遗孀、账房、伙计、堂区执事与来问价的亲戚。便利是所有人都对你客气，因为你的东西他们迟早要用；掣肘是这一行靠天气与季节吃饭，而冬天死人多、夏天死得少。规矩是不急、不问、不说——死者留下的字，通常是活人写的。",
-            "sit_theatre": "剧院后台的日常是排戏、开演、卸妆、散场：服装、道具、灯光、门，哪一样都不能缺。打交道的是演员、乐手、门房、送花与送信的侍者，以及进后台\"谈以后的合同\"的客人。便利是这里什么消息都过一遍，而台上的一切都是假的、后台的一切都是真的；掣肘是后台的门比前台多，出了事算在你账上。这一行靠的是眼里有活、嘴上有把门，还有记性——客人送过什么花、谁跟谁不说话，都要记住。",
-            "sit_opium_house": "茶室的白天与夜里是两桩生意：白天卖茶，夜里上楼要介绍，客人不记名字只记榻号。打交道的是码头账房、写状子的老书生、夜里的常客，以及巷子对面那种站着不动、不抽烟的人——他们可能是巡目，也可能是收债的。便利是这一行听到的话比教区牧师还多，而你一句都不能复述；掣肘是同一件事要记三本账，一本给税吏、一本给自己、一本只记在心里。这一行的活法是一个\"稳\"字，而稳是靠钱买的。",
-            "sit_lamplighter": "管灯的活从天黑前开始，到天快亮时结束：点、灭、换芯、报修，一天要在七条街上走两遍。打交道的是车夫、更夫、酒馆伙计、巡夜的警察，以及临街二楼上那些还没睡的人。便利是这一行最不起眼，谁都不会多看你一眼，所以替人捎一句话比邮局还快；掣肘是工钱按盏算，费率一改，一个月就少三分之一，而\"提前亮的灯\"这种事往上报，报的人往往先要写自己的名字。",
-            "sit_housemaid": "在大户人家做事，一天从生火开始：擦、熨、端、洗，主人起得比你晚，睡得比你早，而你要比他先知道这栋房子里出了什么事。打交道的是厨娘、马车夫、管家、门房，以及隔壁家的仆人——消息在仆人之间走得比在客厅里快。便利是你能进客人进不去的房间，也能在关键的时候\"什么都没看见\"；掣肘是你的名声全部押在主家的一句话上，而一封推荐信写得好不好，取决于你这四年有没有多说一句。",
-            "sit_cabman": "赶车的一天跑几十趟：街口、车站、剧院门口、老渡口，雨天活多，马会病，一天跑不够两镑就是白干。打交道的是客人、同行、警察、旅店伙计，以及那些\"多给两个先令、什么也别问\"的熟客。便利是这座城市的路你比谁都熟，谁在什么时辰从哪里出来你也记得；掣肘是车是租的、马是租的，客人不说到处你也不能问。这一行的规矩只有一条：不记名字、不记车牌、不回头看。",
-            "sit_dockhand": "码头上的日子按潮水与船期过：早上在闸门口等着被点名，叫到名字才有活，工钱一天一结，下雨停工只给一半。打交道的是包工头、船上管事、同乡伙计、点名牌房的老人，以及管账的。便利是码头是这座城消息最灵的地方——哪条船带回了什么、哪一箱货比货单上重，都有人先知道；掣肘是一天不点名就一天没钱，而号牌丢了那几天连上工都上不了。这一行最讲一个\"认\"字，也最不讲情面。",
-            "sit_chimney_sweep": "爬烟道的日子四点半开始：一天八九家，人孔、烟道、屋顶，工钱按根算，学徒管饭不给钱。打交道的是管家、厨娘、看门的、以及比你更小的学徒。便利是全城只有这一行人能钻进那些最窄的地方，所以有些东西只有你拿得到，也只有你知道哪一根烟囱里风声不对；掣肘是煤灰吃进肺里，三十岁以后就喘，而这一行最大的规矩是主家的地板与主家的闲话都不许带出来。",
-            "sit_pawnbroker": "坐柜台的一天收三十件、赎二十件：戒指、表、丧服、假牙、婚书，利钱按先令算，逾期不赎就听凭变卖。打交道的是急着用钱的人、替人来问的人、以及时不时上门问\"前几天有没有人来当过一件东西\"的人。便利是这半条街的底细都在你柜台上过一遍：谁家最近紧、谁家出了事、谁家女儿嫁出去了；掣肘是收得多了，你总有一天要问自己那件东西是从哪来的——而这个问题最好永远不问。",
-            "sit_vaudeville": "在歌舞厅上台，一晚两场、一台十二个号：排练、上妆、等号、上台、卸妆，散场常常已过午夜。打交道的是乐手、班主、后台的姑娘、送茶的侍者，以及点你号的客人——他们来时心情好，说的话比别处多。便利是你所以为的\"体面\"在这里不管用，而你能听见这座城市最真实的一面，也能靠一句好话挡住一件坏事；掣肘是红不红看客人赏不赏、看班主肯不肯把你的号往前排，而这个行当的名声不需要别人来毁。"
+            "sit_cabman": "在街上跑腿的活从傍晚到后半夜：灯火一亮就有人叫车，散场的时候最忙，雨天活多、马会病、一天跑不够两镑就是白干。打交道的是客人、同行、警察、旅店伙计与看门的。便利是这座城市的路与门牌你比谁都熟，谁在什么时辰从哪一扇门出来你也记得；掣肘是车与马都是租的，客人不说到处不能问，多给的两个先令就是“你别问”。这一行的规矩只有一条：不记名字、不记车牌、不回头看。",
+            "sit_dockhand": "码头上的日子按潮水与船期过：早上在闸门口等点名，叫到名字才有活，工钱一天一结，下雨停工只给一半。打交道的是包工头、船上管事、同乡伙计、点名牌房的老人与管账的。便利是这里是全城消息最灵的地方——哪条船带回了什么、哪一箱货比货单上重，都有人先知道；掣肘是一天不点名就一天没钱，号牌丢了那几天连闸门都进不去。这一行最讲一个“认”字，也最不讲情面。",
+            "sit_pawnbroker": "柜台后面的生意一天收三十件、赎二十件：戒指、表、丧服、假牙、婚书，利钱按先令算，逾期不赎就听凭变卖。打交道的是急着用钱的人、替人来问的人，以及时不时上门打听“前几天有没有人来当过一件东西”的人。便利是半条街的底细都在你柜台上过一遍：谁家最近紧、谁家出了事、谁家女儿嫁出去了；掣肘是收得多了，你总有一天要问自己那件东西是从哪来的——而这一问题最好永远不问。",
+            "sit_vaudeville": "在歌舞厅上台，一晚两场、一台十二个号：排练、上妆、等号、上台、卸妆，散场常常已过午夜。打交道的是乐手、班主、后台的姑娘、送茶的侍者，以及点你号的客人——他们来的时候心情好，说的话比在别处多。便利是体面在这里不太管用，而你能听见这座城市最真实的一面，也能靠一句好话替人挡下一件事；掣肘是红不红看客人赏不赏、看班主肯不肯把你的号往前排，而这个行当的名声不用别人来毁。"
           }
         },
         "enableStages": false,

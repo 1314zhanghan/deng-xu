@@ -176,8 +176,18 @@ const GATE = {
 
     以往门槛是 2 槽 / 每槽 3 个 —— 那等于没约束（随便点两下都能过），
     而"背景槽位是玩家投入注意力最多的地方"，值不值得点进去全看这里的多样性。
+
+    ⚠️ 但玩家随后又提出了相反方向的诉求，两边都要顾：
+      「把背景槽位的隐秘直接删除，维持身份种类多样性的同时**精简**背景槽位，将相似的合并」
+      「把机制栏内的背景槽位与预置物品、知识单独拿出来做成一栏 ——
+        不然在世界书内容量大的时候非常杂乱」
+    所以门槛从 ≥4 放宽到 ≥3，**同时卡上限 ≤5** ——
+    槽位多了本身就是要修的问题（帷幕纪年一度 8 个槽位，选角页要滚很久）。
+    ⚠️ 注意区分：**槽位数要少，但每个槽位里的身份种类要多** ——
+    不许靠砍选项来"精简"。
   */
-  minBackgroundSlots: 4,
+  minBackgroundSlots: 3,
+  maxBackgroundSlots: 5,
   minOptionsPerSlot: 8,
   /*
     ⚠️ 这里**故意是低门槛**（曾经是 100 字）。
@@ -439,6 +449,18 @@ for (const exp of EXPECTED) {
       if (slots.length < GATE.minBackgroundSlots) {
         fail(exp.label, '背景槽位太少',
           `${slots.length} 槽 < ${GATE.minBackgroundSlots}（用户要求"像游戏目标一样多元"）`)
+      }
+      /*
+        ⚠️ 上限同样是硬指标。玩家反馈：
+          「把机制栏内的背景槽位与预置物品、知识单独拿出来做成一栏，
+            不然在世界书内容量大的时候非常杂乱」
+        槽位多 → 选角页长 → 世界书预览更长。所以多了要合并，不是留着。
+      */
+      if (slots.length > GATE.maxBackgroundSlots) {
+        fail(exp.label, '背景槽位太多（该合并了）',
+          `${slots.length} 槽 > ${GATE.maxBackgroundSlots} —— ` +
+          `把语义相近的槽位合并（例如"出身"与"入仕之途"→"来路"、"立场"与"志向"→"立场与野心"），` +
+          `但**不要靠删选项来变短**：身份种类必须留住`)
       }
       for (const slot of slots) {
         if (slot.options.length < GATE.minOptionsPerSlot) {

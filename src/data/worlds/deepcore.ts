@@ -1190,214 +1190,8 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
         },
       ],
     },
-    {
-      label: '营生',
-      options: [
-        {
-          id: 'bg_path_hr',
-          title: '在人事与档案上做事',
-          description:
-            '核对编制、归置卷宗。手边放着全渊最完整的一批纸：职级、处置记录、婚配与配额。',
-          attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 0, access: 1 },
-          resourceBonus: { energy: 0, credit: 320, standing: 8 },
-          startingItems: ['item_workbadge', 'item_paper_ledger', 'item_crt_terminal', 'item_coverall'],
-        },
-        {
-          id: 'bg_path_security',
-          title: '在治安与巡逻上做事',
-          description:
-            '查闸机、控人群、写现场记录。成绩不看抓了多少人，看记录写得干不干净。',
-          attributeBonus: { might: 2, wits: 0, charm: 0, nerve: 2, access: 1 },
-          resourceBonus: { health: 10, energy: 10, credit: 280, standing: 6 },
-          startingItems: ['item_workbadge', 'item_steel_boots', 'item_coverall', 'item_bio_wristband'],
-        },
-        {
-          id: 'bg_path_research',
-          title: '在技术与实验上做事',
-          description:
-            '清洗数据、抄参数、删掉没有价值的片段。删掉的东西你偷偷记了下来。',
-          attributeBonus: { might: 0, wits: 3, charm: 0, nerve: 1, access: 1 },
-          resourceBonus: { energy: 0, credit: 620, standing: 10 },
-          startingItems: ['item_workbadge', 'item_personal_terminal', 'item_coded_note', 'item_sedative_ampoule'],
-        },
-        {
-          id: 'bg_path_collect',
-          title: '跟着采集队做事',
-          description:
-            '穿三十四公斤的防护服练窗口期，还没真正出过站。签过一份"余额留给谁"。',
-          attributeBonus: { might: 2, wits: 1, charm: 1, nerve: 2, access: 0 },
-          resourceBonus: { health: 10, energy: 15, credit: 400, standing: 5 },
-          startingItems: ['item_workbadge', 'item_rebreather', 'item_geiger_counter', 'item_steel_boots', 'item_coverall'],
-        },
-        {
-          id: 'bg_path_audit',
-          title: '在账目与审计上做事',
-          description:
-            '复核流水与抄录时间。账不会说谎，写字的人会——所以只信时间戳。',
-          attributeBonus: { might: 0, wits: 3, charm: 0, nerve: 1, access: 1 },
-          resourceBonus: { energy: 0, credit: 480, standing: 9 },
-          startingItems: ['item_workbadge', 'item_paper_ledger', 'item_crt_terminal', 'item_personal_terminal'],
-        },
-        {
-          id: 'bg_path_discipline',
-          title: '在调查与核对上做事',
-          description:
-            '问话、誊抄、写便笺。法律没有规定辩护权，而你的笔迹也要归档。',
-          attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 2, access: 2 },
-          resourceBonus: { energy: 0, credit: 540, standing: 12 },
-          startingItems: ['item_workbadge', 'item_personal_terminal', 'item_coded_note', 'item_sedative_ampoule'],
-        },
-        {
-          id: 'bg_job_broker',
-          title: '做掮客与转手的买卖',
-          description:
-            '让东西动起来：抽成 12%，报价不解释。最怕下游被查时说出一个工号。',
-          attributeBonus: { might: 0, wits: 2, charm: 2, nerve: 2, access: 1 },
-          resourceBonus: { health: 0, energy: 0, credit: 1800, standing: -6 },
-          startingItems: ['item_coffee_token', 'item_credit_chip', 'item_pipe_map', 'item_coded_note'],
-        },
-        {
-          id: 'bg_job_pipewalker',
-          title: '钻管廊与通风道干活',
-          description:
-            '按工单挣钱，爬完一次咳一天。台账上写"传感器漂移"，你的本子上是三个振动值。',
-          attributeBonus: { might: 2, wits: 1, charm: 0, nerve: 1, access: 1 },
-          resourceBonus: { health: -5, energy: 5, credit: 300, standing: 3 },
-          startingItems: ['item_workbadge', 'item_dust_mask', 'item_ear_plugs', 'item_pipe_map'],
-        },
-        {
-          id: 'bg_job_rationclerk',
-          title: '在配给点上记账',
-          description:
-            '核对谁领了、谁替谁领。你的笔能让人少领 140 千卡，也能让他明天再来。',
-          attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 1 },
-          resourceBonus: { health: 0, energy: 0, credit: 340, standing: 6 },
-          startingItems: ['item_workbadge', 'item_paper_ledger', 'item_ration_stub', 'item_wired_phone'],
-        },
-        {
-          id: 'bg_job_nurse',
-          title: '在医务室与暗处之间做医护',
-          description:
-            '白天在正规医务室，晚上处理不能进医务室的人。风险按第六十三条与第七十一条并算。',
-          attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 3, access: 0 },
-          resourceBonus: { health: 0, energy: -5, credit: 900, standing: -3 },
-          startingItems: ['item_workbadge', 'item_sedative_ampoule', 'item_nano_patch', 'item_clinic_key'],
-        },
-        {
-          id: 'bg_job_undertaker',
-          title: '替人办后事',
-          description:
-            '替人凑材料、争那 20%、把遗体送进回收线。不收钱，只收"记名"。',
-          attributeBonus: { might: 0, wits: 1, charm: 3, nerve: 2, access: 0 },
-          resourceBonus: { health: 0, energy: 0, credit: 260, standing: 8 },
-          startingItems: ['item_workbadge', 'item_mourn_stub', 'item_paper_ledger', 'item_coded_note'],
-        },
-        {
-          id: 'bg_job_gambler',
-          title: '靠换班与消息挣钱',
-          description:
-            '不下矿、不坐班，用三个班次与三个人分别作保，总有一头是空的。',
-          attributeBonus: { might: 0, wits: 1, charm: 3, nerve: 2, access: 0 },
-          resourceBonus: { health: 0, energy: -5, credit: 620, standing: -4 },
-          startingItems: ['item_shift_chit', 'item_credit_chip', 'item_contraband_cigarette', 'item_ration_stub'],
-        },
-      ],
-    },
-    {
-      label: '隐秘',
-      options: [
-        {
-          id: 'bg_secret_echo',
-          title: '你是回声的联络人',
-          description:
-            '替回声投递手抄件，两个位置，做过七次。你从不知道另一条线是谁。',
-          attributeBonus: { might: 0, wits: 1, charm: 1, nerve: 2, access: 0 },
-          resourceBonus: { energy: 0, credit: 150, standing: -4 },
-          startingItems: ['item_workbadge', 'item_coded_note', 'item_pipe_map', 'item_forged_badge'],
-        },
-        {
-          id: 'bg_secret_laundry',
-          title: '你替黑市洗贡献点',
-          description:
-            '替人过账：转三次手，来源就模糊了。你抽 9%，也替人保管过额度。',
-          attributeBonus: { might: 0, wits: 2, charm: 2, nerve: 1, access: 1 },
-          resourceBonus: { credit: 1200, standing: -6 },
-          startingItems: ['item_workbadge', 'item_credit_chip', 'item_coffee_token', 'item_paper_ledger'],
-        },
-        {
-          id: 'bg_secret_sample',
-          title: '你藏着一份地表样本',
-          description:
-            '一小瓶土，四十七克，缝在内衬里。按第八十八条处理，处置是注销工牌。',
-          attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 3, access: 0 },
-          resourceBonus: { credit: 120, standing: -2 },
-          startingItems: ['item_workbadge', 'item_lead_case', 'item_unknown_seed', 'item_coded_note'],
-        },
-        {
-          id: 'bg_secret_forged',
-          title: '你伪造过职级档案',
-          description:
-            '假工牌用了十七个月。有人把它收进抽屉，此后每月付他 60 点。',
-          attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 1, access: 2 },
-          resourceBonus: { credit: -180, standing: -5 },
-          startingItems: ['item_workbadge', 'item_forged_badge', 'item_credit_chip', 'item_pipe_map'],
-        },
-        {
-          id: 'bg_secret_secondauth',
-          title: '你的工牌里有一段不属于你的权限',
-          description:
-            '一段不记录的权限，覆盖第 41 至 90 层。给你权限的人也在看你怎么用。',
-          attributeBonus: { might: 0, wits: 1, charm: 0, nerve: 2, access: 3 },
-          resourceBonus: { credit: 220, standing: 5 },
-          startingItems: ['item_workbadge', 'item_personal_terminal', 'item_pipe_map', 'item_bio_wristband'],
-        },
-        {
-          id: 'bg_secret_78c',
-          title: '你见过第 78-C 机房的封条被换',
-          description:
-            '封条完好，背面却有旧压痕。你写了"完好"，没写那 1.4 摄氏度。',
-          attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 2, access: 1 },
-          resourceBonus: { credit: 260, standing: 3 },
-          startingItems: ['item_workbadge', 'item_coded_note', 'item_paper_ledger', 'item_crt_terminal'],
-        },
-        {
-          id: 'bg_secret_stool',
-          title: '你替纪律监察部做过一次线人',
-          description:
-            '一次主动说明换来提前半年，代价是 41 个人的额度与一个你认得的工号。',
-          attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 2 },
-          resourceBonus: { health: 0, energy: 0, credit: 480, standing: 10 },
-          startingItems: ['item_workbadge', 'item_wire_recorder', 'item_coded_note', 'item_personal_terminal'],
-        },
-        {
-          id: 'bg_secret_signature',
-          title: '你手里有一条人命的签字',
-          description:
-            '一份调整单的第二联，折成四折。它是证据，也是一份不生效的自首书。',
-          attributeBonus: { might: 0, wits: 2, charm: 0, nerve: 3, access: 1 },
-          resourceBonus: { health: 0, energy: 0, credit: 420, standing: -2 },
-          startingItems: ['item_workbadge', 'item_coded_note', 'item_paper_ledger', 'item_grey_pass'],
-        },
-        {
-          id: 'bg_secret_deathcert',
-          title: '你伪造过一份死亡登记',
-          description:
-            '把死亡日期改后四十天，让最后一笔补贴发下去。档案里从此多了一条记录。',
-          attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 2, access: 0 },
-          resourceBonus: { health: 0, energy: 0, credit: 200, standing: -3 },
-          startingItems: ['item_workbadge', 'item_death_cert', 'item_paper_ledger', 'item_mourn_stub'],
-        },
-        {
-          id: 'bg_secret_101',
-          title: '你从第 101 层的封堵段里拿过东西',
-          description:
-            '从三厘米的裂缝里钩出两件东西。风是暖的，而图纸说那里没有热源。',
-          attributeBonus: { might: 1, wits: 2, charm: 0, nerve: 3, access: 1 },
-          resourceBonus: { health: 0, energy: 0, credit: 180, standing: -1 },
-          startingItems: ['item_sealed_sample', 'item_pipe_map', 'item_coded_note', 'item_workbadge'],
-        },
-      ],
-    },
+
+
     {
       label: '立场',
       options: [
@@ -1500,25 +1294,25 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           id: 'bg_scene_office',
           title: '在行政与审批线上做事',
           description:
-            '坐在办公室里签文件的人。能退回材料、能让一件事再等十一天，但上面还有两层人能推翻你。',
+            '坐在办公室里签文件、归档名册的人。能退回材料、能让一件事再等十一天，但上面还有两层人能推翻你。',
           attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 600, standing: 8 },
           startingItems: ['item_workbadge', 'item_personal_terminal', 'item_paper_ledger', 'item_credit_chip'],
         },
         {
           id: 'bg_scene_industry',
-          title: '在重工业区上工',
+          title: '在车间与管廊之间上工',
           description:
-            '在高温、粉尘与噪音里上工。配给比办公室多，命比办公室短；工段里认师傅，也认班次。',
+            '在高温、粉尘与机器噪音里上工，或者钻进一米一内径的通风道。配给比办公室多，命比办公室短。',
           attributeBonus: { might: 2, wits: 1, charm: 0, nerve: 1, access: 0 },
           resourceBonus: { health: 5, energy: 5, credit: 260, standing: 3 },
           startingItems: ['item_workbadge', 'item_steel_boots', 'item_dust_mask', 'item_ear_plugs'],
         },
         {
           id: 'bg_scene_service',
-          title: '在配给点与生活服务上做事',
+          title: '在配给点与账目上做事',
           description:
-            '所有人的吃、住、看病都从你桌前过。你的笔能让人少领 140 千卡，也能让他明天再来。',
+            '所有人的吃、住、看病与每一笔配给都从你桌前过。你的笔能让人少领 140 千卡，也能让他明天再来。',
           attributeBonus: { might: 0, wits: 1, charm: 2, nerve: 1, access: 1 },
           resourceBonus: { health: 0, energy: 0, credit: 340, standing: 6 },
           startingItems: ['item_workbadge', 'item_paper_ledger', 'item_ration_stub', 'item_wired_phone'],
@@ -1585,6 +1379,33 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           attributeBonus: { might: 1, wits: 2, charm: 1, nerve: 2, access: -1 },
           resourceBonus: { health: -5, energy: 0, credit: 40, standing: 0 },
           startingItems: ['item_grey_pass', 'item_ration_stub', 'item_forged_badge', 'item_algae_brick'],
+        },
+        {
+          id: 'bg_scene_security',
+          title: '在治安与巡逻上做事',
+          description:
+            '查闸机、控人群、写现场记录。成绩不看抓了多少人，看记录写得干不干净。',
+          attributeBonus: { might: 2, wits: 0, charm: 0, nerve: 2, access: 1 },
+          resourceBonus: { health: 10, energy: 10, credit: 280, standing: 6 },
+          startingItems: ['item_workbadge', 'item_steel_boots', 'item_coverall', 'item_bio_wristband'],
+        },
+        {
+          id: 'bg_scene_medic',
+          title: '在医务室与暗处之间做医护',
+          description:
+            '白天在正规医务室，晚上处理不能进医务室的人。风险按第六十三条与第七十一条并算。',
+          attributeBonus: { might: 0, wits: 2, charm: 1, nerve: 3, access: 0 },
+          resourceBonus: { health: 0, energy: -5, credit: 900, standing: -3 },
+          startingItems: ['item_workbadge', 'item_sedative_ampoule', 'item_nano_patch', 'item_clinic_key'],
+        },
+        {
+          id: 'bg_scene_undertaker',
+          title: '替人办后事',
+          description:
+            '替人凑材料、争那 20%、把遗体送进回收线。不收钱，只收"记名"。',
+          attributeBonus: { might: 0, wits: 1, charm: 3, nerve: 2, access: 0 },
+          resourceBonus: { health: 0, energy: 0, credit: 260, standing: 8 },
+          startingItems: ['item_workbadge', 'item_mourn_stub', 'item_paper_ledger', 'item_coded_note'],
         },
         {
           id: 'bg_scene_deputy',
@@ -2031,11 +1852,11 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
     openingSeeds: {
       开局处境: {
         bg_scene_office:
-          '日常是案牍：一份文件在几个部门之间走一圈，谁先看、谁后看、落谁的款、用谁的印，都有讲究；消息在走廊里比在公文里走得快。打交道的多是同级办事的人、来催件的班组代表，以及靠材料吃饭的中层。体面是从不出错，代价是出一次错就有人替你记着。手里有能办成事的权力，也有必须打的招呼；想办的事常常卡在"再议一议"四个字上。',
+          '日常是案牍：一份文件在几个部门之间走一圈，谁先看、谁后看、落谁的款、用谁的印，都有讲究；编制、考核与调动这类人和档案的事也压在同一批人手上。打交道的多是同级办事的人、来催件的班组代表，以及靠材料吃饭的中层。体面是从不出错，代价是出一次错就有人替你记着。手里有能办成事的权力，也有必须打的招呼；想办的事常常卡在"再议一议"四个字上。',
         bg_scene_industry:
-          '日常在作业面上：高温、粉尘、机器的低频噪音，一班十二小时，中间两次休息。打交道的是班组长、抬工、检修工，以及来收数的记账员。体面在于配给足、工段里认人；麻烦在于事故与"责任落实到人"这句话，落到班组一级就落到个人头上。想办的事大多得靠人情换：一次换班、一片滤芯、一个轻省的岗位。这一层的班次最紧，也最短命。',
+          '日常在作业面、管廊与台前：高温、粉尘、机器的低频噪音，一班十二小时；也有人钻进一米一内径、温度四十度的通风道，或者坐在台前抄参数、清洗数据。打交道的是班组长、抬工、检修工，以及来收数的记账员。体面在于配给足、工段里认人；麻烦在于事故与"责任落实到人"这句话，落到班组一级就落到个人头上。想办的事大多得靠人情换：一次换班、一片滤芯、一个轻省的岗位。这一层的班次最紧，也最短命。',
         bg_scene_service:
-          '日常在窗口与柜台后面：配给表、住房登记、门诊排期、食堂进出货，全都从手边过一遍。打交道的是排队的人、替领的人、来核数的记账员，以及偶尔来"看一看"的监察人员。体面在于没人敢跟你吵；麻烦在于这个位置人情债最密，每天都要在按表办与给人方便之间选一次。便利是消息快、路好走，掣肘是每一笔都要留痕。',
+          '日常在窗口与台账后面：配给表、住房登记、门诊排期、食堂进出货，以及每天要核一遍的领取记录，全都从手边过一遍。打交道的是排队的人、替领的人、来核数的记账员，以及偶尔来"看一看"的监察人员。体面在于没人敢跟你吵；麻烦在于这个位置人情债最密，每天都要在按表办与给人方便之间选一次。便利是消息快、路好走，掣肘是每一笔都要留痕，差额也要说得清。',
         bg_scene_discipline:
           '日常是记录与核对：问话很短，停顿很长，答话要一字不落抄下来。打交道的是被核对的人、同科室的人，以及来调卷宗的其他部门。体面在于没人愿意让你久等；麻烦在于每一次落笔都在替一套没有辩护环节的流程工作，而笔迹也要归档。便利是通行权限高，掣肘是任何一次判断失误都会被抽样翻出来。',
         bg_scene_farm:
@@ -2050,6 +1871,12 @@ NPC 不会主动解释设定。所有世界观信息都必须通过具体物件�
           '日常在角落的台子前：修旧终端、改不合规格的零件、替人办手续、替人看一张看不懂的纸。打交道的是慕名来的人、送货来的人，以及来问"这东西哪来的"的人。体面在于别人不会的东西你会；麻烦在于接下的每一件东西都带着来路，而你必须替对方保密。便利是不用排班，掣肘是活儿大半在灰色地带。',
         bg_scene_nobody:
           '日常在别人看不见的地方：找活儿、找住处、找一口热的，替人跑腿挣当天的钱。打交道的是同样没有号的人、偶尔施舍的熟人，以及来清人的治安员。体面在于制度管不到你；麻烦在于所有的门都假定你有一个可以追溯的过去，而你什么都没有。便利是能把任何东西带过任何闸机，掣肘是每一样筹码都是即时的。',
+        bg_scene_security:
+          '日常在闸机、街面与治安站之间：查牌、控人群、写现场记录，一次聚集要在 20 分钟内解散。打交道的是违规的人、来要说法的人、同队的人，以及事后调记录的其他部门。体面在于制服能让人自动让路；麻烦在于动手必须有记录支撑，记录写得不好，责任就落在执笔的人身上。便利是消息灵、通行不限，掣肘是每一次处置都要有人签名。',
+        bg_scene_medic:
+          '日常在诊室与宿舍之间：白天看门诊、换药、开处方，晚上处理那些不能进医务室的人。打交道的是工伤的人、不敢报案的人、来查药品流向的人，以及替你顶班的同事。体面在于手艺能换人情；麻烦在于非法医疗的处置依据是第六十三条与第七十一条并用，一旦被认定没有警告环节。便利是能接触到从废弃物口流出的药品，掣肘是每一支药都要能说清来路。',
+        bg_scene_undertaker:
+          '日常在宿舍、班组与回收线之间：替一户人家把死亡手续办完，凑材料、找签字、争那 20% 的余额返还。打交道的是死者家属、班组长、配给点的记账员，以及偶尔来核对名册的人。体面在于浅层认你，因为谁都可能用到你；麻烦在于手上的本子是一份没有账目的账，上面记着谁欠谁、谁家半年里死了两个人。便利是消息比别人早一步，掣肘是每一笔都要有指印。',
         bg_scene_deputy:
           '日常在会议与批件之间：定方向、分任务、看下面报上来的数，再决定哪一件先办。打交道的是同级、上级，以及来要资源的其他部门。体面在于不用排队、一个电话就能让人加班；麻烦在于不能决定总额，也不能拒绝一场与你无关的会，签字位随时可以被收回。便利是能看到全局，掣肘是每个决定都要落到纸上。',
         bg_scene_bureau_chief:

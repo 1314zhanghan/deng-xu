@@ -121,6 +121,19 @@ const emptyState = JSON.parse(await ev(`(()=>{const T=document.body.innerText;
 check('进入了我的主角页', emptyState.onPage)
 check('空状态文案在', emptyState.empty)
 check('有新建按钮', emptyState.hasNewBtn)
+
+/*
+  主角卡的导出 / 导入入口。
+  为什么要测：预设只存在本机 IndexedDB 里，换机器或清站点数据就会丢，
+  所以"能把主角带走一份"是这个功能的全部意义 —— 入口不见了就等于功能没了。
+*/
+const ioBtns = JSON.parse(await ev(`(()=>{const T=[...document.querySelectorAll('button')].map(b=>(b.textContent||'').trim());
+  return JSON.stringify({
+    imp: T.some(t=>/导入/.test(t)),
+    exp: T.some(t=>/导出全部/.test(t)),
+  })})()`))
+check('有「导入」入口', ioBtns.imp)
+check('有「导出全部」入口', ioBtns.exp)
 await shot('heroes-01-empty')
 
 check('点新建', await clickText('/新建主角|设定第一位主角/') === 'ok')

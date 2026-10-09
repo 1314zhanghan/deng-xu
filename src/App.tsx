@@ -20,7 +20,7 @@ import { useGameStore } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { useUIStore } from '@/stores/ui'
 import { useGameEngine } from '@/hooks/useGameEngine'
-import { X, AlertTriangle } from 'lucide-react'
+import { X, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react'
 import { lazyWithRetry, appLoadedCleanly } from '@/utils/lazyWithRetry'
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SceneBackdrop } from '@/components/SceneBackdrop'
@@ -63,6 +63,11 @@ function App() {
   const isMobileMenuOpen = useUIStore(s => s.mobileMenuOpen)
   const setIsMobileMenuOpen = useUIStore(s => s.setMobileMenuOpen)
   const [rightPanelTab, setRightPanelTab] = useState<'inventory' | 'relationships'>('inventory')
+  /**
+   * 错误横幅是否展开。
+   * 默认收起（显示两行），因为服务商原始报错很长，全量铺开在手机上要吃掉 5 行。
+   */
+  const [errExpanded, setErrExpanded] = useState(false)
   /**
    * 手机端当前打开的面板抽屉；null = 都关着。
    *
@@ -285,11 +290,33 @@ function App() {
           </div>
         )}
 
-        {/* 错误提示 */}
+        {/*
+          错误提示。
+          ⚠️ **手机上必须默认截断**：服务商的原始报错很长
+          （"Authentication Fails, Your api key: **** is invalid (request_id: 8c67da0f-…)"
+          ＋ 中文建议），全量铺开会占掉 5 行、把叙事区顶下去 ——
+          而玩家此刻只需要知道"出错了、点重试"。
+          所以：默认收成两行，点一下才展开全文。
+        */}
         {lastError && (
           <div className="flex items-start gap-2 px-4 py-2 text-xs bg-red-900/20 border-b border-red-900/40 text-red-300">
             <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
-            <span className="leading-relaxed flex-1 min-w-0">{lastError}</span>
+            <div
+              onClick={() => setErrExpanded(v => !v)}
+              className={`leading-relaxed flex-1 min-w-0 cursor-pointer ${errExpanded ? '' : 'line-clamp-2'}`}
+              title={errExpanded ? '点击收起' : '点击展开全文'}
+            >
+              {lastError}
+            </div>
+            {lastError.length > 60 && (
+              <button
+                onClick={() => setErrExpanded(v => !v)}
+                className="shrink-0 p-0.5 text-red-400/70 hover:text-red-200 transition-colors"
+                aria-label={errExpanded ? '收起错误详情' : '展开错误详情'}
+              >
+                {errExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              </button>
+            )}
             {/*
               加一个重试出口。
               之前这里只有文字：生成失败后玩家知道了原因，却没有任何可点的动作 ——

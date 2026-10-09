@@ -45,7 +45,22 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #525252; 
+  background: #525250; 
+}
+
+/*
+  横向可滚动、但不显示滚动条。
+  给**手机上的页签栏**用：世界书预览有四个分页（概览/人物/设定/资料），
+  在 390px 宽里塞不下，只能横滚；可横滚区域再画一条 6px 的滚动条很难看，
+  而且会占掉本来就紧张的高度。
+  触摸滚动与惯性照常，只是不画。
+*/
+.no-scrollbar {
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* 旧 Edge / IE */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;              /* Chromium / WebKit */
 }
 
 /*
