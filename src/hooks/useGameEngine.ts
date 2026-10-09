@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useGameStore, type GameState } from '@/stores/game'
+import { useGameStore, countTurns, type GameState, type TokenUsage } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { useUIStore } from '@/stores/ui'
 import { useMetaStore } from '@/stores/meta'
@@ -14,6 +14,7 @@ import {
 import { storySystem } from '@/systems/StorySystem'
 import { pickAvatarId } from '@/utils/avatarArt'
 import { isKnownSceneId } from '@/utils/sceneArt'
+import { renderMemoryForPrompt } from '@/utils/memory'
 import { LlmError, classifyLlmError } from '@/api/llmErrors'
 import type { LLMConfig, WorldCard } from '@/types/cards'
 import { detectTruncation } from '@/utils/truncation'
@@ -21,6 +22,7 @@ import {
   needsArchive,
   isHistoryPressureHigh,
   archiveOldMessages,
+  clearArchive,
   type HistoryMessage,
 } from '@/utils/historyArchive'
 
@@ -160,6 +162,124 @@ function formatEngineError(error: unknown): string {
 }
 import { useLibraryStore } from '@/stores/library'
 
+/**
+ * 估算一次调用的 token 数（C9）。
+ *
+ * 为什么需要估算：只有一部分 OpenAI 兼容端点会在响应里回 `usage`
+ * （流式响应里尤其少见 —— 多数服务商只在最后一个 chunk 才带，很多干脆不带）。
+ * 而"看不到花了多少"正是这一项要解决的问题，所以拿不到时按字符数估。
+ *
+ * 系数取 1/1.5：中文大约 1 字 ≈ 0.7~1 token（各家分词器有别），
+ * ASCII 更省。用 1.5 做除数略微**偏保守**（估出来的数偏小），
+ * 免得让玩家把估算值当成比实际更贵的账单。
+ *
+ * ⚠️ 估算值一律带上 `estimated: true`，界面上必须与真实 usage 区分显示。
+ */
+export function estimateTokens(text: string): number {
+  const n = (text || '').length
+  return n === 0 ? 0 : Math.max(1, Math.round(n / 1.5))
+}
+
+/**
+ * 从一次 LLM 响应里取出用量。
+ *
+ * @param response 原始响应（非流式为解析后的 JSON；流式由调用方另行提供 usage）
+ * @param promptMessages 本次请求的输入消息（用于估算 prompt 部分）
+ * @param output 本次产出的文本（用于估算 completion 部分）
+ */
+export function usageFromResponse(
+  response: any,
+  promptMessages: ChatMessage[],
+  output: string,
+): TokenUsage {
+  const u = response?.usage
+  const promptTokens = Number(u?.prompt_tokens)
+  const completionTokens = Number(u?.completion_tokens)
+
+  if (Number.isFinite(promptTokens) || Number.isFinite(completionTokens)) {
+    const p = Number.isFinite(promptTokens) ? promptTokens : estimateTokens(promptMessages.map(m => m.content).join(''))
+    const c = Number.isFinite(completionTokens) ? completionTokens : estimateTokens(output)
+    return {
+      promptTokens: p,
+      completionTokens: c,
+      // total 自己算，不信服务商给的 total_tokens：有些端点会把它漏掉或算错
+      totalTokens: p + c,
+      estimated: false,
+    }
+  }
+
+  const p = estimateTokens(promptMessages.map(m => m.content).join(''))
+  const c = estimateTokens(output)
+  return { promptTokens: p, completionTokens: c, totalTokens: p + c, estimated: true }
+}
+
+/**
+ * 把叙事历史渲染成**带轮次编号**的文本。
+ *
+ * 轮次是记忆分层的骨架：摘要 AI 要靠它产出 `timeline[].turn`，
+ * 而 B8 的回溯也以同一套编号定位。没有编号，模型只能写
+ * "他们先去了码头，后来去了酒馆" —— 那种时间线既撑不起回溯，
+ * 也让玩家问不出"我们之前干过什么"。
+ *
+ * 轮次的定义：**每一条 assistant 消息算一轮**（与 gameStore.countTurns 同一口径）。
+ * 这里传入的已经是切片后的窗口，所以要带上起始偏移 `firstTurn`。
+ */
+export function formatHistoryWithTurns(
+  history: { role: string; content: string }[],
+  firstTurn: number,
+): string {
+  let turn = firstTurn
+  const out: string[] = []
+  for (const h of history) {
+    if (h.role === 'assistant') {
+      out.push(`[第${turn}轮 · 叙事] ${h.content}`)
+      turn += 1
+    } else if (h.role === 'user') {
+      out.push(`[第${turn}轮 · 玩家行动] ${h.content}`)
+    }
+  }
+  return out.join('\n')
+}
+
+/**
+ * 从一行 SSE 原始数据里抠出 `usage`。
+ *
+ * 为什么要单独做：流式响应里服务商通常**只在最后一个 chunk**附带 usage
+ * （有的干脆不带）。`parseSseLine` 只关心正文与推理增量，看不到它 ——
+ * 而"这一轮花了多少 token"正是 C9 要显示的东西。拿不到就退回估算，
+ * 但**能拿到就该拿到**：真实 token 数与估算值能差 20% 以上。
+ */
+export function parseSseUsage(line: string): TokenUsage | null {
+  if (!line.startsWith('data:')) return null
+  const payload = line.slice(5).trim()
+  if (!payload || payload === '[DONE]') return null
+  try {
+    const json = JSON.parse(payload)
+    const u = json?.usage
+    if (!u) return null
+    const p = Number(u.prompt_tokens)
+    const c = Number(u.completion_tokens)
+    if (!Number.isFinite(p) && !Number.isFinite(c)) return null
+    const promptTokens = Number.isFinite(p) ? p : 0
+    const completionTokens = Number.isFinite(c) ? c : 0
+    return {
+      promptTokens,
+      completionTokens,
+      totalTokens: promptTokens + completionTokens,
+      estimated: false,
+    }
+  } catch {
+    return null
+  }
+}
+
+/** 流式响应关闭后，正文已经完整拿到 —— 用来把"没回 usage"的那一半补成估算 */
+export function estimateMissingCompletion(usage: TokenUsage, output: string): TokenUsage {
+  if (usage.estimated || usage.completionTokens > 0) return usage
+  const c = estimateTokens(output)
+  return { ...usage, completionTokens: c, totalTokens: usage.promptTokens + c }
+}
+
 interface GameEngineReturn {
   handleAction: (actionId: string, actionText: string) => Promise<void>
   retryLastAction: () => Promise<void>
@@ -175,6 +295,17 @@ interface GameEngineReturn {
   debugDataInput: string | null
   debugDataOutput: string | null
   isInputAllowed: boolean
+  /** 当前是第几轮（= 已完成的叙事段数），供回溯 UI 定位 */
+  turnCount: number
+  /** 可回溯到的轮次列表（升序）；空数组表示还没攒下快照 */
+  rewindTurns: number[]
+  /**
+   * 回到第 N 轮结束时（B8）。
+   *
+   * 返回是否真的回滚了：快照不存在（例如超过 MAX_TURN_SNAPSHOTS）时返回 false，
+   * 由 UI 明确告诉玩家"这一轮回不去了"，而不是假装成功。
+   */
+  rewindToTurn: (turnIndex: number) => boolean
 }
 
 export function useGameEngine(): GameEngineReturn {
@@ -192,7 +323,13 @@ export function useGameEngine(): GameEngineReturn {
   const [truncationWarning, setTruncationWarning] = useState<string | null>(null)
   const [streamingContent, setStreamingContent] = useState<string | null>(null)
   const [streamingReasoning, setStreamingReasoning] = useState<string | null>(null)
-  const [turnCount, setTurnCount] = useState(0)
+  /*
+    ⚠️ 这里**故意没有**"本轮是第几轮"的 useState。
+    轮次来自 `countTurns(history)` —— 它是唯一可信的来源：回溯会**真的截短历史**，
+    任何本地计数器都必须跟着手动重置，而只要有一处忘了重置，
+    摘要节流与时间线编号就会和存档对不上（且不会报错，只会慢慢地错）。
+    参考上一版的教训：本地的 turnCount 与 history 各自演化，正是这类不一致的温床。
+  */
   const [lastAction, setLastAction] = useState<{ id: string; text: string } | null>(null)
   const [debugDataInput, setDebugDataInput] = useState<string | null>(null)
   const [debugDataOutput, setDebugDataOutput] = useState<string | null>(null)
@@ -227,7 +364,7 @@ export function useGameEngine(): GameEngineReturn {
     const {
       resources, aspects, inventory, location, tags, story, knownFacts, readBooks,
       masteredLores, rites, languages, characters, unlockedDoors, time, identity,
-      summary, playerName, playerGender, playerAppearance, turnsSinceLastMajorEvent,
+      summary, memory, playerName, playerGender, playerAppearance, turnsSinceLastMajorEvent,
       attributeDefs, resourceDefs
     } = currentState
 
@@ -324,7 +461,19 @@ export function useGameEngine(): GameEngineReturn {
       },
       userAction: actionText,
       storyContext: storyContext || undefined,
-      previousSummary: summary || undefined
+      previousSummary: summary || undefined,
+      /*
+        把三层记忆也交给数据 AI，让它知道**已经记下了什么**。
+        没有这一段，它会反复"重新发现"同一段关系、或者把已经了结的线索再列一遍 ——
+        记忆于是越滚越长，最后撑爆 900 字预算，把真正新的信息挤出去。
+      */
+      currentMemory: {
+        bonds: memory?.bonds ?? [],
+        threads: memory?.threads ?? [],
+        timeline: memory?.timeline ?? [],
+      },
+      /** 数据 AI 写时间线时要用它当 turn（"这一轮是第几轮"） */
+      turn: countTurns(currentState.history),
     })
   }
 
@@ -427,6 +576,12 @@ export function useGameEngine(): GameEngineReturn {
                 cid,
                 useGameStore.getState().characters.map(c => (c.id === cid ? undefined : c.avatarId))
               ),
+              /*
+                部件级外观：数据 AI **不生成**它（prompt 里没有这个字段），
+                但世界卡自带的角色可能已经带了 —— 透传一次，
+                免得 AI 重新描述这个角色时把立绘的可控外观抹掉。
+              */
+              look: change.payload.look,
             })
             summaryLines.push(`登场人物：${change.payload.name}`)
           }
@@ -554,29 +709,94 @@ export function useGameEngine(): GameEngineReturn {
     }
   }
 
-  /** 历史压缩 */
+  /**
+   * 记录一次调用的用量。
+   *
+   * @param override 已经算好的用量（流式响应从 SSE 的 usage 字段取）；
+   *                 给了它就**不要**再按字符估 —— 真实值优先。
+   */
+  const recordUsage = (
+    response: any,
+    promptMessages: ChatMessage[],
+    output: string,
+    override?: TokenUsage | null,
+  ) => {
+    // 估算需要**真实的输入消息**：只按输出估会严重低估（提示词里有世界设定、
+    // 角色档案、记忆三层，往往比输出还长）
+    useGameStore.getState().recordUsage(
+      override || usageFromResponse(response, promptMessages, output),
+    )
+  }
+
+  /**
+   * 历史压缩 —— 同时增量更新三层记忆（A1）。
+   *
+   * 这是**唯一**会动 `summary` / `bonds` / `threads` 的地方：它本来就每 6 轮跑一次、
+   * 要通读最近一段剧情，所以"顺手产出记忆"几乎不额外花 token。
+   * 每轮都跑一次是不可接受的（那等于把 LLM 调用次数翻倍）。
+   */
   const summarizeHistory = async () => {
-    const { history, summary, updateSummary } = useGameStore.getState()
+    const { history, summary, memory, patchMemory, updateSummary } = useGameStore.getState()
     if (history.length < 12) return
 
     const olderHistory = history.slice(0, -12)
-    const textToSummarize = olderHistory
-      .filter(h => h.role !== 'system')
-      .map(h => `${h.role === 'user' ? '玩家' : '叙事'}：${h.content}`)
-      .join('\n')
+    const cleanOlder = olderHistory.filter(h => h.role !== 'system')
+    if (!cleanOlder.length) return
+
+    /*
+      只把 **新的那一段** 交给模型（最后 12 条留在热历史里，不重复压缩）。
+      编号从 1 开始 —— 这是"本次被压缩的这段剧情里的第几轮"，不是全局轮次。
+      相对编号够用：模型同时能看到 `memory.timeline` 里已记录的真实轮次（见 buildSummaryPrompt），
+      而**同一轮的覆盖**是按 turn 值相等来判定的，所以不会把第 3 轮的记录
+      误写到第 9 轮的格子里；重叠的那几轮最多让模型把同一件事重写一遍。
+    */
+    const textToSummarize = formatHistoryWithTurns(cleanOlder, 1)
     if (!textToSummarize.trim()) return
 
     const config = useUIStore.getState().llm
+    const prompt = buildSummaryPrompt(summary, textToSummarize, memory)
+    const messages: ChatMessage[] = [{ role: 'user', content: prompt }]
+
     try {
       const response = await llmChat({
-        messages: [{ role: 'user', content: buildSummaryPrompt(summary, textToSummarize) }],
+        messages,
         config,
         model: config.analysisModel,
         stream: false,
         temperature: 0.3
       })
-      const newSummary = extractContent(response)
-      if (newSummary) updateSummary(newSummary)
+      const raw = extractContent(response)
+      recordUsage(response, messages, raw)
+
+      /*
+        摘要 AI 现在返回的是 JSON（带三层记忆）。
+        ⚠️ 但**不能假设它一定照做**：模型可能返回一段纯文本（旧提示词、
+        被截断、或者干脆不听话）。那种情况下必须退回"把整段当成新摘要"，
+        否则这一局的记忆就永远停止更新了 —— 而这正是要修的问题本身。
+      */
+      let parsed: any = null
+      try {
+        parsed = parseModelJson(raw).value as any
+      } catch {
+        parsed = null
+      }
+
+      if (parsed && typeof parsed === 'object') {
+        if (typeof parsed.summary === 'string' && parsed.summary.trim()) {
+          updateSummary(parsed.summary.trim())
+        }
+        const patch = parsed.memory
+        if (patch && typeof patch === 'object') {
+          patchMemory({
+            bonds: patch.bonds,
+            threads: patch.threads,
+            timeline: patch.timeline,
+            earlierSummary: typeof patch.earlierSummary === 'string' ? patch.earlierSummary : undefined,
+          })
+        }
+      } else if (raw.trim()) {
+        updateSummary(raw.trim())
+      }
     } catch (e) {
       // 摘要失败不该打断游戏
       console.warn('Summarization failed', e)
@@ -607,9 +827,16 @@ export function useGameEngine(): GameEngineReturn {
     setLastError(null)
     setStreamingContent('')
     setStreamingReasoning('')
+    // 本轮开始就把"上一轮的用量"清掉：留着它会让玩家以为本轮已经花了那么多
+    useGameStore.getState().clearLastUsage()
 
-    if (turnCount > 0 && turnCount % 6 === 0) summarizeHistory()
-    setTurnCount(prev => prev + 1)
+    // 摘要节流：每 6 轮压缩一次。用"已经写完的轮数"而不是组件本地的计数器 ——
+    // 本地计数器在回溯时必须手动重置，一旦忘了就会按错误的节奏跑摘要
+    const completedTurns = countTurns(useGameStore.getState().history)
+    if (completedTurns > 0 && completedTurns % 6 === 0) summarizeHistory()
+
+    // 这一轮是全局第几轮 —— 时间线、快照、回溯定位都用这一个编号
+    const turnNumber = completedTurns + 1
 
     try {
       // —— 装载章节卡，保证事件表与当前世界一致 ——
@@ -690,9 +917,26 @@ export function useGameEngine(): GameEngineReturn {
       useUIStore.getState().setStatusMessage('正在生成叙事…')
       const context = buildContext(actionText, useGameStore.getState(), currentStoryContext)
 
+      /*
+        三层记忆的注入位置（A1）。
+        放在"前情摘要"**之后**、历史之前，理由有两条：
+         1. 它比摘要更结构化（关系/线索/按轮次的事件），模型读条目比读散文更容易照做；
+         2. 紧挨着历史，模型会把它当成"读这段历史的索引"，
+            而不是一段需要重新总结的旧文本。
+        为空时**完全不注入**（renderMemoryForPrompt 返回空串）：
+        一个只有标题没有内容的空区块只会浪费 token，并让模型以为记忆丢了。
+      */
+      const memoryBlock = renderMemoryForPrompt(updatedStore.memory)
+
       const narrativeMessages: ChatMessage[] = [
         { role: 'system', content: buildNarrativeSystemPrompt(activeWorld, activeCharacters, player) },
         ...(updatedStore.summary ? [{ role: 'system' as const, content: `[前情摘要]\n${updatedStore.summary}` }] : []),
+        ...(memoryBlock
+          ? [{
+              role: 'system' as const,
+              content: `[长期记忆]（前几轮留下的要点，请当作**已经发生的事实**，不要与之矛盾）\n${memoryBlock}`,
+            }]
+          : []),
         ...updatedStore.history
           .slice(-12)
           .filter(h => h.role !== 'system')
@@ -714,6 +958,8 @@ export function useGameEngine(): GameEngineReturn {
       let fullNarrative = ''
       let fullReasoning = ''
       let buffer = ''
+      /** 服务商在流里回的 usage（通常只在最后一个 chunk 带一次） */
+      let streamUsage: TokenUsage | null = null
 
       while (true) {
         const { done, value } = await reader.read()
@@ -725,6 +971,8 @@ export function useGameEngine(): GameEngineReturn {
         buffer = lines.pop() ?? ''
 
         for (const line of lines) {
+          const usage = parseSseUsage(line.trim())
+          if (usage) streamUsage = usage
           const chunk = parseSseLine(line.trim())
           if (!chunk) continue
           if (chunk.reasoning) {
@@ -738,13 +986,28 @@ export function useGameEngine(): GameEngineReturn {
         }
       }
       // 处理残留缓冲
-      const tail = parseSseLine(buffer.trim())
+      const tailLine = buffer.trim()
+      const tailUsage = parseSseUsage(tailLine)
+      if (tailUsage) streamUsage = tailUsage
+      const tail = parseSseLine(tailLine)
       if (tail?.content) {
         fullNarrative += tail.content
         setStreamingContent(fullNarrative)
       }
 
       if (!fullNarrative.trim()) throw new Error('模型返回了空内容，请检查模型名称与接口地址。')
+
+      /*
+        记录第一段（叙事）的用量。
+        流里没回 usage 时退回估算 —— 但**别丢掉已经拿到的 prompt 数**：
+        只有 completion 缺失时补它（见 estimateMissingCompletion）。
+      */
+      recordUsage(
+        null,
+        narrativeMessages,
+        fullNarrative,
+        streamUsage ? estimateMissingCompletion(streamUsage, fullNarrative) : null,
+      )
 
       /*
         截断检测。
@@ -796,82 +1059,143 @@ export function useGameEngine(): GameEngineReturn {
       // 不会等撞到 5MB 配额、写入静默失败之后才发现。
       void maybeArchiveHistory()
 
-      // —— 第二阶段：数据结算 ——
-      useUIStore.getState().setStatusMessage('正在结算世界状态…')
-      setIsAnalyzingData(true)
+      /*
+        ── 第二阶段：数据结算（快速模式下跳过）──
 
-      const afterNarrative = useGameStore.getState()
-      const dataAnalysisContext = JSON.stringify({
-        userAction: actionText,
-        userActionType: actionType,
-        narrativeOutput: fullNarrative,
-        storyContext: currentStoryContext,
-        currentState: {
-          attributes: Object.fromEntries(
-            afterNarrative.attributeDefs.map(d => [d.id, afterNarrative.aspects[d.id] ?? 0])
-          ),
-          resources: Object.fromEntries(
-            afterNarrative.resourceDefs.map(d => [
-              d.id,
-              { 名称: d.name, 当前: afterNarrative.resources[d.id] ?? 0, 上限: d.max ?? null }
-            ])
-          ),
-          inventory: afterNarrative.inventory,
-          facts: afterNarrative.facts,
-          story: afterNarrative.story,
-          characters: afterNarrative.characters,
-          location: afterNarrative.location,
-          sceneId: afterNarrative.sceneId,
-          time: afterNarrative.time
-        }
-      })
-      setDebugDataInput(dataAnalysisContext)
+        为什么把开关放在这里，而不是"少发一个请求"这么简单：
+        分析阶段是**唯一**会更新数值、物品、关系、选项的地方。
+        跳过它就以"状态不再变化"为代价换速度与钱 ——
+        这个代价必须由玩家知情地选择（UI 上写明了），
+        并且此时**仍然**要往时间线记一拍：记忆属于叙事层，
+        不应该因为省了一次结算调用就把"这一轮发生过什么"丢掉。
+      */
+      const fastMode = useUIStore.getState().fastMode
+      if (fastMode) {
+        useGameStore.getState().appendTimeline(turnNumber, `${actionText} → ${finalNarrative}`)
+        setDebugDataInput('[快速模式] 已跳过分析阶段，本轮不更新数值与状态')
+        setDebugDataOutput('[快速模式] 未发起数据结算调用')
+      } else {
+        // —— 第二阶段：数据结算 ——
+        useUIStore.getState().setStatusMessage('正在结算世界状态…')
+        setIsAnalyzingData(true)
 
-      const dataResponse = await llmChat({
-        messages: [
+        const afterNarrative = useGameStore.getState()
+        const dataAnalysisContext = JSON.stringify({
+          userAction: actionText,
+          userActionType: actionType,
+          narrativeOutput: fullNarrative,
+          storyContext: currentStoryContext,
+          currentState: {
+            attributes: Object.fromEntries(
+              afterNarrative.attributeDefs.map(d => [d.id, afterNarrative.aspects[d.id] ?? 0])
+            ),
+            resources: Object.fromEntries(
+              afterNarrative.resourceDefs.map(d => [
+                d.id,
+                { 名称: d.name, 当前: afterNarrative.resources[d.id] ?? 0, 上限: d.max ?? null }
+              ])
+            ),
+            inventory: afterNarrative.inventory,
+            facts: afterNarrative.facts,
+            story: afterNarrative.story,
+            characters: afterNarrative.characters,
+            location: afterNarrative.location,
+            sceneId: afterNarrative.sceneId,
+            time: afterNarrative.time,
+            /** 这一轮是第几轮 —— 数据 AI 写时间线时要抄这个数字 */
+            turn: turnNumber,
+            /** 已经记下的三层记忆，避免它把同一件事反复重新记录 */
+            memory: {
+              bonds: afterNarrative.memory?.bonds ?? [],
+              threads: afterNarrative.memory?.threads ?? [],
+              timeline: afterNarrative.memory?.timeline ?? [],
+            }
+          }
+        })
+        setDebugDataInput(dataAnalysisContext)
+
+        const dataMessages: ChatMessage[] = [
           { role: 'system', content: buildDataSystemPrompt(activeWorld) },
           { role: 'user', content: dataAnalysisContext }
-        ],
-        config,
-        model: config.analysisModel,
-        stream: false,
-        temperature: 0.2,
-        jsonMode: true
-      })
+        ]
 
-      const dataContent = extractContent(dataResponse)
-      setDebugDataOutput(dataContent)
+        const dataResponse = await llmChat({
+          messages: dataMessages,
+          config,
+          model: config.analysisModel,
+          stream: false,
+          temperature: 0.2,
+          jsonMode: true
+        })
 
-      try {
-        const parsed = parseModelJson(dataContent).value as any
-        if (!parsed || typeof parsed !== 'object') {
-          throw new Error('解析结果不是对象')
-        }
+        const dataContent = extractContent(dataResponse)
+        setDebugDataOutput(dataContent)
+        recordUsage(dataResponse, dataMessages, dataContent)
 
-        // 章节卡的关键选项按拖延程度注入
-        if (pendingKeyOptions.length > 0) {
-          const currentTurns = useGameStore.getState().turnsSinceLastMajorEvent
-          if (currentTurns >= activeWorld.story.urgencyAfterTurns) {
-            parsed.options = pendingKeyOptions
-          } else if (currentTurns >= 2) {
-            const existingIds = new Set((parsed.options || []).map((o: any) => o.id))
-            parsed.options = [
-              ...(parsed.options || []),
-              ...pendingKeyOptions.filter(o => !existingIds.has(o.id))
-            ]
+        let parsed: any = null
+        try {
+          parsed = parseModelJson(dataContent).value as any
+          if (!parsed || typeof parsed !== 'object') {
+            throw new Error('解析结果不是对象')
           }
+
+          // 章节卡的关键选项按拖延程度注入
+          if (pendingKeyOptions.length > 0) {
+            const currentTurns = useGameStore.getState().turnsSinceLastMajorEvent
+            if (currentTurns >= activeWorld.story.urgencyAfterTurns) {
+              parsed.options = pendingKeyOptions
+            } else if (currentTurns >= 2) {
+              const existingIds = new Set((parsed.options || []).map((o: any) => o.id))
+              parsed.options = [
+                ...(parsed.options || []),
+                ...pendingKeyOptions.filter(o => !existingIds.has(o.id))
+              ]
+            }
+          }
+
+          handleStateChanges(parsed.stateChanges)
+
+          const options = activeWorld.story.enableChoices ? (parsed.options || []) : []
+          useGameStore.getState().setCurrentOptions(options)
+        } catch (e) {
+          console.error('Failed to parse Data AI response', e)
+          setLastError('数据结算返回的内容无法解析为 JSON（已重试截断解析）。可点开右下角调试面板查看原始输出。')
         }
 
-        handleStateChanges(parsed.stateChanges)
+        /*
+          三层记忆的**每轮**更新（A1）。
+          摘要 AI 每 6 轮才跑一次（那是唯一会花掉一次完整调用代价的地方），
+          但时间线必须每轮都有 —— 否则第 5 轮玩家点回溯时，
+          时间线上根本没有第 3 轮，而"回到第 N 轮"正是靠它给出落点的。
+          这里优先用数据 AI 给的措辞（它刚读过这一段叙事，写得比机械截取准）；
+          解析失败时也要补一条机械记录 —— 玩家确实看到了这段叙事，
+          让它在记忆里凭空消失比记一条粗糙的更糟。
+        */
+        const memoryPatch = parsed?.memory && typeof parsed.memory === 'object' ? parsed.memory : null
+        if (memoryPatch) {
+          useGameStore.getState().patchMemory({
+            bonds: memoryPatch.bonds,
+            threads: memoryPatch.threads,
+            timeline: memoryPatch.timeline,
+          })
+        }
+        if (!memoryPatch?.timeline?.length) {
+          const beat = typeof parsed?.summary === 'string' && parsed.summary.trim()
+            ? parsed.summary.trim()
+            : `${actionText} → ${finalNarrative}`
+          useGameStore.getState().appendTimeline(turnNumber, beat)
+        }
 
-        const options = activeWorld.story.enableChoices ? (parsed.options || []) : []
-        useGameStore.getState().setCurrentOptions(options)
-      } catch (e) {
-        console.error('Failed to parse Data AI response', e)
-        setLastError('数据结算返回的内容无法解析为 JSON（已重试截断解析）。可点开右下角调试面板查看原始输出。')
+        setIsAnalyzingData(false)
       }
 
-      setIsAnalyzingData(false)
+      /*
+        一轮**完整走完**才拍快照（B8）。
+        放在这里而不是 try 的开头：结算半途失败的那一轮不留快照，
+        否则回溯会退回到一个"叙事有了、数值没结算"的残缺状态 ——
+        那种不一致比不能回溯更难查。
+      */
+      useGameStore.getState().pushTurnSnapshot(turnNumber)
     } catch (error: any) {
       console.error('Game Engine Error:', error)
       setLastError(formatEngineError(error))
@@ -887,6 +1211,12 @@ export function useGameEngine(): GameEngineReturn {
   const handleAction = async (actionId: string, actionText: string) => {
     const currentStore = useGameStore.getState()
 
+    /*
+      给"重新生成"留一份**可复现这一步**的状态。
+      注意顺序：必须在下面"结算章节卡事件效果 / 风格标签加属性"**之前**拍 ——
+      那些副作用会改数值，拍在它们之后就等于把副作用**算了两次**
+      （玩家点一次重新生成，属性凭空 +2，而且只在有 style 的选项上出现，极难复现）。
+    */
     currentStore.saveSnapshot()
     useUIStore.getState().setStatusMessage('处理行动中…')
 
@@ -921,14 +1251,67 @@ export function useGameEngine(): GameEngineReturn {
     return processTurn(actionText, actionType)
   }
 
+  /**
+   * 重新生成上一轮。
+   *
+   * 完整顺序，缺一不可：
+   *  1. `restoreSnapshot()` —— 回到"这一步开始之前"（含 history 与三层记忆）；
+   *  2. 清掉 `lastAction` —— 否则 handleAction 里的 setLastAction 会拿它当新值，
+   *     而更长的一串后果是：重试 N 次后"重新生成"的语义开始漂移
+   *     （它可能指向更早的一次行动）；
+   *  3. 再跑一次同样的行动 —— handleAction 会重新拍一份快照，
+   *     于是玩家可以反复重试，每次的起点都一致。
+   */
   const retryLastAction = async () => {
     if (!lastAction) return
+    const { id, text } = lastAction
     const currentStore = useGameStore.getState()
     if (currentStore.lastStateSnapshot) {
       currentStore.restoreSnapshot()
     }
+    setLastAction(null)
     useUIStore.getState().setStatusMessage('重新生成中…')
-    return handleAction(lastAction.id, lastAction.text)
+    return handleAction(id, text)
+  }
+
+  /**
+   * 回到第 N 轮结束时（B8）。
+   *
+   * 为什么放在引擎层而不是让 UI 直接调 `gameStore.rewindTo`：
+   * 回滚之后还有几件**引擎自己的**状态要一起复位，漏掉任何一件都会让
+   * 界面和存档对不上：
+   *
+   *  1. `lastAction` —— 不清掉的话，"重新生成"会把玩家**回滚掉的那一轮**
+   *     的行动重新执行一遍（他会发现退回第 3 轮后点重试，故事又跳回第 9 轮）。
+   *  2. 流式残留与错误 —— 回滚是个突变，屏幕上不该还留着上一轮的半截文本。
+   *  3. **归档** —— 见下方注释，这是最容易被忽略的一处。
+   *
+   * 轮次本身**不需要**在这复位：它由 `countTurns(history)` 算出来，
+   * 而 history 已经被 store 真的截短了（见上一节关于本地计数器的说明）。
+   */
+  const rewindToTurn = (turnIndex: number): boolean => {
+    const ok = useGameStore.getState().rewindTo(turnIndex)
+    if (!ok) return false
+
+    setLastAction(null)
+    setStreamingContent(null)
+    setStreamingReasoning(null)
+    setLastError(null)
+    setTruncationWarning(null)
+
+    /*
+      清空 IndexedDB 里的叙事归档。
+      回溯把 history 截短了，但归档是**定时**发生的，里面可能已经收着
+      "被回滚掉的那几轮"的正文；不清掉的话，`loadArchive` 读回来的旧叙事
+      会重新出现在历史里 —— 玩家会看到自己已经取消的未来。
+      代价：归档里那些**更早的、仍然有效**的旧叙事也一起丢了（它们的要点
+      仍在 summary 与 memory 里）。这个取舍在 TurnSnapshot 的注释里写明了。
+    */
+    void clearArchive()
+
+    useUIStore.getState().setStatusMessage(`已回到第 ${turnIndex} 轮`)
+    setTimeout(() => useUIStore.getState().setStatusMessage(null), 2500)
+    return true
   }
 
   return {
@@ -944,6 +1327,9 @@ export function useGameEngine(): GameEngineReturn {
     streamingReasoning,
     debugDataInput,
     debugDataOutput,
-    isInputAllowed
+    isInputAllowed,
+    turnCount: countTurns(store.history),
+    rewindTurns: store.turnSnapshots.map(s => s.turn),
+    rewindToTurn,
   }
 }

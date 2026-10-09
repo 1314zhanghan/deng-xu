@@ -51,6 +51,20 @@ interface UIState {
   /** 手机端「更多」菜单是否打开（设置类操作的容器） */
   mobileMenuOpen: boolean
   setMobileMenuOpen: (open: boolean) => void
+
+  /**
+   * 快速模式（C9）。
+   *
+   * 开启后**跳过分析阶段**，每轮只跑一次叙事调用：速度快一倍、花费减半，
+   * 代价是数值（属性/资源/物品/关系/选项）**不再更新** ——
+   * 这一点必须在界面上写清楚，而不是让玩家玩十轮之后
+   * 自己发现"生命值一直没变过"（那是最难归因的一类问题）。
+   *
+   * 与 `statusMessage` 这类瞬时状态不同，它要**落盘**：
+   * 这是玩家的偏好设置，刷新一次页面就悄悄关掉等于没记住。
+   */
+  fastMode: boolean
+  setFastMode: (on: boolean) => void
 }
 
 /** 切换服务商时同步默认地址与模型 */
@@ -99,11 +113,14 @@ export const useUIStore = create<UIState>()(
       setMobileSheet: (t) => set({ mobileSheet: t }),
       mobileMenuOpen: false,
       setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
+
+      fastMode: false,
+      setFastMode: (on) => set({ fastMode: on }),
     }),
     {
       name: 'pale-notes-ui',
-      // statusMessage / 编辑器开关属于瞬时状态，不落盘
-      partialize: (state) => ({ llm: state.llm }),
+      // statusMessage / 编辑器开关属于瞬时状态，不落盘；fastMode 是玩家偏好，必须落盘
+      partialize: (state) => ({ llm: state.llm, fastMode: state.fastMode }),
       version: 2,
       migrate: (persisted: any) => {
         // 兼容旧版本存的裸 apiKey 字段

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Accessibility } from 'lucide-react'
 import { recipeFor, renderSprite, type SpriteRecipe, type AppearanceProfile } from '@/utils/lpcSprite'
+import type { SpriteLook } from '@/types/cards'
 
 /**
  * LPC 像素立绘（方形/竖版）。
@@ -11,6 +12,13 @@ import { recipeFor, renderSprite, type SpriteRecipe, type AppearanceProfile } fr
  *
  * 素材是 64×64 全身图，这里按整数倍放大（默认 3 倍 = 192px 画布），
  * 保证像素锐利；显示尺寸由 CSS 控制、用 pixelated 渲染再次兜底。
+ *
+ * ## 外观的两个来源（优先级）
+ *
+ *  1. **`look`（推荐）** —— 卡里显式写好的结构化外观（部件级）。有它就不猜。
+ *  2. **`profile`（兜底）** —— 从自由文本描述里用关键词推断。
+ *     ⚠️ 这条路的天花板很低（中文表述空间无穷，正则表有限），
+ *     只该用于没写 `look` 的卡（例如导入的第三方卡）。
  */
 export function CharacterSprite({
   name,
@@ -19,6 +27,7 @@ export function CharacterSprite({
   build,
   seed,
   profile,
+  look,
   direction = 'down',
   scale = 3,
   className = '',
@@ -36,6 +45,11 @@ export function CharacterSprite({
    * 不传就退回随机，那正是"立绘和描述对不上"的原因。
    */
   profile?: AppearanceProfile
+  /**
+   * 卡里显式写好的结构化外观（部件级）。**有它就以它为准**，
+   * `profile` 只用来补 `look` 里没写的字段。
+   */
+  look?: SpriteLook
   direction?: string
   scale?: number
   className?: string
@@ -57,6 +71,12 @@ export function CharacterSprite({
   const pAge = profile?.age
   const pGender = profile?.gender
 
+  /*
+    `look` 同理不能直接进依赖数组（调用方多半是内联字面量），
+    所以序列化成字符串当依赖 —— 内容变了才重算，引用变了不算。
+  */
+  const lookKey = look ? JSON.stringify(look) : ''
+
   useEffect(() => {
     let cancelled = false
     const merged: AppearanceProfile | undefined = profile
@@ -65,14 +85,20 @@ export function CharacterSprite({
     /*
       种子只用 id/name（**不含描述**）：描述会随剧情更新，
       若把它算进种子，同一个角色每次改描述就换一张脸。
+      ⚠️ `look` 同样**不进种子** —— 它只覆盖"画什么"，
+      不该改变"这个角色的脸是哪一张"。
     */
-    const recipe: SpriteRecipe = recipeFor(seed || id || name, { gender, build, profile: merged })
+    const recipe: SpriteRecipe = recipeFor(seed || id || name, {
+      gender, build, profile: merged,
+      // 反序列化回来：依赖项是字符串，用的时候要还原成对象
+      look: lookKey ? (JSON.parse(lookKey) as SpriteLook) : undefined,
+    })
     renderSprite(recipe, { direction, scale, headOnly })
       .then(u => { if (!cancelled) setUrl(u) })
       .catch(() => { if (!cancelled) setFailed(true) })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seed, id, name, gender, build, direction, scale, headOnly, pName, pDesc, pPers, pScen, pRel, pAge, pGender])
+  }, [seed, id, name, gender, build, direction, scale, headOnly, pName, pDesc, pPers, pScen, pRel, pAge, pGender, lookKey])
 
   if (failed) {
     // 素材加载失败不该留空 —— 给一个可辨认的占位

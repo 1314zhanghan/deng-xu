@@ -11,6 +11,7 @@ import {
   Star,
   Gauge,
   Compass,
+  ScrollText,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -18,13 +19,50 @@ import type { LucideIcon } from 'lucide-react';
 const ATTRIBUTE_ICONS: LucideIcon[] = [Sparkles, Zap, Shield, Eye, Flame, Droplet, Star, Gauge];
 const RESOURCE_ICONS: LucideIcon[] = [Gauge, Sparkles, Shield, Droplet, Star, Flame, Zap, Eye];
 
-interface StatusPanelProps {
-  className?: string;
+/** 身份标签的字数上限。玩家填的是自由文本（可能一整段自述），标签只取开头那一小截 */
+const IDENTITY_LABEL_MAX = 14;
+
+/**
+ * 把玩家的**自设背景**（`PlayerCard.background`）压成一个短身份标签。
+ *
+ * 为什么需要它：
+ *  选角页让玩家认真写了「刑部正四品，掌刑名」这类自述，而它原先**只进了提示词**，
+ *  界面上一个字都看不到 —— 玩家感觉自己的设定没被承认，代入感不闭环。
+ *  但整段背景（常常上百字）铺在状态栏/角色卡里又太长，所以只取
+ *  **第一句 → 第一个分句**，并剥掉「我是…」这类口语前缀。
+ *
+ * 为什么不直接用 AI 给出的 `identity`：那个是剧情推进中变化的**当前身份**，
+ *  开局时是空的（要等第一轮 SET_IDENTITY）。玩家自己想的那一版不能等 AI。
+ */
+export function shortIdentityLabel(background: string, max = IDENTITY_LABEL_MAX): string {
+  const first = String(background || '')
+    .split(/[\n。；;]/)[0]          // 只取第一句
+    .split(/[，,、]/)[0]            // 再取第一个分句
+    // ⚠️ 量词必须跟在前缀**同一个正则**里：写成 "我是|我是一名" 的并列时，
+    // 正则按顺序先命中 `我是`，结果留下孤零零的「一名……」（探针实测抓到过）。
+    .replace(/^(?:我是|本人是|我乃|我叫)(?:一名|一位|一个)?\s*/, '')
+    .trim();
+  if (!first) return '';
+  return first.length > max ? `${first.slice(0, max)}…` : first;
 }
 
-export function StatusPanel({ className = '' }: StatusPanelProps) {
-  const { resources, resourceDefs, aspects, attributeDefs, playerName, playerGender, playerAppearance } = useGameStore();
+interface StatusPanelProps {
+  className?: string;
+  /**
+   * 打开编年史。
+   * 可选：手机端的状态抽屉（MobileSheet）不传它 —— 手机端走「更多」菜单的入口，
+   * 面板里就没有必要再放一个。桌面左栏由 App 传入。
+   */
+  onOpenChronicle?: () => void;
+}
+
+export function StatusPanel({ className = '', onOpenChronicle }: StatusPanelProps) {
+  const { resources, resourceDefs, aspects, attributeDefs, playerName, playerGender, playerAppearance, identity } = useGameStore();
   const world = useSessionStore(s => s.world);
+  const playerBackground = useSessionStore(s => s.player?.background ?? '');
+  const selfIdentity = shortIdentityLabel(playerBackground);
+  /** AI 在剧情里给出的"当前身份"（开局为空，随 SET_IDENTITY 变化） */
+  const currentIdentity = identity;
   return (
     <div className={`h-full p-4 space-y-6 overflow-y-auto bg-surface/30 border-r border-text-muted/20 backdrop-blur-sm flex flex-col ${className}`}>
       {/*
@@ -52,10 +90,45 @@ export function StatusPanel({ className = '' }: StatusPanelProps) {
             </div>
           </div>
         </div>
+        {/*
+          身份标签。
+          ⚠️ 这里刻意**不显示整段自设背景**（可能上百字）：一段长文字铺在窄栏里
+          既挤掉下面的资源条，玩家也读不出重点。只给一个短标签，
+          完整自述挂在 title 上（想看再悬停）。
+        */}
+        {(selfIdentity || currentIdentity) && (
+          <div className="flex items-center gap-2 flex-wrap text-[11px]" title={playerBackground || undefined}>
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border border-accent-lantern/30 bg-accent-lantern/5 text-accent-lantern/90 font-serif max-w-full">
+              <span className="text-[10px] text-accent-lantern/60 shrink-0">身份</span>
+              <span className="truncate">{selfIdentity || currentIdentity}</span>
+            </span>
+            {selfIdentity && currentIdentity && currentIdentity !== selfIdentity && (
+              <span className="text-[10px] text-text-muted truncate" title="剧情推进中由 AI 更新的当前身份">
+                当前 · {currentIdentity}
+              </span>
+            )}
+          </div>
+        )}
+
         {playerAppearance && (
           <p className="text-[11px] text-text-secondary leading-relaxed line-clamp-3 font-serif" title={playerAppearance}>
             {playerAppearance}
           </p>
+        )}
+
+        {/*
+          编年史入口。
+          放"角色"这一节而不是最底部：长局里"我做过什么"和"我是谁"是同一类回看需求，
+          而底部已经被 GameMenuActions 占据（返回标题 / 模型设置）。
+        */}
+        {onOpenChronicle && (
+          <button
+            onClick={onOpenChronicle}
+            className="w-full flex items-center justify-center gap-2 p-2 text-xs text-text-muted hover:text-accent-lantern hover:bg-accent-lantern/10 border border-text-muted/20 hover:border-accent-lantern/30 rounded-sm transition-all"
+          >
+            <ScrollText size={13} />
+            <span>编年史</span>
+          </button>
         )}
       </section>
 

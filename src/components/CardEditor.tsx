@@ -63,7 +63,7 @@ export function createEmptyWorld(): WorldCard {
     items: [],
     lores: [],
     story: {
-      opening: '',
+      atmosphere: '',
       mainQuest: '',
       enableStages: false,
       stages: [],
@@ -547,7 +547,8 @@ export function CardEditor() {
               {(() => {
                 const slotLabel = draft.story.openerSlot
                 const slots = draft.backgrounds || []
-                const map = slotLabel ? draft.story.openingSeeds?.[slotLabel] : undefined
+                // openingSeeds 已扁平化：直接「选项 id → 素材」
+                const map = draft.story.openingSeeds
                 const openerSlot = slots.find(s => s.label === slotLabel)
                 const rows = openerSlot
                   ? openerSlot.options.map(o => ({

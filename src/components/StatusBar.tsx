@@ -1,11 +1,23 @@
 import { useState } from 'react';
 import { useGameStore } from '@/stores/game';
+import { useSessionStore } from '@/stores/session';
 import { useUIStore } from '@/stores/ui';
+import { shortIdentityLabel } from '@/components/StatusPanel';
 import { MapPin, Clock, User, BookOpen, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function StatusBar() {
   const { location, time, identity, story } = useGameStore();
   const { statusMessage } = useUIStore();
+  /**
+   * 玩家在选角页填的**自设背景**。
+   *
+   * `game.identity` 是 AI 在剧情里给出的"当前身份"，**与玩家填的背景不同步**：
+   * 开局它是空的（要等第一轮 SET_IDENTITY 才写进来）。
+   * 于是玩家认真写的「刑部正四品」在界面上一个字都看不到 —— 只进了提示词。
+   * 这里把自设背景压成一个短标签补上，完整自述放 title。
+   */
+  const playerBackground = useSessionStore(s => s.player?.background ?? '');
+  const selfIdentity = shortIdentityLabel(playerBackground);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const formatTime = (t: typeof time) => {
@@ -73,9 +85,22 @@ export function StatusBar() {
         )}
 
         <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-6 w-full md:w-auto">
-          <div className="flex items-center gap-2" title="身份">
-            <User className="w-3 h-3 text-zinc-500" />
-            <span className="text-zinc-300">{identity}</span>
+          {/*
+            身份一栏。
+            · 有 AI 给出的当前身份 → 用它当主值（它代表剧情里的现状）
+            · 否则用玩家自设背景的短标签（开局第一轮之前只有这个）
+            · 两者都有且不同 → 主值后面再挂一个"自设 · xxx"，
+              让玩家看到自己写的那一版**没有被丢掉**（这正是原先缺失的反馈）
+          */}
+          <div
+            className="flex items-center gap-2 min-w-0"
+            title={playerBackground ? `自设背景：${playerBackground.slice(0, 120)}` : '身份'}
+          >
+            <User className="w-3 h-3 text-zinc-500 shrink-0" />
+            <span className="text-zinc-300 truncate">{identity || selfIdentity || '未设定'}</span>
+            {selfIdentity && identity && selfIdentity !== identity && (
+              <span className="text-[10px] text-zinc-500 shrink-0">自设 · {selfIdentity}</span>
+            )}
           </div>
 
           <div className="flex items-center gap-2" title="当前章节">

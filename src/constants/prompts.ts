@@ -257,6 +257,30 @@ ${resources.length ? resources.map(resourceLine).join('\n') : '（本世界未�
    - 已有角色的关系、状态、位置、描述变化 → \`UPDATE_CHARACTER\`（**务必沿用已有的 id**）
    - 注意：已在「出场角色档案」中的角色**不需要**重复 ADD_CHARACTER，只在状态变化时 UPDATE_CHARACTER。
 
+## 长期记忆维护（memory）
+
+引擎会按轮次记住"发生过什么"，并在每一轮把这份记忆交给叙事 AI。你**每轮都要**顺手更新它
+—— 这是叙事 AI 在二十轮以后还记得"谁欠谁"的唯一依据。
+
+\`\`\`json
+{
+  "summary": "一句话，不超过 40 字：这一轮发生了什么（供时间线使用）",
+  "memory": {
+    "bonds": [{ "who": "人名", "state": "两人**此刻**的关系，如：欠他一枚铜钱未还/对他有戒心" }],
+    "threads": [{ "id": "英文小写下划线标识", "text": "还没了结的谜题/承诺/债务/威胁，一句话" }],
+    "timeline": [{ "turn": 轮次数字, "text": "这一轮发生了什么，一句话" }]
+  }
+}
+\`\`\`
+
+规则（每一条都是为了别让记忆丢掉）：
+- \`turn\` 用输入里的 \`currentState.turn\`；同一轮重复提交会**覆盖**（不会重复两条）。
+- \`bonds\` / \`threads\` 是**增量**：这次剧情里提到谁、哪条线索有变化，就只写那几条。
+  **没提到的不要重写、更不要清空** —— 你看不到更早的轮次，漏写等于让引擎丢掉它。
+- 关系变了就给**新的那一条**（「欠人情」变「结仇」），不要新旧都列。
+- 线索已经了结（谜题揭开、债还清、威胁解除）时，**不要**再列它。
+- 本世界关闭了机制层时，这一段**仍然要写**：它不涉及数值，只是记录发生了什么。
+
 ## 角色头像分配（avatarId）
 
 新角色登场时，请从下面的头像素材库里挑一个最贴合该角色气质的 id，填进 \`ADD_CHARACTER.payload.avatarId\`。
@@ -323,11 +347,18 @@ ${world.story.enableChoices ? `生成 3~4 个下一步行动选项。
       "text": "string",
       "style": ${styleIds}
     }
-  ]
+  ],
+  "summary": "string：这一轮发生了什么，不超过 40 字，供时间线使用",
+  "memory": {
+    "bonds": [{ "who": "string", "state": "string" }],
+    "threads": [{ "id": "string", "text": "string" }],
+    "timeline": [{ "turn": number, "text": "string" }]
+  }
 }
 \`\`\`
 
-没有变更时 \`stateChanges\` 用空数组。**必须**始终包含 \`options\` 字段。`);
+没有变更时 \`stateChanges\` 用空数组。**必须**始终包含 \`options\` 字段。
+\`summary\` 每轮都要给；\`memory\` 的三层没有变化时给空数组 \`[]\`。`);
 
   sections.push(`## JSON 格式化硬性规则
 
@@ -400,11 +431,68 @@ export function resolveOpeningSeed(
   const chosenId = choices?.[slotLabel]
   const opt = slot.options.find(o => o.id === chosenId)
   if (!opt) return null
-  const map = world.story?.openingSeeds?.[slotLabel]
-  // 优先按选项 id 找；找不到再退回按标题找（作者两种写法都认）
+  /*
+    ⚠️ `openingSeeds` 已**扁平化**（2026-10）：直接是「选项 id → 素材」，
+    不再按槽位再套一层。原先那层嵌套只有 openerSlot 一个槽位在用，
+    多出来的一层既没用、又让作者容易写错键。
+    仍然兼容按标题写的旧卡（`map[opt.title]`）。
+  */
+  const map = world.story?.openingSeeds
   const seed = (map?.[opt.id] ?? map?.[opt.title] ?? '').trim()
   if (!seed) return null
   return { slot: slotLabel, id: opt.id, title: opt.title, seed }
+}
+
+/**
+ * 从世界卡里抽一份**专名清单**（地名、机构、族群、器物…）。
+ *
+ * ## 为什么需要（A3）
+ *
+ * 开场现在是 AI **现场创作**的，这带来了一个新风险：
+ * 它可能顺手编出与 `worldLore` 冲突的地名与机构名
+ * （"你走进汴梁的锦衣卫衙门" —— 而这个世界的设定里没有锦衣卫）。
+ * 有了这份清单，指令里就能写"优先使用这些名字"，
+ * 把即兴创作约束在世界的既有词汇里。
+ *
+ * ## 怎么抽
+ *
+ * 优先取**真正是专名的地方**，按可信度从高到低：
+ *  1. `worldLore` 里用 `「」` 括起来的词 —— 本项目的写作惯例是把专名括起来，
+ *     这是最可靠的一路信号；
+ *  2. 角色卡的名字（世界里真实存在的人）；
+ *  3. lore 与物品的名字（真实存在的知识与器物）。
+ *
+ * 会滤掉过长/过短/明显不是专名的（纯数字、单字、超过 8 字的句子）。
+ */
+export function collectWorldProperNouns(world: WorldCard, limit = 48): string[] {
+  const out = new Set<string>()
+  const ok = (s: string) => {
+    const t = s.trim()
+    if (t.length < 2 || t.length > 8) return false
+    if (/^[\d\s、，。·—\-]+$/.test(t)) return false
+    // 排掉明显的句读片段（含逗号句号的说明性文字）
+    if (/[，。；：！？]/.test(t)) return false
+    return true
+  }
+
+  // ① 「」里的词 —— 出现次数越多越可能是真专名，所以统计一下频次
+  const freq = new Map<string, number>()
+  for (const m of String(world.worldLore || '').matchAll(/「([^「」]{2,8})」/g)) {
+    const t = m[1].trim()
+    if (ok(t)) freq.set(t, (freq.get(t) || 0) + 1)
+  }
+  // 出现 ≥2 次的优先（一次性的可能只是随手引用）
+  for (const [t] of [...freq.entries()].sort((a, b) => b[1] - a[1])) {
+    if (out.size >= limit) break
+    out.add(t)
+  }
+
+  // ② 角色名 / ③ 知识名 / ④ 物品名 —— 这些本身就是世界里真实存在的东西
+  for (const c of world.characters || []) if (out.size < limit && ok(c.name)) out.add(c.name.trim())
+  for (const l of world.lores || []) if (out.size < limit && ok(l.name)) out.add(l.name.trim())
+  for (const i of world.items || []) if (out.size < limit && ok(i.name)) out.add(i.name.trim())
+
+  return [...out]
 }
 
 /**
@@ -480,7 +568,7 @@ ${seed.seed}
 而主角写的是另一个），**一律以主角的设定为准**，素材只保留可用的氛围与人物类型。
 ${hasOwnBackground ? '' : '\n（主角没有自述背景，所以这一段可以更大程度地充当他的处境依据。）'}`);
   } else {
-    const tone = (world.story?.opening || '').trim();
+    const tone = (world.story?.atmosphere || world.story?.opening || '').trim();
     if (tone) {
       parts.push(`═══ 二、世界开场的基调（**附加参考**）═══
 
@@ -546,24 +634,107 @@ ${lines.join('\n')}
 - 结尾留一个明确的、必须马上回应的钩子。
 - 这是第一幕，不要信息过载，先让玩家站稳。
 - 叙事里**不要出现**"开局处境""背景槽位""世界卡"这类游戏术语。`);
+
+  /*
+    ── A3：把即兴创作约束在世界既有的专名里 ──
+    开场由 AI 现场创作，它可能编出与 worldLore 冲突的地名与机构
+    （"汴梁的锦衣卫衙门" —— 而这个世界里没有锦衣卫）。
+    给一份真实存在的名字清单，能显著降低这种跑偏。
+  */
+  const nouns = collectWorldProperNouns(world)
+  if (nouns.length >= 6) {
+    parts.push(`═══ 五、这个世界真实存在的名字（**优先使用**）═══
+
+${nouns.join('、')}
+
+提到地名、机构、族群、器物时，**优先从上面这个清单里取**；
+清单没覆盖到的地方可以按这个世界的风格新起名，但**不要引入与世界观冲突的既有概念**
+（不要把现实世界的朝代、机构、品牌塞进来）。`);
+  }
+
   return parts.join('\n\n');
 }
 
-/** 上下文压缩 prompt */
-export function buildSummaryPrompt(previousSummary: string, textToSummarize: string): string {
-  return `你是文字冒险游戏的**前情摘要器**。
+/**
+ * 上下文压缩 prompt —— 同时产出**三层长期记忆**（A1）。
+ *
+ * ## 为什么把记忆三层挂在摘要这一路，而不是单独再发一次请求
+ *
+ * 摘要本来就要读一遍"最近这一段剧情"，顺手输出关系/线索/时间线**几乎不额外花 token**
+ * （输出多几十个字）。若要单独维护记忆，就得多一次 LLM 调用 ——
+ * 那正好是 C9 想解决的问题（每轮两次调用已经够贵了）。
+ *
+ * ## 为什么必须是"合并语义"而不是"重写"
+ *
+ * 这个调用**只看到最近的一段剧情和当前记忆**，看不到更早的轮次。
+ * 所以提示词里反复强调"没提到的不要删"：模型天生倾向给出一个"完整的新版本"，
+ * 而那样每 6 轮就会把前面攒下的关系与线索洗掉一次。
+ * 合并的实际执行在 `utils/memory.ts` 的 `mergeMemory`（并集 + 同人覆盖），
+ * 这里的措辞是让模型**别做多余的省略**，两道保险。
+ *
+ * ## 轮次怎么给
+ *
+ * 调用方把带轮次编号的剧情传进来（`[第N轮]`），模型把它抄进 timeline。
+ * 没有轮次的时间线对玩家毫无意义（"我们之前干过什么"），也支撑不了 B8 回溯 ——
+ * 所以这一条在提示词里是**硬要求**，写在最显眼的位置。
+ */
+export function buildSummaryPrompt(
+  previousSummary: string,
+  textToSummarize: string,
+  memory?: { bonds?: unknown; threads?: unknown; timeline?: unknown; earlierSummary?: string },
+): string {
+  const currentMemory = JSON.stringify({
+    bonds: memory?.bonds ?? [],
+    threads: memory?.threads ?? [],
+    timeline: memory?.timeline ?? [],
+    earlierSummary: memory?.earlierSummary ?? '',
+  })
 
-把下列剧情压缩成一段连贯的摘要，保留：
-- 关键决定与后果
-- 已获得的重要情报、物品、人物关系
-- 主角当前处境与未解决的悬念
+  return `你是文字冒险游戏的**剧情档案员**。你的工作是把剧情压缩成摘要，并**增量更新**三层长期记忆。
 
-丢弃：氛围描写、重复的对话、可推断的细节。
+## 一、摘要（summary）
+把下列剧情压缩成一段连贯的摘要，保留关键决定与后果、获得的重要情报与物品、主角当前处境与未解决的悬念；
+丢弃氛围描写、重复的对话、可推断的细节。
+${previousSummary ? `已有的旧摘要（请在其基础上累加，不要丢失其中仍然有效的信息）：\n${previousSummary}\n` : ''}
+## 二、三层记忆（memory）
+分三层维护，每一层的更新规则**不同**，请严格区分：
 
-${previousSummary ? `已有的旧摘要（请在其基础上累加，不要丢失其中仍然有效的信息）：\n${previousSummary}\n` : ''}需要压缩的剧情：
-${textToSummarize}
+1. \`bonds\`（人物关系**现状**）：主角与关键角色**此刻**的关系 —— 谁欠他、他得罪过谁、谁在帮他、谁在防着他。
+   - 写"现在的状态"，不要写事件经过（「欠他一枚铜钱未还」优于「他曾经借过钱」）。
+   - 关系变了就给出**新的那一条**，不要把新旧两条都留着。
+2. \`threads\`（未结线索）：还没了结的谜题、承诺、债务、威胁。已经了结的**不要**再列。
+3. \`timeline\`（事件时间线）：每一轮一句话。**必须**带上轮次 \`turn\`，
+   用输入里 \`[第N轮]\` 标出的那个 N；同一轮已有旧记录时**覆盖**它，不要重复两条。
 
-要求：与剧情使用同一种语言；不超过 300 字；不要分点，写成一段。`;
+### ⚠️ 合并规则（最重要，请先读这条）
+下面是**当前已经积累的记忆**（JSON）。本次输入只包含最近一段剧情，
+你**看不到**更早的轮次，所以：
+
+- **没在这次剧情里提到的人、线索、时间线，一律原样保留，不要删。**
+- 输出的 \`bonds\` / \`threads\` / \`timeline\` 是**要与旧记忆合并的增量**，不是"完整的新版本"。
+- 只有剧情明确说明某条线索已经了结、或某段关系已被取代时，才不要再写旧的那一条。
+- \`earlierSummary\` 一般**留空字符串**：更早的经过由程序自动折叠，你不需要操心。
+
+当前记忆：
+${currentMemory}
+
+## 三、输出格式
+只输出一个 JSON 对象，不要任何解释、不要 markdown 代码块：
+\`\`\`json
+{
+  "summary": "不超过 300 字的一段话，与剧情同一种语言，不要分点",
+  "memory": {
+    "bonds": [{ "who": "人名", "state": "关系现状，如：欠他一枚铜钱未还/对他有戒心" }],
+    "threads": [{ "id": "英文小写下划线标识", "text": "未结的线索，一句话" }],
+    "timeline": [{ "turn": 7, "text": "这一轮发生了什么，一句话" }],
+    "earlierSummary": ""
+  }
+}
+\`\`\`
+没有变化的层给空数组 \`[]\`。字符串内不要用双引号（用「」）。
+
+## 四、需要压缩的剧情
+${textToSummarize}`
 }
 
 /** 首次加载时用来做连通性测试 */

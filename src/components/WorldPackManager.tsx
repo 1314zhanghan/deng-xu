@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
-import { Package, PackagePlus, Check, X, AlertTriangle } from 'lucide-react'
+import { Package, PackagePlus, Check, X, AlertTriangle, Download } from 'lucide-react'
 import { useLibraryStore } from '@/stores/library'
 import { exportPack, importPackFile } from '@/utils/worldPack'
 import { collectSave } from '@/utils/saveFile'
 import { parseWorldbook, worldbookToPack } from '@/utils/worldbook'
+import { fromSillyTavernLorebook, isSillyTavernLorebook, toSillyTavernLorebook } from '@/utils/stLorebook'
+import { downloadFile, safeFilename, timestampSuffix } from '@/utils/files'
 
 /**
  * 世界包导出 / 导入。
@@ -65,6 +67,56 @@ export function WorldPackManager() {
     }
   }
 
+  /**
+   * 导出成 SillyTavern 世界书。
+   *
+   * 为什么世界包之外还要这个出口：本作的世界书只有自己认得的
+   * `format: deng-xu-worldbook`，而 ST 生态（以及 DSH 的 `prompt_import_world`
+   * 这类工具）只认 `{ entries: [...] }`。没有这个出口，辛辛苦苦写的设定
+   * 就只能在自家页面里用；有了它，两张卡可以互相喂。
+   *
+   * 多选时合并成一本：ST 的世界书本来就是把多个主题的条目混装在一本书里，
+   * 按世界拆成多个文件反而不好导入。
+   */
+  const handleExportSillyTavern = () => {
+    const picked = selected.size ? worlds.filter(w => selected.has(w.id)) : exportAll()
+    if (!picked.length) {
+      setMsg({ kind: 'err', text: '卡片库里没有可导出的世界卡' })
+      return
+    }
+    try {
+      const books = picked.map(w => toSillyTavernLorebook(w) as {
+        name: string
+        description: string
+        entries: Record<string, unknown>[]
+      })
+      const entries = books.flatMap((b, bi) => b.entries.map((e, i) => ({
+        ...e,
+        // uid / order 全局重排：合并两本书后沿用各自的序号会出现重复 uid
+        // （每本按 1000 条留位，够用；真要单本超 1000 条时 uid 也只需唯一，不必连续）
+        uid: bi * 1000 + i,
+        order: 100 + bi * 1000 + i,
+        insertion_order: 100 + bi * 1000 + i,
+      })))
+      const book = {
+        name: books.length === 1 ? books[0].name : `${books[0].name} 等 ${books.length} 个世界`,
+        description: picked.map(w => w.tagline).filter(Boolean).join(' / '),
+        entries,
+      }
+      const base = picked.map(w => w.title).slice(0, 2).join('-') || '世界书'
+      const filename = `${safeFilename(base)}-${timestampSuffix()}.sillytavern-lorebook.json`
+      downloadFile(filename, book)
+      setMsg({
+        kind: 'ok',
+        text: `已导出 ${filename}（${entries.length} 条条目，SillyTavern 格式）。`
+          + '可直接导入 SillyTavern，或用 DSH 的 ST 世界书导入器打开。'
+          + '本作的 lore 是全量注入的，导出时一律标成 ST 的「常驻（蓝灯）」条目。',
+      })
+    } catch (e) {
+      setMsg({ kind: 'err', text: `导出失败：${(e as Error)?.message || e}` })
+    }
+  }
+
   const handleImport = async (file: File | undefined) => {
     if (!file) return
 
@@ -75,6 +127,32 @@ export function WorldPackManager() {
       raw = JSON.parse(await file.text())
     } catch {
       setMsg({ kind: 'err', text: '文件不是合法 JSON' })
+      return
+    }
+
+    /*
+      SillyTavern 世界书优先判：它没有 `format` 字段，只能靠形状认
+      （`{ entries: [...] }`、entries 为对象 map、或角色卡里的 character_book）。
+      放在前面免得它掉进下面"既不是世界书也不是世界包"的报错里。
+    */
+    if (isSillyTavernLorebook(raw)) {
+      const world = fromSillyTavernLorebook(raw)
+      if (!world) {
+        setMsg({ kind: 'err', text: '这份 SillyTavern 世界书里没有可用的条目（条目内容与标题都是空的）' })
+        return
+      }
+      try {
+        const imported = await importWorlds([world])
+        setMsg({
+          kind: 'ok',
+          text: `已导入 SillyTavern 世界书《${world.title}》：新增 ${imported.length} 个世界，`
+            + `${world.lores.length} 条知识条目。`
+            + '注意：ST 的**关键词触发在本作不生效** —— 这些条目会全量注入提示词，'
+            + '触发词只作为「触发词：…」一行留在条目正文里备查。',
+        })
+      } catch (e) {
+        setMsg({ kind: 'err', text: `写入失败：${(e as Error)?.message || e}` })
+      }
       return
     }
 
@@ -186,6 +264,13 @@ export function WorldPackManager() {
         >
           <PackagePlus size={12} /> 导入世界包
         </button>
+        {/* 导入按钮同样吃 SillyTavern 世界书（靠形状自动分流），所以这里不必再放一个入口 */}
+        <button
+          onClick={handleExportSillyTavern}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-text-muted/40 rounded hover:border-accent-lantern/50 hover:text-accent-lantern transition-colors"
+        >
+          <Download size={12} /> 导出为 SillyTavern 世界书
+        </button>
         <input
           ref={fileRef}
           type="file"
@@ -194,6 +279,16 @@ export function WorldPackManager() {
           onChange={e => { void handleImport(e.target.files?.[0]); e.target.value = '' }}
         />
       </div>
+
+      <p className="text-[10px] text-text-muted leading-relaxed">
+        「导入世界包」也能直接吃 <b className="text-text-secondary">SillyTavern 世界书</b>
+        （<code>{'{ entries: [...] }'}</code> 那种，含角色卡内嵌的 character_book）——
+        认出来就自动转成本作的世界卡。
+        <br />
+        <b className="text-text-secondary">注意语义差别</b>：ST 的条目靠关键词触发，
+        本作的 lore 是<b>全量注入</b>，导入后所有条目都会进提示词；
+        触发词会以「触发词：…」一行留在条目正文里备查，并不会真的"生效"。
+      </p>
 {/* 官方世界书既是范例也是可直接导入的成品 */}
 <div className="text-[10px] text-text-muted leading-relaxed">
   想照着写自己的世界？{' '}

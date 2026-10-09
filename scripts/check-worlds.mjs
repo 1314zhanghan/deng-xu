@@ -267,12 +267,13 @@ for (const exp of EXPECTED) {
 
   const allText = [
     w.title, w.tagline, w.worldLore, w.rules,
-    w.narrative?.customStyle, w.story?.opening, w.story?.mainQuest,
+    // ⚠️ `opening` 已改名 `atmosphere`（2026-10）；这里两个都算，兼容旧卡
+    w.narrative?.customStyle, w.story?.atmosphere, w.story?.opening, w.story?.mainQuest,
     ...(w.items || []).map(i => i.name + i.description),
     ...(w.lores || []).map(l => l.name + l.description),
     ...(w.backgrounds || []).flatMap(b => b.options.map(o => o.title + (o.description || ''))),
-    // 逐处境的开场场景也是实打实的内容，计入全卡字数
-    ...Object.values(w.story?.openingSeeds || {}).flatMap(m => Object.values(m || {})),
+    // 处境素材也是实打实的内容，计入全卡字数（openingSeeds 已扁平化：选项 id → 素材）
+    ...Object.values(w.story?.openingSeeds || {}),
     ...(w.characters || []).map(c => c.name + c.description + c.personality + c.relationship),
   ].join('\n')
 
@@ -280,7 +281,7 @@ for (const exp of EXPECTED) {
   const loreCjk = cjk(w.worldLore)
   const rulesCjk = cjk(w.rules)
   const styleCjk = cjk(w.narrative?.customStyle)
-  const openingCjk = cjk(w.story?.opening)
+  const openingCjk = cjk(w.story?.atmosphere || w.story?.opening)
 
   const row = {
     id: w.id, title: w.title,
@@ -494,7 +495,7 @@ for (const exp of EXPECTED) {
       */
       const openerLabel = w.story?.openerSlot
       const openerSlot = slots.find(s => s.label === openerLabel)
-      const seedMap = openerLabel ? w.story?.openingSeeds?.[openerLabel] : undefined
+      const seedMap = w.story?.openingSeeds
 
       if (!openerLabel) {
         fail(exp.label, '没指定处境槽位（openerSlot）',
@@ -721,5 +722,114 @@ if (problems.length) {
 
 console.log(`\n  门槛：中文字数 ≥${GATE.worldCjk} / worldLore ≥${GATE.worldLoreCjk} / rules ≥${GATE.rulesCjk}`
   + ` / 角色 ≥${GATE.minChars}（≥${GATE.minPresent} 个开局登场）/ 物品 ≥${GATE.minItems} / lore ≥${GATE.minLores}\n`)
+
+/*
+  ── A4：专名一致性（**只警告，绝不进 problems，也就不影响退出码**）──
+
+  要抓的现象：同一个地名/族名在世界书里被写成了两种样子
+  （「汴梁」/「汴京」、「地渊」/「深渊」），玩家读着出戏，
+  而这类错误不会被上面任何一条硬门槛拦到。
+
+  为什么只 warn（这一点比判据本身更重要）：
+    · 中文里一字之差的两个词**多数并不是同一个东西**（「官军」/「官兵」、
+      「漕帮」/「漕运」、「偏将」/「副将」… 有的同义、有的泾渭分明）；
+    · 本脚本已经栽过一次"校验器的词表比作者的用词窄，把好内容判成没写"的跟头
+      （见 SANDBOX_SECTIONS 上方的注释）——**判据比内容更窄时，错的是判据**。
+  所以这里只把"最可疑的几对"摆到人眼前，由人来决定要不要统一。
+
+  判据（刻意宽松）：
+    1. 从 worldLore 里抽高频专名：「」里的词（本项目写作惯例就是用「」标专名，权重更高）
+       + 反复出现的 2~4 字中文词；
+    2. 两词**编辑距离 ≤ 1**（一字之差），且共享首字或尾字
+       （「汴梁/汴京」共享首字，「地渊/深渊」共享尾字），
+       互不为子串，且都不含虚词字（否则"的时候/时候"这类会刷屏）；
+    3. 取出现次数最多的几对，每个世界最多报 3 对、一行说完。
+
+  ⚠️ `--json` 输出不含这一段：那是给下游工具读的既有结构，不动它最省事。
+*/
+const NOUN_STOP_CHARS = new Set(
+  // 虚词字 + 中文数字：前者会造出"的时候/时候"这类噪音，
+  // 后者会造出"二十/四十""一年/一份"这类根本不该报的配对
+  ('的了是在有和与也就都还只不我你他她它们这那什么怎因为所以但而之其此该个把被从对向于为以如若则即很更最太又要会能可时侯些里面上中下前后来到着过给让没好大小多少长短位次种样'
+    + '一二三四五六七八九十百千万亿两零').split(''),
+)
+
+/** 编辑距离（两词都在 2~4 字，直接经典 DP，不用优化） */
+function editDistanceOf(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => {
+    const row = new Array(b.length + 1).fill(0)
+    row[0] = i
+    return row
+  })
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      )
+    }
+  }
+  return dp[a.length][b.length]
+}
+
+/** 统计 worldLore 里的词频：「」里的词算 3 次（那是作者明确标出来的专名） */
+function collectNounFreq(text) {
+  const freq = new Map()
+  const bump = (word, times = 1) => freq.set(word, (freq.get(word) || 0) + times)
+  for (const m of String(text || '').matchAll(/「([^「」]{2,6})」/g)) {
+    const t = m[1].trim()
+    if (/^[\u4e00-\u9fff]+$/.test(t)) bump(t, 3)
+  }
+  // 只在连续中文段内滑窗，避免跨标点拼出"梁的""的秋"这类假词
+  for (const seg of String(text || '').split(/[^\u4e00-\u9fff]+/)) {
+    for (let n = 2; n <= 4; n++) {
+      for (let i = 0; i + n <= seg.length; i++) bump(seg.slice(i, i + n))
+    }
+  }
+  return freq
+}
+
+/** 可疑变体对：编辑距离 ≤1、共享首尾字、互不为子串 */
+function suspiciousNounPairs(freq, minFreq = 24) {
+  const words = [...freq.entries()]
+    .filter(([w, n]) =>
+      n >= minFreq
+      && w.length >= 2 && w.length <= 4
+      && ![...w].some(ch => NOUN_STOP_CHARS.has(ch)))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 150)
+
+  const pairs = []
+  for (let i = 0; i < words.length; i++) {
+    for (let j = i + 1; j < words.length; j++) {
+      const [a, na] = words[i]
+      const [b, nb] = words[j]
+      if (a === b) continue
+      if (a.includes(b) || b.includes(a)) continue
+      if (Math.abs(a.length - b.length) > 1) continue
+      if (a[0] !== b[0] && a[a.length - 1] !== b[b.length - 1]) continue
+      if (editDistanceOf(a, b) > 1) continue
+      pairs.push({ a, b, total: na + nb })
+    }
+  }
+  return pairs.sort((x, y) => y.total - x.total).slice(0, 3)
+}
+
+const nounWarnings = []
+for (const w of WORLDS) {
+  const pairs = suspiciousNounPairs(collectNounFreq(w.worldLore))
+  if (pairs.length) {
+    nounWarnings.push(
+      `  ⚠ ${w.title}：` + pairs.map(p => `「${p.a}」/「${p.b}」`).join('、')
+      + ' —— 一字之差，疑似同一专名的两种写法（也可能确实是两个东西）',
+    )
+  }
+}
+if (nounWarnings.length) {
+  console.log('\n  —— 专名一致性抽查（仅供参考，**不影响退出码**）——')
+  for (const line of nounWarnings) console.log(line)
+}
 
 process.exit(problems.length ? 1 : 0)

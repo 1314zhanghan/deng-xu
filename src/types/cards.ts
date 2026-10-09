@@ -71,6 +71,94 @@ export interface LoreTemplate {
   level?: number;
 }
 
+/**
+ * **立绘的结构化外观** —— 部件级指定，不经任何推断。
+ *
+ * ## 为什么要做这件事（2026-10，玩家反馈）
+ *
+ * > 「人物立绘与描述的匹配程度仍然堪忧，**仅仅只是靠关键词来临时构筑人物立绘的
+ * > 错误率高到不必多说**，你想想怎么彻底解决这个问题」
+ *
+ * 他说得对，而且问题是**方法论**上的，不是词表不够长：
+ *
+ *  1. 原先立绘走的是「中文描述 → 正则抽特征 → 再从部件池里挑部件」两步猜测
+ *     （`appearance.ts` 953 行、291 个正则；`lpcSprite.ts` 976 行）。
+ *  2. 中文描述的表述空间是**无穷的**（「黛青直裰」「玄色箭袖」「月白中衣」「一身缟素」…），
+ *     而正则表是有限的 —— 于是词表永远追不上，错误率永远下不来。
+ *  3. 更糟的是第二步：即使抽对了"深青色长袍"，**从 67 件衣服里挑哪一件**仍是猜的。
+ *
+ * 所以这里的做法不是"加更多关键词"，而是**换掉数据来源**：
+ * 立绘的每一个部件都由**显式数据**决定 —— 作者（或玩家）直接写部件 id 与调色板键。
+ * `inferTraits` 退化为**兜底**，只用于「导入的第三方卡」或「没填的字段」。
+ *
+ * ## 用法
+ *
+ * 只需要写**你在意的那几项**，其余留空由推断补齐：
+ *
+ * ```ts
+ * look: {
+ *   head: 'heads_human_male', skin: 'light',
+ *   hair: 'hair_topknot_long', hairColor: 'black',
+ *   torso: 'torso_clothes_robe', torsoColor: 'slate',
+ *   legs: 'legs_pants', legsColor: 'black',
+ *   feet: 'feet_shoes_basic', feetColor: 'black',
+ *   beard: 'beards_mustache', beardColor: 'dark_gray',
+ *   note: '青灰直裰、束发、山羊胡',   // 只用于审计与展示，不参与渲染
+ * }
+ * ```
+ *
+ * ⚠️ 部件 id 必须来自 `src/assets/lpc/runtime.json`（246 个部件），
+ * 调色板键必须来自 `palettes.json` 的 `hair` / `body` / `cloth` / `eye` / `metal` / `wood`。
+ * 写错的 id 不会报错，只会被静默忽略 —— 所以有 `pnpm check:sprites` 专门查这件事。
+ */
+export interface SpriteLook {
+  /** 头部部件（决定性别与年龄感）：heads_human_male / _female / _elderly / _small / _gaunt / _plump */
+  head?: string
+  /** 发型部件 id（hair_*，共 67 个：hair_topknot_long / hair_long_tied / hair_buzzcut / hair_balding …）；空串 = 明确光头 */
+  hair?: string
+  /** 上装部件 id（torso_* 或 dress_*）；传了 dress_* 会自动去掉腿部件 */
+  torso?: string
+  /** 下装部件 id（legs_*）；空串 = 不要下装（裙装已覆盖） */
+  legs?: string
+  /** 鞋部件 id（feet_*） */
+  feet?: string
+  /** 帽子/头饰部件 id（hat_*，共 36 个） */
+  hat?: string
+  /** 胡子部件 id（beards_*，共 12 个）；空串 = 明确不要胡子 */
+  beard?: string
+  /** 披风（cape_solid / cape_tattered / cape_trim） */
+  cape?: string
+  /** 腰带等配件（belt_*） */
+  belt?: string
+  /** 臂部/护腕（arms_* / shoulders_* / wrists_*） */
+  arms?: string
+  /** 眉毛部件（eyebrows_thick / eyebrows_thin） */
+  brows?: string
+  /** 鼻子部件（head_nose_straight / _button / _big / _large / _elderly） */
+  nose?: string
+
+  // ── 颜色：**只有这四种材质能独立指定** ──
+  // ⚠️ `RecolorSpec` 只有 hair / body / cloth / eye 四种映射表。
+  // 也就是说**所有布料部件（上衣、下装、鞋、帽子、披风、腰带）共用同一个 cloth 色** ——
+  // 「上衣红、裤子黑」目前做不到，要支持得改整个换色管线（按部件分别建映射表）。
+  // 与其在类型里留一堆不生效的字段骗人，不如只留真实可用的这四个。
+  /** 肤色键（body 材质，如 light / amber / olive / taupe / bronze / brown / black） */
+  skin?: string
+  /** 发色键（hair 材质，如 black / dark_brown / gray / white / blonde / raven） */
+  hairColor?: string
+  /** 衣色键（cloth 材质，统管所有布料部件） */
+  clothColor?: string
+  /** 瞳色键（eye 材质：blue / green / purple / red / orange / yellow / brown / gray） */
+  eye?: string
+
+  /**
+   * 作者写的一句外观说明 —— **只用于展示与审计，不参与渲染**。
+   * 有了它，`pnpm check:sprites` 才能拿它跟 `look` 做一致性检查
+   * （例如 note 写"女子"而 head 填了 male 就会被抓出来）。
+   */
+  note?: string
+}
+
 /** 一个角色卡（NPC 或可扮演角色） */
 export interface CharacterCard {
   id: string;
@@ -108,6 +196,12 @@ export interface CharacterCard {
   /** 是否由玩家扮演（用于多主角/组队跑团） */
   playable?: boolean;
 
+  /**
+   * 立绘的结构化外观（部件级）。
+   * 填了就以它为准渲染；留空的字段才走关键词推断。见 `SpriteLook` 的说明。
+   */
+  look?: SpriteLook;
+
   /** 原卡里未识别的字段，原样保留以免导入导出丢数据 */
   extensions?: Record<string, unknown>;
 }
@@ -128,12 +222,24 @@ export interface NarrativeStyle {
 
 export interface StorySettings {
   /**
-   * 世界开场的**基调与质感**（不是剧本）。
+   * 世界的**氛围与质感**（不是剧本，也不是"开场文本"）。
    *
-   * 引擎不再拿它当"第一幕的正文"，而是当**氛围参考**：写世界特有的时间感、
-   * 地标、气味、物价、规矩。真正的第一幕由 AI **现场创作**（见 `openingSeeds`）。
+   * ⚠️ **字段名从 `opening` 改成了 `atmosphere`**（2026-10）。
+   * 它被我改过三次语义（唯一开场 → 兜底示例 → 世界氛围参考），
+   * 旧名字早就不准确了；而"名字骗人"正是当初我误用它写死第一幕的原因之一。
+   * 现在它只有一个职责：告诉 AI 这个世界的时间感、地标、气味、物价与规矩。
+   * 真正的第一幕由 AI **现场创作**（见 `openingSeeds`）。
+   *
+   * ⚠️ 注意别与 `WorldTone`（`utils/worldTone.ts`）混淆 ——
+   * 那个是**场景配色的色调**（ink / neon / holo / parchment），管的是画面颜色，
+   * 与本字段（管叙事氛围）是两件事。我最初想叫 `worldTone`，正因撞名才改成现在这个名字。
    */
-  opening: string;
+  atmosphere: string;
+  /**
+   * @deprecated 旧字段名，仅用于兼容**导入的旧世界包**。
+   * 加载/导入时 `normalizeWorldCard()` 会把它搬到 `atmosphere`，之后不再使用。
+   */
+  opening?: string;
   /**
    * **开局处境槽位**：哪个背景槽位描述"主角此刻大致处在什么场合、什么层级"。
    *
@@ -151,7 +257,7 @@ export interface StorySettings {
    *     最高优先级。他写了自己是刑部正四品，第一幕里他就必须是刑部正四品。
    *  2. **开局处境**（本字段指向的槽位）—— **附加参考**：这一场合通常是什么样、
    *     和什么人打交道、会遇到哪类麻烦。**只是素材，不是剧本。**
-   *  3. **其余背景槽位** —— 附加参考：来路、立场、志向、隐秘、随身物。
+   *  3. **其余背景槽位** —— 附加参考：来路、立场、志向、随身物。
    *
    * 所以背景槽位的选项**不得预设具体官职、部门、上司与专名**：
    * 写「在朝中当权」而不是「朝中一部的仓部郎中」；
@@ -162,7 +268,7 @@ export interface StorySettings {
    */
   openerSlot?: string;
   /**
-   * 逐选项的**开场素材**（`{槽位label → {选项id → 文本}}`）。
+   * 逐选项的**开场素材**：`{ 选项id → 文本 }`。
    *
    * ⚠️ 这是**素材**，不是写死的第一幕。每段应当写给 AI 的"这类处境长什么样"：
    * 典型场合、会碰到的人的类型、这一行当特有的麻烦与体面、这个层级的便利与掣肘。
@@ -173,9 +279,12 @@ export interface StorySettings {
    *  · 有名字的 NPC 被写成"你的谁"（NPC 在世界卡里只记客观立场）；
    *  · 把时间地点写到"某日某时某间屋"这种分镜级精度 —— 那是 AI 的工作。
    *
-   * 只需给 `openerSlot` 那一个槽位写。
+   * ⚠️ **已扁平化**（2026-10）：原先按槽位再套一层
+   * （`Record<槽位label, Record<选项id, 文本>>`），但只有 `openerSlot`
+   * 那一个槽位在用，多出来的一层既没用、又让作者容易写错键。
+   * 现在直接 `选项id → 素材`（选项 id 在同世界内本就要求唯一）。
    */
-  openingSeeds?: Record<string, Record<string, string>>;
+  openingSeeds?: Record<string, string>;
   /** 主线目标，可为空 = 纯沙盒 */
   mainQuest: string;
   /** 是否启用章节卡（原 prologue / chapter_1 那套脚本事件） */
@@ -262,6 +371,15 @@ export interface PlayerCard {
   extra: string;
   /** 头像 */
   avatar?: string;
+  /**
+   * 立绘的结构化外观（部件级）。
+   *
+   * ⚠️ 主角的立绘**必须**走这条路：玩家的 `appearance` 是自由文本
+   * （「瘦削，眉骨高，惯穿青灰直裰」），拿它去猜部件命中率很低，
+   * 而"我自己设的主角画得不像"是最伤代入感的一件事。
+   * 选角页给了可视化选择器，产出就是这个字段。
+   */
+  look?: SpriteLook;
 }
 
 /** 一次开局前的完整配置 */

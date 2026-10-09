@@ -44,6 +44,8 @@ export function PortraitPanel() {
   useEffect(() => {
     if (!char) { setRecipe(null); return }
     setRecipe(recipeFor(char.id, {
+      // 部件级显式外观优先；profile 只补没写的字段
+      look: char.look,
       profile: {
         name: char.name,
         description: char.description,
@@ -94,6 +96,8 @@ export function PortraitPanel() {
               <CharacterSprite
                 name={char.name}
                 id={char.id}
+                /* 部件级显式外观优先；profile 只补没写的字段 */
+                look={char.look}
                 profile={{
                   name: char.name,
                   description: char.description,

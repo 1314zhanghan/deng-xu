@@ -1291,7 +1291,7 @@ export const westfantasy: WorldCard = {
     { id: 'lore_country_of_debt', name: '三邦的债务链', description: '帝国欠联邦银行家一千四百万索林（只还利息，本金二十六年未动），抵押物是关税与部分铸币权；王国抵押了三个山口的通行税三十年。三方军事上互相提防、财政上互相捆绑，因此都在做同一件矛盾的事：希望对手变弱，但不希望对手倒下。任何一方的崩溃都会拖垮另外两方。', attribute: 'lore', level: 2 },
   ],
   story: {
-    opening: `阿瓦朗的日子不是按一套历法过的。帝国人写承继历，高地人写誓约历，联邦的汇票上两种都印，而一个赶驮队的人只记得住「霜末」与「剪毛月」。时间在这块大陆上是会走样的：同一件事，三方的档案里能差出半个月，而差出来的那半个月，往往正是一笔违约金算不算数的关键。
+    atmosphere: `阿瓦朗的日子不是按一套历法过的。帝国人写承继历，高地人写誓约历，联邦的汇票上两种都印，而一个赶驮队的人只记得住「霜末」与「剪毛月」。时间在这块大陆上是会走样的：同一件事，三方的档案里能差出半个月，而差出来的那半个月，往往正是一笔违约金算不算数的关键。
 
 重量也算不出统一的样子。帝国的磅、高地的驮、矮人的车、联邦的标斗，各有各的用法；铸秤行会每年发布一次换算表，而每一次发布都有人抗议、有人行贿、有人伪造旧表——一枚方框缺一角的检定印，因此成了全大陆被仿得最多的东西。钱也是这样：金币会磨掉分量，银币会被人用牙咬一下听声音，而一张汇票的价值取决于开票的城最近有没有出过事。
 
@@ -1323,21 +1323,19 @@ export const westfantasy: WorldCard = {
     stages: [],
     openerSlot: '开局处境',
     openingSeeds: {
-      '开局处境': {
-        sit_revenue_clerk: '在行省的官署里当差，日常是文字与册子：丁口、田亩、税期，一样都错不得。打交道的对象是乡里来办事的人、跑驿路的信使、以及衙门里管钱与管兵的两三个位置；一句话能替人省下一趟路，也能替人招来三年的账。这个层级的便利是借得到马、叫得动人、说得出「按例」，掣肘是每一处改过的墨色都得由活着的人签字认下。',
-        sit_highland_retainer: '在领主的宅子里做事的人，鞍具、粮秣、书信、以及主人不便出面时那些话，都从他手上过。打交道的是家臣、家兵、别家派来的说客与跑腿的人；这一行的体面是替主人说的就等于是他说的，掣肘是说错了要自己担，而没有封地的幼子一旦丢了差事就没有退路。主家子弟多，继承的事往往比外面的事更难缠，做事的能不能站稳，有时就看他有没有先给自己留一条退路。',
-        sit_league_clerk: '在联邦的钱庄做事，日常是票据与数字：辨汇票上的真假笔迹、算贴现、看哪一家的名字在市场上已经被提过两次。打交道的是商人、船长、跑单帮的、以及来借钱的地方官；穿得体面，名字上得了分号的册子。体面是懂行、说得上话，掣肘是每替一笔自己不同意的账背书，出事时第一个被查的是那个签名。',
-        sit_road_mule: '跑商路的人，工钱按趟算，跑通了才有。他熟的是关口、渡口、宿站与封山的日子，打交道的是税吏、船夫、同行、以及半路上靠打劫过日子的散户。体面是不属于任何衙门、不必看谁脸色，掣肘是全部身家都压在马与货上，掉一头驮畜就是一趟白跑，而一趟白跑能欠下整个冬天。这一行最值钱的不是脚力，是知道哪一段在什么时辰走、哪个关口的人收钱不认账，而这些都要用几年摔出来。',
-        sit_mercenary_camp: '在雇佣队里带一队人的人，钱按日结、合同按季签。他打交道的是雇主派来的代表、同队的队长与老兵、以及路上被他们「清过」的村镇里的人。体面是刀口上的话最直接、分成拿得最快，掣肘是队伍按条款就地自偿过之后，被推出去顶事的往往是带队的那个。军饷一拖，队里先乱的是新来的那一批，老兵反而安静；带队的要同时压住两边，还得替整队的行为承担后果。',
-        sit_church_ward: '在教会堂区做事的人，管档案、管钥匙、管给穷人开证明。婚配与遗嘱都要从他手上过，打交道的是本堂的教士、城里的官吏、以及上门求助的各类人。体面是官吏见了会让路、一张证明能改一个人的一生，掣肘是教会的职分与官府的册子近来在同一件事上正好冲突，夹在中间的人要担两份记录。能进档房的只有极少数人，而所有要留很久的东西都得另抄一份藏在别处，这是这块大陆上最稳妥的活法。',
-        sit_elf_boundary: '在银椴林最外一圈记录物候的精灵。他记雪水、花期、以及人类在界石外砍了几棵，打交道的是族人、林缘的收购商、以及偶而来问路的人类；这份记录决定了整片林子对外缘的判断。体面是被议事会需要，掣肘是一旦离开记录就断，而他看事的尺度是几十年，人类觉得他慢，他觉得人类根本不看季节。',
-        sit_anvil_guild: '在矮人的行会里做工的人，名字刻在自己的工具上，厅里有筹码可以说话。打交道的是同行的师傅、来订货的包工头、以及替各方跑腿的中间人；规矩是账要刻在墙上，欠着的都要刻。体面是手艺硬就有人认、说话有人记，掣肘是行会费与示艺评定一样都躲不开，而刻上墙的账二百年后还会有人翻。',
-        sit_orc_ledger: '在兽人外务帐房轮值的人，同时说两种话、写两种字。护盐的登记、几起官司的卷宗都从他手里过，打交道的是部族里的说话人、官署的书吏、以及来谈通路的商人。体面是他写下的话三方都要受理，掣肘是部族里有人说他把话都写给了外人，官署里有人算他哪天会出错。他写下的每一个数目都要经得起三方对照，写错一个词，可能就变成一份对部族不利的判决。',
-        sit_freeport_lane: '在城墙外的棚户区讨生活的人，没有族属、行会与保人，靠看场子、剥刻字、替人递话赚零钱。打交道的是赌坊的东家、被逐出门的人、以及收门钱不给收据的门吏。体面是没人管他，掣肘是也没人替他说话：一旦官署要给他登记，最省事的处理方式就是先关起来，等查清。棚户区的人最在意的不是贫富，是谁记得住谁的脸，因为没有人肯替陌生人作保。',
-        sit_vice_governor: '在行省里说话算话的人，一道令就能让一个县赶在封冻前修完渠，商号也愿意替他把钱先垫上。打交道的是营官、各县的代表、书吏与财政官派来的人；他使唤得动人，也能开仓。体面是走到哪里都有人让座，掣肘是兵符与总册都在更上面，而任期一到，垫的钱仍会有人来讨，欠下的人情全记在他名下。',
-        sit_steward: '管着领主家的钥匙、私账与用印授权的人。求见的人先经过他，家臣冬天多领两袋燕麦也常由他点头；打交道的是各路访客、管事的、以及主家的亲戚。体面是每个人都要过他的手，掣肘是宣誓、割地、在集会上说话都不归他，而知道太多的人在主家换人时最先被清掉。经手的事里最难的不是钱，是那些写完了不能抄一份、只能烧掉的东西。',
-        sit_branch_manager: '经手一整条街信用的人，汇票由他签、贴现率由他定，谁能赊账也就一句话。打交道的是商号掌柜、驮队头目、摊主与来短借的地方官；摊主到驮队都先看他的脸色。体面是过手的钱比一个行省一年的税还多，掣肘是存疑的票必须上报总号，上报之后做主的就不再是他，而每一笔签字日后都要他自己认。',
-      },
+      sit_revenue_clerk: '在行省的官署里当差，日常是文字与册子：丁口、田亩、税期，一样都错不得。打交道的对象是乡里来办事的人、跑驿路的信使、以及衙门里管钱与管兵的两三个位置；一句话能替人省下一趟路，也能替人招来三年的账。这个层级的便利是借得到马、叫得动人、说得出「按例」，掣肘是每一处改过的墨色都得由活着的人签字认下。',
+      sit_highland_retainer: '在领主的宅子里做事的人，鞍具、粮秣、书信、以及主人不便出面时那些话，都从他手上过。打交道的是家臣、家兵、别家派来的说客与跑腿的人；这一行的体面是替主人说的就等于是他说的，掣肘是说错了要自己担，而没有封地的幼子一旦丢了差事就没有退路。主家子弟多，继承的事往往比外面的事更难缠，做事的能不能站稳，有时就看他有没有先给自己留一条退路。',
+      sit_league_clerk: '在联邦的钱庄做事，日常是票据与数字：辨汇票上的真假笔迹、算贴现、看哪一家的名字在市场上已经被提过两次。打交道的是商人、船长、跑单帮的、以及来借钱的地方官；穿得体面，名字上得了分号的册子。体面是懂行、说得上话，掣肘是每替一笔自己不同意的账背书，出事时第一个被查的是那个签名。',
+      sit_road_mule: '跑商路的人，工钱按趟算，跑通了才有。他熟的是关口、渡口、宿站与封山的日子，打交道的是税吏、船夫、同行、以及半路上靠打劫过日子的散户。体面是不属于任何衙门、不必看谁脸色，掣肘是全部身家都压在马与货上，掉一头驮畜就是一趟白跑，而一趟白跑能欠下整个冬天。这一行最值钱的不是脚力，是知道哪一段在什么时辰走、哪个关口的人收钱不认账，而这些都要用几年摔出来。',
+      sit_mercenary_camp: '在雇佣队里带一队人的人，钱按日结、合同按季签。他打交道的是雇主派来的代表、同队的队长与老兵、以及路上被他们「清过」的村镇里的人。体面是刀口上的话最直接、分成拿得最快，掣肘是队伍按条款就地自偿过之后，被推出去顶事的往往是带队的那个。军饷一拖，队里先乱的是新来的那一批，老兵反而安静；带队的要同时压住两边，还得替整队的行为承担后果。',
+      sit_church_ward: '在教会堂区做事的人，管档案、管钥匙、管给穷人开证明。婚配与遗嘱都要从他手上过，打交道的是本堂的教士、城里的官吏、以及上门求助的各类人。体面是官吏见了会让路、一张证明能改一个人的一生，掣肘是教会的职分与官府的册子近来在同一件事上正好冲突，夹在中间的人要担两份记录。能进档房的只有极少数人，而所有要留很久的东西都得另抄一份藏在别处，这是这块大陆上最稳妥的活法。',
+      sit_elf_boundary: '在银椴林最外一圈记录物候的精灵。他记雪水、花期、以及人类在界石外砍了几棵，打交道的是族人、林缘的收购商、以及偶而来问路的人类；这份记录决定了整片林子对外缘的判断。体面是被议事会需要，掣肘是一旦离开记录就断，而他看事的尺度是几十年，人类觉得他慢，他觉得人类根本不看季节。',
+      sit_anvil_guild: '在矮人的行会里做工的人，名字刻在自己的工具上，厅里有筹码可以说话。打交道的是同行的师傅、来订货的包工头、以及替各方跑腿的中间人；规矩是账要刻在墙上，欠着的都要刻。体面是手艺硬就有人认、说话有人记，掣肘是行会费与示艺评定一样都躲不开，而刻上墙的账二百年后还会有人翻。',
+      sit_orc_ledger: '在兽人外务帐房轮值的人，同时说两种话、写两种字。护盐的登记、几起官司的卷宗都从他手里过，打交道的是部族里的说话人、官署的书吏、以及来谈通路的商人。体面是他写下的话三方都要受理，掣肘是部族里有人说他把话都写给了外人，官署里有人算他哪天会出错。他写下的每一个数目都要经得起三方对照，写错一个词，可能就变成一份对部族不利的判决。',
+      sit_freeport_lane: '在城墙外的棚户区讨生活的人，没有族属、行会与保人，靠看场子、剥刻字、替人递话赚零钱。打交道的是赌坊的东家、被逐出门的人、以及收门钱不给收据的门吏。体面是没人管他，掣肘是也没人替他说话：一旦官署要给他登记，最省事的处理方式就是先关起来，等查清。棚户区的人最在意的不是贫富，是谁记得住谁的脸，因为没有人肯替陌生人作保。',
+      sit_vice_governor: '在行省里说话算话的人，一道令就能让一个县赶在封冻前修完渠，商号也愿意替他把钱先垫上。打交道的是营官、各县的代表、书吏与财政官派来的人；他使唤得动人，也能开仓。体面是走到哪里都有人让座，掣肘是兵符与总册都在更上面，而任期一到，垫的钱仍会有人来讨，欠下的人情全记在他名下。',
+      sit_steward: '管着领主家的钥匙、私账与用印授权的人。求见的人先经过他，家臣冬天多领两袋燕麦也常由他点头；打交道的是各路访客、管事的、以及主家的亲戚。体面是每个人都要过他的手，掣肘是宣誓、割地、在集会上说话都不归他，而知道太多的人在主家换人时最先被清掉。经手的事里最难的不是钱，是那些写完了不能抄一份、只能烧掉的东西。',
+      sit_branch_manager: '经手一整条街信用的人，汇票由他签、贴现率由他定，谁能赊账也就一句话。打交道的是商号掌柜、驮队头目、摊主与来短借的地方官；摊主到驮队都先看他的脸色。体面是过手的钱比一个行省一年的税还多，掣肘是存疑的票必须上报总号，上报之后做主的就不再是他，而每一笔签字日后都要他自己认。',
     },
     enableChoices: true,
     urgencyAfterTurns: 5,
@@ -1366,6 +1364,7 @@ export const westfantasy: WorldCard = {
       scenario: '在白石城宫城的西侧书房里，面前摊着三份日期互相矛盾的婚配登记抄本',
       location: '白石城·宫城西书房',
       present: false,
+      look: { head: 'heads_human_male_elderly', skin: 'light', hair: 'hair_buzzcut', hairColor: 'gray', torso: 'torso_clothes_robe', clothColor: 'slate', legs: 'legs_pants', feet: 'feet_shoes_basic', beard: '', eye: 'gray', brows: 'eyebrows_thin', note: '五十岁人类男性，灰白短发，深灰素袍，瘦削、肩塌；脸上有不眠的眼袋（画不出）' },
       tags: ['帝国', '权臣', '人类'],
     }),
     char({
@@ -1377,6 +1376,7 @@ export const westfantasy: WorldCard = {
       scenario: '在白垩脊南麓的一个边防据点里，正在检查一块被移回原位的界碑上的刻痕',
       location: '白垩脊南麓·狼喉隘据点',
       present: false,
+      look: { head: 'heads_human_female', skin: 'light', hair: 'hair_long_straight', hairColor: 'dark_gray', torso: 'torso_clothes_robe', clothColor: 'navy', legs: 'legs_pants', feet: 'feet_shoes_basic', beard: '', eye: 'brown', brows: 'eyebrows_thin', note: '四十七岁人类女性，深灰长发，洗得发白的深蓝外袍，袖口卷到小臂；小臂与颈侧有浅白术痕（画不出）' },
       tags: ['帝国', '术士', '人类'],
     }),
     char({
@@ -1388,6 +1388,7 @@ export const westfantasy: WorldCard = {
       scenario: '在三姓城的教会堂区里等一个人，等的人不是你，但你已经进门了',
       location: '三姓城·圣承教会堂区',
       present: true,
+      look: { head: 'heads_human_male', skin: 'light', hair: '', hairColor: 'dark_brown', torso: 'torso_clothes_robe', clothColor: 'gray', legs: 'legs_pants', feet: 'feet_boots_basic', beard: 'beards_mustache', eye: 'gray', brows: 'eyebrows_thick', note: '四十一岁人类男性，剃光头、短须，灰袍下藏旧皮甲，身高体壮；左小腿有旧弩伤（画不出）' },
       tags: ['教会', '严律派', '人类'],
     }),
     char({
@@ -1399,6 +1400,7 @@ export const westfantasy: WorldCard = {
       scenario: '在三姓城官署的后巷屋里核一份提交给行省法庭的补充陈述，桌上摊着四份契约的抄本',
       location: '三姓城·官署后巷',
       present: true,
+      look: { head: 'heads_human_male_gaunt', skin: 'brown', hair: 'hair_long_tied', hairColor: 'black', torso: 'torso_clothes_robe', clothColor: 'tan', legs: 'legs_pants', feet: 'feet_boots_basic', beard: '', eye: 'brown', brows: 'eyebrows_thick', note: '三十六岁兽人男性，深褐偏灰肤色，颧骨高，黑发在脑后束成短辫，长袍腰系盐晶；鼻梁有旧裂痕（画不出）' },
       tags: ['兽人', '公议', '外务帐房'],
     }),
     char({
@@ -1410,6 +1412,7 @@ export const westfantasy: WorldCard = {
       scenario: '在南境返回白石城的途中，车马正停在一座行省小城的驿馆里等一场雨停',
       location: '帝国南境·驿馆',
       present: false,
+      look: { head: 'heads_human_female', skin: 'light', hair: 'hair_half_up', hairColor: 'dark_brown', torso: 'torso_clothes_longsleeve_formal', clothColor: 'navy', legs: 'legs_pants', feet: 'feet_boots_basic', beard: '', eye: 'brown', brows: 'eyebrows_thin', note: '二十六岁人类女性，深褐头发盘起，素色好料长衣，中等身材偏瘦；右手食指内侧有烫伤疤（画不出）' },
       tags: ['帝国', '公主', '继承'],
     }),
     char({
@@ -1421,6 +1424,7 @@ export const westfantasy: WorldCard = {
       scenario: '在白塔城的双誓团营地里，正为一批到期的马料款与团里的粮官争执',
       location: '白塔城·双誓团营地',
       present: false,
+      look: { head: 'heads_human_male', skin: 'light', hair: 'hair_buzzcut', hairColor: 'ginger', torso: 'torso_armour_leather', clothColor: 'teal', legs: 'legs_leggings', feet: 'feet_boots_basic', beard: 'beards_beard', eye: 'blue', brows: 'eyebrows_thick', arms: 'arms_bracers', cape: 'cape_solid', note: '二十九岁人类男性，结实矮壮，红褐大胡子，深青战袍配皮甲与披风；左手缺半截小指（画不出）' },
       tags: ['王国', '骑士', '人类'],
     }),
     char({
@@ -1432,6 +1436,7 @@ export const westfantasy: WorldCard = {
       scenario: '在第三谷地的领主宅邸里主持一场关于羊毛价与过山礼的族内议事',
       location: '王国·第三谷地领主宅邸',
       present: false,
+      look: { head: 'heads_human_female', skin: 'light', hair: 'hair_braid', hairColor: 'chestnut', torso: 'torso_clothes_longsleeve', clothColor: 'forest', legs: 'legs_skirt_straight', feet: 'feet_shoes_basic', beard: '', eye: 'brown', brows: 'eyebrows_thin', belt: 'belt_sash', note: '三十五岁人类女性，皮肤偏白颧骨略高，深棕长辫，厚羊毛长裙腰系腰带；左腕有旧疤（画不出）' },
       tags: ['王国', '领主', '人类'],
     }),
     char({
@@ -1443,6 +1448,7 @@ export const westfantasy: WorldCard = {
       scenario: '在白塔城双誓团总部的地图厅里，听两名谷地来的旗士说明第三谷的情况',
       location: '白塔城·双誓团总部',
       present: false,
+      look: { head: 'heads_human_male', skin: 'light', hair: 'hair_buzzcut', hairColor: 'dark_brown', torso: 'torso_armour_legion', clothColor: 'gray', legs: 'legs_leggings', feet: 'feet_boots_basic', beard: '', eye: 'gray', brows: 'eyebrows_thick', arms: 'arms_armour', cape: 'cape_solid', note: '三十八岁人类男性，比常人高半头、肩极宽，短发，下巴干净，普通骑士甲；左眉到颧骨有旧伤（画不出）' },
       tags: ['王国', '双誓团', '人类'],
     }),
     char({
@@ -1454,6 +1460,7 @@ export const westfantasy: WorldCard = {
       scenario: '在维克斯的长桥市场，正在处理一笔帝国国债的利息交割',
       location: '维克斯·长桥市场',
       present: false,
+      look: { head: 'heads_human_female', skin: 'light', hair: 'hair_half_up', hairColor: 'light_brown', torso: 'torso_clothes_longsleeve_formal', clothColor: 'forest', legs: 'legs_pants', feet: 'feet_shoes_basic', beard: '', eye: 'brown', brows: 'eyebrows_thin', note: '三十一岁人类女性，身材纤细，浅栗色头发半挽，深绿商袍；右手小指戴记名环（画不出）' },
       tags: ['联邦', '钱庄', '人类'],
     }),
     char({
@@ -1465,6 +1472,7 @@ export const westfantasy: WorldCard = {
       scenario: '在白石城外的灰门商栈里，核一批军用钢材的进出记录，发现有一批去向不明',
       location: '白石城外·灰门商栈',
       present: true,
+      look: { head: 'heads_human_male_plump', skin: 'bronze', hair: 'hair_balding', hairColor: 'gray', torso: 'torso_clothes_longsleeve2', clothColor: 'brown', legs: 'legs_pants', feet: 'feet_boots_basic', beard: 'beards_winter', eye: 'brown', brows: 'eyebrows_thick', belt: 'belt_leather', note: '两百四十七岁矮人男性，肤色黝黑，身材矮壮、肩极厚、手臂粗短，铁灰色大胡子（编成两股系铜环，画不出），深褐厚呢旅行衣，腰挂铜秤' },
       tags: ['矮人', '秤会', '账目'],
     }),
     char({
@@ -1476,6 +1484,7 @@ export const westfantasy: WorldCard = {
       scenario: '在石桥市一间租来的屋子里，桌上摊着几片星图残页，正在比对一段被改动过的星象记录',
       location: '石桥市·租屋',
       present: false,
+      look: { head: 'heads_human_male', skin: 'light', hair: 'hair_long_center_part', hairColor: 'blonde', torso: 'torso_clothes_robe', clothColor: 'forest', legs: 'legs_pants', feet: 'feet_shoes_basic', beard: '', eye: 'gray', brows: 'eyebrows_thin', note: '三百八十九岁精灵男性，看起来三十五岁上下，身材高瘦，浅金色长发中分（原辫垂左肩，画不出），灰绿薄袍，浅灰蓝眼' },
       tags: ['精灵', '议事会', '星图'],
     }),
     char({
@@ -1487,6 +1496,7 @@ export const westfantasy: WorldCard = {
       scenario: '在三姓城的市集边上替一头被偷的牛找下落，已经问过十一个人',
       location: '三姓城·市集',
       present: true,
+      look: { head: 'heads_human_female_elderly', skin: 'brown', hair: 'hair_braid', hairColor: 'gray', torso: 'torso_clothes_longsleeve2', clothColor: 'tan', legs: 'legs_widepants', feet: 'feet_boots_basic', beard: 'beards_mustache', eye: 'gray', brows: 'eyebrows_thin', belt: 'belt_sash_narrow', note: '五十二岁兽人女性，中等身高背略前倾，深褐肤色，花白辫发系盐晶；脸上盐晶粉面纹（画不出）' },
       tags: ['兽人', '萨满', '盐部'],
     }),
     char({
@@ -1498,6 +1508,7 @@ export const westfantasy: WorldCard = {
       scenario: '坐在三姓城铁砧酒馆的角落里，面前一杯没动过的酒，看着门口',
       location: '三姓城·铁砧酒馆',
       present: true,
+      look: { head: 'heads_human_male_gaunt', skin: 'taupe', hair: 'hair_long_straight', hairColor: 'raven', torso: 'torso_clothes_robe', clothColor: 'walnut', legs: 'legs_pants', feet: '', beard: '', eye: 'gray', brows: 'eyebrows_thin', note: '人类形态约四十岁，身材高瘦，极深的黑长发到肩下，皮肤偏灰，深褐无饰长衣，赤脚；不眨眼（画不出）' },
       tags: ['龙', '代言', '不可测'],
     }),
   ],

@@ -15,6 +15,7 @@
 import runtime from '@/assets/lpc/runtime.json'
 import { inferTraits, resolvePaletteName, type AppearanceTraits } from '@/utils/appearance'
 import paletteData from '@/assets/lpc/palettes.json'
+import type { SpriteLook } from '@/types/cards'
 
 // ============================================================================
 // 换色（LPC 的 palette recolor）
@@ -263,8 +264,18 @@ export interface RecipeOptions {
    * 角色资料。传了就用它推断外貌（发色、发型、年龄、身份…），
    * 不传则退回纯随机 —— 见 `appearance.ts` 的说明：
    * 只看 gender 一个字段会让立绘和角色描述毫无关系。
+   *
+   * ⚠️ 一旦 `look` 提供了某个字段，**推断就不再参与那个字段**。
    */
   profile?: AppearanceProfile
+  /**
+   * **立绘的结构化外观**（部件级）。
+   *
+   * 这是"立绘与描述不匹配"的根治办法：不再从中文描述里猜部件，
+   * 而是让作者/玩家直接指定。见 `SpriteLook` 的长注释。
+   * 只写你在意的字段即可，其余留空由 `profile` 推断补齐。
+   */
+  look?: SpriteLook
 }
 
 /** 可参与推断的角色资料（字段都取自角色卡） */
@@ -629,6 +640,23 @@ export function playerSpriteSeed(name?: string, gender?: string): string {
 export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   const rng = makeRng(hashSeed(key))
 
+  /*
+    ══ 结构化外观直通（2026-10）══
+
+    `opts.look` 是**部件级**的显式指定。它存在时，下面每一个选择点都优先用它，
+    完全跳过"从描述里猜 → 再从部件池里挑"这两步。
+
+    为什么这是必要的修法（玩家原话）：
+      「人物立绘与描述的匹配程度仍然堪忧，**仅仅只是靠关键词来临时构筑
+        人物立绘的错误率高到不必多说**」
+
+    中文描述的表述空间是无穷的（「黛青直裰」「玄色箭袖」「月白中衣」…），
+    正则表永远追不上；而且即使抽对了"深青色长袍"，**从 67 件衣服里挑哪件**仍是猜的。
+    所以正解不是加词表，是让作者/玩家**直接写部件 id**。
+    推断只用于没填的字段（以及导入的第三方卡）。
+  */
+  const look = opts?.look
+
   // —— 先推断外貌：描述里写了什么，就尽量照着画 ——
   const traits: AppearanceTraits = opts?.profile
     ? inferTraits(opts.profile)
@@ -651,7 +679,18 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
 
   const isBroad = traits.build === 'broad' || traits.build === 'muscular'
 
-  const head = pickHead(rng, traits, isBroad)
+  /*
+    ⚠️ `look` 里的部件 id 必须真实存在，否则**静默忽略**并退回推断。
+    这里统一做一次校验 —— 与其相信作者记得目录，不如在这里挡一道。
+    （`pnpm check:sprites` 会在构建期把错的 id 全抓出来。）
+  */
+  const part = (id: string | undefined): string | undefined => {
+    if (id === undefined) return undefined
+    if (id === '') return ''          // 空串是**有意义的**：明确"不要这件"
+    return BY_ID.has(id) ? id : undefined
+  }
+
+  const head = part(look?.head) || pickHead(rng, traits, isBroad)
 
   /*
     发型：优先按推断出的关键词选。
@@ -662,14 +701,18 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     看起来仍然像有头发，与设定矛盾。这种情况**整个不加头发层**。
   */
   const bald = traits.hairStyle?.some(k => /bald|shaved/i.test(k))
-  const hair = bald ? '' : pickRequired(rng, HAIRS, traits.hairStyle, 'hair_bob')
+  const lookHair = part(look?.hair)
+  const hair = lookHair !== undefined
+    ? lookHair                       // 显式指定（含"明确光头"的空串）
+    : (bald ? '' : pickRequired(rng, HAIRS, traits.hairStyle, 'hair_bob'))
 
   /*
     衣着：先用身份选类型（守卫→盔甲、法师→长袍），选不出再随机。
     身份是最能拉开辨识度的一维 —— 一排守卫穿一样的甲、法师穿一样的袍，
     玩家一眼就能从立绘看出谁是谁。
   */
-  let torso = pickRequired(rng, TORSOS, traits.role, 'torso_clothes_longsleeve')
+  const lookTorso = part(look?.torso)
+  let torso = lookTorso || pickRequired(rng, TORSOS, traits.role, 'torso_clothes_longsleeve')
 
   /*
     **外层件必须配打底衬衣**。
@@ -701,7 +744,12 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   let skirtReplacesLegs = false
   /** 是否穿了和服 —— 决定腰带要用和服带（obi）而不是皮腰带 */
   let wearsKimono = false
-  if (traits.skirt && DRESSES.length) {
+  /*
+    ⚠️ **显式指定了上装时，跳过整套裙装推断**。
+    玩家/作者写了 `torso: 'torso_jacket_frock'`，就不该再因为推断出"裙"而把它换成连衣裙。
+    这正是"匹配度堪忧"的一个具体来源：显式指定被推断覆盖。
+  */
+  if (!lookTorso && traits.skirt && DRESSES.length) {
     /*
       裙装只有这几种颜色变体，而描述里推断出的衣色名可能来自更宽的调色板
       （如 slate / teal / sky）—— 匹配不到时用 resolvePaletteName 退到最近的一件，
@@ -725,6 +773,11 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     skirtReplacesLegs = true
     wearsKimono = /kimono/i.test(torso)
   }
+  // 显式指定的上装若是裙装（dress_* / kimono），同样要顶掉腿部件
+  if (lookTorso) {
+    skirtReplacesLegs = /^dress_|kimono/i.test(lookTorso)
+    wearsKimono = /kimono/i.test(lookTorso)
+  }
 
   /*
     下半身。
@@ -732,22 +785,27 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
       - 明确要裙装但没有连衣裙可用 → 用独立的裙装部件兜底
       - 其余 → 从**裤装池**取（裙子已按 id 排除，不会随机分给男 NPC）
   */
+  const lookLegs = part(look?.legs)
   let legs: string
-  if (skirtReplacesLegs) {
+  if (lookLegs !== undefined) {
+    legs = lookLegs                       // 显式指定优先（空串 = 不要下装）
+  } else if (skirtReplacesLegs) {
     legs = ''
   } else if (traits.skirt && SKIRT_LEGS.length) {
     legs = pick(rng, SKIRT_LEGS)
   } else {
     legs = pick(rng, LEGS.length ? LEGS : ['legs_pants'])
   }
-  const shoes = pick(rng, FEET.length ? FEET : ['feet_shoes_basic'])
+  const shoes = part(look?.feet) ?? pick(rng, FEET.length ? FEET : ['feet_shoes_basic'])
   /*
     鼻子与眉毛也要**跟着年龄走**。
     `head_nose_elderly` 原先一直在全池里随机 —— 一个十七八岁的少年配上一只
     老人鼻子（鼻头特别大、位置偏低），同样是"推断为young却用老年件"。
   */
-  const nose = pick(rng, agePool(NOSES, traits.age).length ? agePool(NOSES, traits.age) : ['head_nose_straight'])
-  const brows = pick(rng, agePool(BROWS, traits.age).length ? agePool(BROWS, traits.age) : ['eyebrows_thick'])
+  const nose = part(look?.nose)
+    ?? pick(rng, agePool(NOSES, traits.age).length ? agePool(NOSES, traits.age) : ['head_nose_straight'])
+  const brows = part(look?.brows)
+    ?? pick(rng, agePool(BROWS, traits.age).length ? agePool(BROWS, traits.age) : ['eyebrows_thick'])
 
   // —— 可选部件：只在描述明确提到、且**素材库里真的有对应件**时才加 ——
   const optional: string[] = []
@@ -759,24 +817,37 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     此时若回退随机，就会给他配一顶野蛮人头盔 —— 比不戴帽子糟糕得多。
     宁可少一个配饰，也不能给错。
   */
-  if (traits.headwear?.length && HEADWEAR.length) {
+  const lookHat = part(look?.hat)
+  if (lookHat) {
+    optional.push(lookHat)              // 显式指定：直接加，不做关键词判断
+  } else if (lookHat === undefined && traits.headwear?.length && HEADWEAR.length) {
     const hw = pickByKeywords(rng, HEADWEAR, traits.headwear)
     if (hw) optional.push(hw)
   }
 
   // 胡须：描述里明确写了才加（zPos 110，会被头发压住一部分，符合真实观感）
-  if (traits.beard && BEARDS.length) {
+  const lookBeard = part(look?.beard)
+  if (lookBeard) {
+    optional.push(lookBeard)            // 显式指定：直接加（空串 = 明确不要）
+  } else if (lookBeard === undefined && traits.beard && BEARDS.length) {
     optional.push(pick(rng, BEARDS))
   }
 
   /*
     腰带。
+      - **显式指定优先**（`look.belt`）
       - 穿和服 → 用和服带（obi），这是和服的必要组成，不加会很怪
       - 穿普通裙装 → 不加（裙装自带腰线，再叠一条会穿模）
       - 穿盔甲 → 不加（板甲外面系皮腰带很荒谬）
       - 其余 → 45% 概率加一条
+
+    ⚠️ 有 `look` 时**不做那个 45% 概率**：像 `hat` / `beard` 一样立刻加成 →
+    "有时候有、有时候没有"会让同一个角色在不同界面下长得不一样。
   */
-  if (BELTS.length) {
+  const lookBelt = part(look?.belt)
+  if (lookBelt) {
+    optional.push(lookBelt)
+  } else if (lookBelt === undefined && BELTS.length) {
     if (wearsKimono) {
       const obi = BELTS.filter(b => /^belt_obi/.test(b))
       if (obi.length) optional.push(pick(rng, obi))
@@ -790,7 +861,11 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   }
 
   // 披风：只在身份明确指向领主/法师/游侠时加
-  if (CAPES.length && /lord|noble|robe|ranger|mage/.test((traits.role || []).join(' ')) && rng() < 0.5) {
+  const lookCape = part(look?.cape)
+  if (lookCape) {
+    optional.push(lookCape)
+  } else if (lookCape === undefined && CAPES.length
+    && /lord|noble|robe|ranger|mage/.test((traits.role || []).join(' ')) && rng() < 0.5) {
     optional.push(pick(rng, CAPES))
   }
 
@@ -799,7 +874,12 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
     守卫、骑士、刺客这类身份戴护腕很自然，加一点能让轮廓更"有装备感"。
     只在身份命中时加，避免人人都戴。
   */
-  if (ARMS.length && /armour|leather|bracer|warrior|knight|guard|rogue|assassin/.test((traits.role || []).join(' ')) && rng() < 0.55) {
+  const lookArms = part(look?.arms)
+  if (lookArms) {
+    optional.push(lookArms)
+  } else if (lookArms === undefined && ARMS.length
+    && /armour|leather|bracer|warrior|knight|guard|rogue|assassin/.test((traits.role || []).join(' '))
+    && rng() < 0.55) {
     optional.push(pick(rng, ARMS))
   }
 
@@ -812,21 +892,28 @@ export function recipeFor(key: string, opts?: RecipeOptions): SpriteRecipe {
   /*
     肤色先定，衣色再定 —— 因为衣色要看肤色来决定（避免撞色）。
     顺序反过来的话没法做这个约束。
+
+    ⚠️ `look` 给的颜色**一律照办**，包括"撞肤色"的情况 ——
+    玩家/作者明确写了就是这个色，不该被"避免撞色"的启发式改掉。
   */
-  const skinName = resolvePaletteName(traits.skin, bodyNames.length ? bodyNames : paletteNames('body'))
+  const skinName = (look?.skin && PALETTES.body?.[look.skin] ? look.skin : undefined)
+    || resolvePaletteName(traits.skin, bodyNames.length ? bodyNames : paletteNames('body'))
     || pick(rng, bodyNames.length ? bodyNames : paletteNames('body'))
 
   const colors: RecolorSpec = opts?.colors || {
-    hair: resolvePaletteName(traits.hairColor, hairNames) || pick(rng, hairNames),
+    hair: (look?.hairColor && PALETTES.hair?.[look.hairColor] ? look.hairColor : undefined)
+      || resolvePaletteName(traits.hairColor, hairNames) || pick(rng, hairNames),
     body: skinName,
     /*
       描述里明确写了衣色就照办（玩家说了算）；
       没写时才随机，但**排除与肤色太接近的**，否则无袖/短袖部件
       看起来就像没穿衣服。玩家明确指定的颜色即使撞肤色也保留。
     */
-    cloth: resolvePaletteName(traits.cloth, clothNames)
+    cloth: (look?.clothColor && PALETTES.cloth?.[look.clothColor] ? look.clothColor : undefined)
+      || resolvePaletteName(traits.cloth, clothNames)
       || pickContrastingCloth(rng, clothNames, skinName),
-    eye: resolvePaletteName(traits.eye, eyeNames) || pick(rng, eyeNames),
+    eye: (look?.eye && PALETTES.eye?.[look.eye] ? look.eye : undefined)
+      || resolvePaletteName(traits.eye, eyeNames) || pick(rng, eyeNames),
   }
 
   return {

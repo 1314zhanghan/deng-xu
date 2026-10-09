@@ -204,13 +204,13 @@ export function WorldbookPreview({
             </div>
           )}
 
-          {world.story?.opening && (
+          {(world.story?.atmosphere || world.story?.opening) && (
             <Panel
               icon={<BookOpen size={14} />}
-              title="开场基调"
+              title="世界氛围"
               hint="第一幕由 AI 依据「你自设的主角」＋所选处境现场创作，这一段只是世界的氛围参考"
             >
-              <Prose text={world.story.opening} />
+              <Prose text={world.story.atmosphere || world.story.opening || ''} />
             </Panel>
           )}
 
@@ -245,6 +245,8 @@ export function WorldbookPreview({
                   <CharacterSprite
                     name={c.name}
                     id={c.id}
+                    /* 部件级显式外观优先；profile 只补没写的字段 */
+                    look={c.look}
                     profile={{ name: c.name, description: c.description, personality: c.personality, scenario: c.scenario }}
                     headOnly
                     scale={4}
@@ -342,9 +344,8 @@ export function WorldbookPreview({
           loreGroups.get(key)!.push(l)
         }
 
-        const seedMap = world.story?.openerSlot
-          ? world.story?.openingSeeds?.[world.story.openerSlot]
-          : undefined
+        // openingSeeds 已扁平化：直接「选项 id → 素材」
+        const seedMap = world.story?.openingSeeds
         const nBg = bgSlots.reduce((n, s) => n + s.options.length, 0)
         const nItem = [...itemGroups.values()].reduce((n, a) => n + a.length, 0)
         const nLore = [...loreGroups.values()].reduce((n, a) => n + a.length, 0)

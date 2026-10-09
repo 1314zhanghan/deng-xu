@@ -934,7 +934,7 @@ export const veil: WorldCard = {
     { id: 'item_brass_key_odd', name: '一枚不属于任何门的钥匙', description: '一枚黄铜钥匙，长约三英寸，齿形很旧，配不上你见过的任何一把锁。它是在一件旧外套的口袋里发现的，而那件外套的原主已经在三年前下葬。**钥匙本身不值钱，值钱的是"哪一扇门"这个问题。**你试过七把锁，都不对；第八把你没有试，因为那扇门后面是你自己家的储藏间。', tags: ['器物', '线索', '门'] },
   ],
   story: {
-    opening: `邓威克的白天是一场交易，晚上是一场妥协。雾从下午四点开始从河上长起来，先把下城填满，再往上爬——上城的人说“上头看得见星星”，下头的人说“下头不归谁管”。煤气灯一根一根亮，掌灯人扛着七英尺的点火杆走七条街，一顿晚饭四便士半，一间东区的屋子一周四先令六便士，而柏树台一栋四层房子的租金一年四百镑。这座城市不常谈帷幕，它谈“那栋房子空气不好”“那条巷子晚上不要走”“那家人这些年不顺”。判据是免费的：脚步声闷不闷、影子的边发不发毛、纸上的字过三天会不会变；有人刚刚做过某件事的房间，通常最薄。而在这座城里，一个人的位置由四样东西决定——他能进哪一间客厅，他欠谁，他认识谁，以及他哪一天晚上独自待得太久。`,
+    atmosphere: `邓威克的白天是一场交易，晚上是一场妥协。雾从下午四点开始从河上长起来，先把下城填满，再往上爬——上城的人说“上头看得见星星”，下头的人说“下头不归谁管”。煤气灯一根一根亮，掌灯人扛着七英尺的点火杆走七条街，一顿晚饭四便士半，一间东区的屋子一周四先令六便士，而柏树台一栋四层房子的租金一年四百镑。这座城市不常谈帷幕，它谈“那栋房子空气不好”“那条巷子晚上不要走”“那家人这些年不顺”。判据是免费的：脚步声闷不闷、影子的边发不发毛、纸上的字过三天会不会变；有人刚刚做过某件事的房间，通常最薄。而在这座城里，一个人的位置由四样东西决定——他能进哪一间客厅，他欠谁，他认识谁，以及他哪一天晚上独自待得太久。`,
     mainQuest: `**以下全是可选的。** 你可以在这座城里当一个掌灯人、一个女仆、一个跑街的，把日子过下去，这不算玩错。下面列的不是任务，而是这座城市里**存在着的几大方向**——每一个方向里头，都还有无数种活法。
 
 **一、弄明白一件事。** 从一份日期对不上的死亡登记、一具鞋底是干的尸体、一条少掉十步的街、一封自己写给自己的信开始，往下查。你可以查法条、查账、查堂区的旧册子、查第五科的表册；你也可以查一件更小的事：谁在什么时辰从哪一扇门出来。这条路没有终点，而它的代价很具体——**你查得越深，越会发现名单上有你自己认识的人**，而到了那一步，你要决定的是把东西交出去、卖掉、还是烧掉。
@@ -956,8 +956,7 @@ export const veil: WorldCard = {
 **这八个方向不是选项菜单。** 它们只是"这座城市里有人在这么活"的几个例子。你可以做掌灯人、验尸人、殡仪人、鸦片馆掌柜、扫烟囱的、公证人、舞女、巡目、教士、骗子；你可以谁的债都不欠，也可以欠一屁股。**你不需要选一个方向，也不需要一直待在同一个方向里。没有人会来催你，也没有哪一条是唯一正确的。**`,
     openerSlot: '开局处境',
     openingSeeds: {
-      开局处境: {
-        sit_peer_lords: `这一层的人一整天都在被看：走廊、会客室、包厢、乡间猎场、某一场午餐会——真正的事情多半是在这些地方谈成的，而不是在记录上。打交道的是同席的人、账房、代理人、家族里的长辈，以及那些想借你一句话的人。这个位置的便利是名字管用：一句"我来问一句"能办成别人跑三趟的事；掣肘是它全靠别人怎么看你，而钱从来是借来的。这一行最怕的不是说错话，是在需要表态的时候不说话，或者说了话之后才发现记错了日子。`,
+      sit_peer_lords: `这一层的人一整天都在被看：走廊、会客室、包厢、乡间猎场、某一场午餐会——真正的事情多半是在这些地方谈成的，而不是在记录上。打交道的是同席的人、账房、代理人、家族里的长辈，以及那些想借你一句话的人。这个位置的便利是名字管用：一句"我来问一句"能办成别人跑三趟的事；掣肘是它全靠别人怎么看你，而钱从来是借来的。这一行最怕的不是说错话，是在需要表态的时候不说话，或者说了话之后才发现记错了日子。`,
         sit_bureau_deputy: `这一类差事的日常是卷宗、走廊与登记册：勘验、封存、定性、抹除，四张纸走完一件案子，而每一张都要有人签名。打交道的是巡官、法医、堂区执事、报馆的人、以及上级署里那个不爱说话的人。便利在于你调得动别人调不动的东西：一份登记、一处封条、一条半夜的门路；掣肘在于你的分量来自别人愿意让你用，而"不可归类"那种案子一旦办坏，后果会跟着具体的人。这一行办得好等于没发生过，办不好会进档案。`,
         sit_duke_secretary: `替一位大人物管的三样东西：日程、信件、他不便亲自过问的那些事。一整天在会客室、书房、门厅与马车之间过，打交道的是管家、账房、访客、送来"货样"的生意人。便利在于你能看见整张网：谁在什么时候来、谁的信被压下来、谁的名字不能写进日程；掣肘在于你的权力是借来的，而你知道得太多了。这一行最要紧的本事是记住哪封信放在哪一只抽屉里，以及哪一件事应当没有发生。`,
         sit_detective: `警局的日常是在辖区里走：现场、门房、酒馆、停尸房、档案室，一天要写两三份报告，而每一份都要有人签。打交道的是巡官、验尸人、法医、堂区执事、以及各种不肯说实话的人。便利在于你进得去别人进不去的地方，看得见别人看不见的册子；掣肘在于结案的期限从来不在你手上，报纸、上司、甚至市长都在推。这一行最要紧的是先问清"谁想让它结"——一次办错的结论，会跟着一个人一辈子。`,
@@ -973,7 +972,6 @@ export const veil: WorldCard = {
         sit_dockhand: `码头上的日子按潮水与船期过：早上在闸门口等点名，叫到名字才有活，工钱一天一结，下雨停工只给一半。打交道的是包工头、船上管事、同乡伙计、点名牌房的老人与管账的。便利是这里是全城消息最灵的地方——哪条船带回了什么、哪一箱货比货单上重，都有人先知道；掣肘是一天不点名就一天没钱，号牌丢了那几天连闸门都进不去。这一行最讲一个“认”字，也最不讲情面。`,
         sit_pawnbroker: `柜台后面的生意一天收三十件、赎二十件：戒指、表、丧服、假牙、婚书，利钱按先令算，逾期不赎就听凭变卖。打交道的是急着用钱的人、替人来问的人，以及时不时上门打听“前几天有没有人来当过一件东西”的人。便利是半条街的底细都在你柜台上过一遍：谁家最近紧、谁家出了事、谁家女儿嫁出去了；掣肘是收得多了，你总有一天要问自己那件东西是从哪来的——而这一问题最好永远不问。`,
         sit_vaudeville: `在歌舞厅上台，一晚两场、一台十二个号：排练、上妆、等号、上台、卸妆，散场常常已过午夜。打交道的是乐手、班主、后台的姑娘、送茶的侍者，以及点你号的客人——他们来的时候心情好，说的话比在别处多。便利是体面在这里不太管用，而你能听见这座城市最真实的一面，也能靠一句好话替人挡下一件事；掣肘是红不红看客人赏不赏、看班主肯不肯把你的号往前排，而这个行当的名声不用别人来毁。`,
-      },
     },
     enableStages: false,
     stages: [],
@@ -1033,6 +1031,15 @@ export const veil: WorldCard = {
       location: '邓威克·议会街十七号四楼',
       present: true,
       tags: ['第五科', '官署', '权力', '内务署'],
+      look: {
+        head: 'heads_human_male_small', skin: 'light',
+        hair: 'hair_parted_side_bangs', hairColor: 'gray',
+        torso: 'torso_jacket_frock', clothColor: 'charcoal',
+        legs: 'legs_formal_striped', feet: 'feet_boots_revised',
+        beard: 'beards_mustache', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'gray',
+        belt: 'belt_formal',
+        note: '五十六岁男性，中等身量、肩膀往下沉；灰白短发，蓄短须；深灰燕尾服与条纹正装裤，胸前口袋插一支红铅笔',
+      },
     }),
     char({
       id: 'char_harlow',
@@ -1044,6 +1051,14 @@ export const veil: WorldCard = {
       location: '邓威克北区·解剖楼地下层',
       present: true,
       tags: ['烛下学会', '医生', '学者', '验物'],
+      look: {
+        head: 'heads_human_male_gaunt', skin: 'light',
+        hair: 'hair_swoop_side', hairColor: 'dark_brown',
+        torso: 'torso_clothes_longsleeve2_buttoned', clothColor: 'walnut',
+        legs: 'legs_pants', feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'blue',
+        note: '四十一岁男性，身量很高、瘦，重心偏一条腿；深棕色头发斜分，不留须；褐旧外套，袖口与前襟有洗过的痕',
+      },
     }),
     char({
       id: 'char_elias_finch',
@@ -1055,6 +1070,14 @@ export const veil: WorldCard = {
       location: '邓威克南岸·芬奇诊所',
       present: false,
       tags: ['蜕室', '外科', '违禁', '隐秘'],
+      look: {
+        head: 'heads_human_male', skin: 'light',
+        hair: 'hair_relm_short', hairColor: 'dark_brown',
+        torso: 'torso_clothes_longsleeve2', clothColor: 'black',
+        legs: 'legs_pants', feet: 'feet_boots_revised',
+        beard: 'beards_5oclock_shadow', brows: 'eyebrows_thick', nose: 'head_nose_big', eye: 'brown',
+        note: '四十七岁男性，矮壮、手掌很大；深棕短发、前额已退，眉很浓；常洗得发白的黑色外套，衬衫袖口卷到小臂',
+      },
     }),
     char({
       id: 'char_aurora_bright',
@@ -1066,6 +1089,15 @@ export const veil: WorldCard = {
       location: '邓威克中区·布莱特浴场',
       present: false,
       tags: ['蜕室', '商人', '隐秘', '中区'],
+      look: {
+        head: 'heads_human_female', skin: 'light',
+        hair: 'hair_half_up', hairColor: 'ginger',
+        torso: 'dress_bodice_green',
+        legs: '',
+        feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'green',
+        note: '四十一岁女性，身量中等偏高、肩背笔直；深红头发梳成极整齐的发髻、鬓角用发油压住；深绿天鹅绒长裙配短外套，两手各戴一枚戒指',
+      },
     }),
     char({
       id: 'char_miriam_voss',
@@ -1077,6 +1109,15 @@ export const veil: WorldCard = {
       location: '邓威克东区·白霜修会关怀院',
       present: true,
       tags: ['白霜修会', '修女', '临终', '东区'],
+      look: {
+        head: 'heads_human_female_elderly', skin: 'light',
+        hair: 'hair_lob', hairColor: 'gray',
+        torso: 'torso_clothes_robe', clothColor: 'gray',
+        legs: '', feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_elderly', eye: 'gray',
+        belt: 'belt_sash',
+        note: '六十三岁女性，个子小、背有点驼，脸皱纹很深、浅灰眼睛不眨；深灰修会长袍，腰间一条麻绳，绳上挂两把钥匙',
+      },
     }),
     char({
       id: 'char_rowland_ellis',
@@ -1088,6 +1129,15 @@ export const veil: WorldCard = {
       location: '邓威克中区·苏格兰门警察厅',
       present: false,
       tags: ['警察厅', '官署', '权力', '军人'],
+      look: {
+        head: 'heads_human_male', skin: 'light',
+        hair: 'hair_swoop', hairColor: 'white',
+        torso: 'torso_jacket_collared', clothColor: 'navy',
+        legs: 'legs_pants2', feet: 'feet_boots_revised',
+        beard: 'beards_mustache', brows: 'eyebrows_thick', nose: 'head_nose_straight', eye: 'gray',
+        belt: 'belt_leather',
+        note: '五十九岁男性，身量高大、体格厚实，重心压在右腿；方脸、浓眉、白发向后梳；深蓝制服，肩章擦得亮',
+      },
     }),
     char({
       id: 'char_grace_ashford',
@@ -1099,6 +1149,14 @@ export const veil: WorldCard = {
       location: '邓威克中区·鲍街',
       present: false,
       tags: ['风化科', '警察厅', '东区', '登记'],
+      look: {
+        head: 'heads_human_female', skin: 'light',
+        hair: 'hair_page', hairColor: 'dark_brown',
+        torso: 'torso_clothes_longsleeve2_cardigan', clothColor: 'slate',
+        legs: 'legs_skirt_straight', feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_button', eye: 'brown',
+        note: '三十四岁女性，身量中等、行动轻捷；深棕头发梳得紧而朴素，只在耳后别一枚黑别针；深色长裙配短外套，看着像女教师或商铺记账员',
+      },
     }),
     char({
       id: 'char_agnes_rook',
@@ -1110,6 +1168,14 @@ export const veil: WorldCard = {
       location: '邓威克中区·帝王剧院后台',
       present: true,
       tags: ['镜厅', '剧院', '后台', '门路'],
+      look: {
+        head: 'heads_human_female', skin: 'light',
+        hair: 'hair_topknot_short', hairColor: 'black',
+        torso: 'torso_aprons_apron', clothColor: 'charcoal',
+        legs: 'legs_skirt_straight', feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'brown',
+        note: '二十九岁女性，身量瘦高、手指细长，走路很快；黑发随意挽在脑后，用一支木簪别住；深色工作围裙，口袋插卷尺与别针',
+      },
     }),
     char({
       id: 'char_thomas_graves',
@@ -1121,6 +1187,15 @@ export const veil: WorldCard = {
       location: '邓威克中区·法院巷',
       present: false,
       tags: ['盐约公所', '律师', '婚事', '体面'],
+      look: {
+        head: 'heads_human_male_elderly', skin: 'light',
+        hair: 'hair_balding', hairColor: 'white',
+        torso: 'torso_jacket_frock', clothColor: 'black',
+        legs: 'legs_formal', feet: 'feet_shoes_revised',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'gray',
+        belt: 'belt_formal',
+        note: '六十三岁男性，身量不高、微胖，走路脚掌外撇；头发稀疏、鬓角全白，脸上是正在听人说话的表情；剪裁极好的黑呢外套，袖口珍珠纽扣',
+      },
     }),
     char({
       id: 'char_hester_lane',
@@ -1132,6 +1207,14 @@ export const veil: WorldCard = {
       location: '邓威克中区·中央电报局',
       present: false,
       tags: ['钟楼人', '东区', '劳工', '女工'],
+      look: {
+        head: 'heads_human_female_small', skin: 'light',
+        hair: 'hair_ponytail2', hairColor: 'sandy',
+        torso: 'torso_clothes_shortsleeve', clothColor: 'gray',
+        legs: 'legs_skirt_straight', feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_button', eye: 'blue',
+        note: '二十三岁女性，身量瘦小、肩膀窄，手上有针扎的旧痕；浅棕头发用一条褪色的深红丝带束起；改过三次的深色长裙外罩电报局的灰布工作衫',
+      },
     }),
     char({
       id: 'char_clarence_percy',
@@ -1143,6 +1226,14 @@ export const veil: WorldCard = {
       location: '邓威克西区·柏树台',
       present: false,
       tags: ['贵族院', '西区', '权力', '温室'],
+      look: {
+        head: 'heads_human_male', skin: 'light',
+        hair: 'hair_parted2', hairColor: 'blonde',
+        torso: 'torso_jacket_iverness', clothColor: 'navy',
+        legs: 'legs_formal', feet: 'feet_shoes_revised',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'gray',
+        note: '三十四岁男性，身量高、体格偏瘦，站着习惯把手插在裤袋里；深金色头发、脸很白、下颌线条清楚；深蓝外套，扣子是素的，腕上一只旧皮表带',
+      },
     }),
     char({
       id: 'char_edmund_vane',
@@ -1154,6 +1245,14 @@ export const veil: WorldCard = {
       location: '邓威克北区·验尸官法庭',
       present: false,
       tags: ['烛下学会', '医生', '学者', '记录'],
+      look: {
+        head: 'heads_human_male_plump', skin: 'light',
+        hair: 'hair_parted_side_bangs2', hairColor: 'dark_gray',
+        torso: 'torso_clothes_longsleeve_formal', clothColor: 'charcoal',
+        legs: 'legs_formal', feet: 'feet_shoes_revised',
+        beard: 'beards_medium', brows: 'eyebrows_thick', nose: 'head_nose_large', eye: 'brown',
+        note: '五十九岁男性，中等身量偏胖、圆脸，戴一副圆片眼镜所以眼睛显得小；深灰头发分缝，蓄中等胡子；深色医生礼服，口袋插一支玻璃温度计',
+      },
     }),
     char({
       id: 'char_owen_pritchard',
@@ -1165,6 +1264,15 @@ export const veil: WorldCard = {
       location: '邓威克东区·三号码头',
       present: false,
       tags: ['码头', '东区', '劳工', '共同账户'],
+      look: {
+        head: 'heads_human_male', skin: 'bronze',
+        hair: 'hair_buzzcut', hairColor: 'dark_brown',
+        torso: 'torso_clothes_shortsleeve', clothColor: 'teal',
+        legs: 'legs_cuffed', feet: 'feet_boots_basic',
+        beard: 'beards_5oclock_shadow', brows: 'eyebrows_thick', nose: 'head_nose_big', eye: 'brown',
+        belt: 'belt_leather',
+        note: '二十六岁男性，身量壮实、肩膀宽、晒得比城里人黑；深棕短发剪得很短，下巴一道旧疤；粗布衬衫配油布外套，脖子上挂一块椭圆码头号牌',
+      },
     }),
     char({
       id: 'char_dorothea_stone',
@@ -1176,6 +1284,14 @@ export const veil: WorldCard = {
       location: '邓威克中区·法院巷',
       present: false,
       tags: ['盐约公所', '公证人', '法律', '中区'],
+      look: {
+        head: 'heads_human_female', skin: 'light',
+        hair: 'hair_long_center_part', hairColor: 'dark_brown',
+        torso: 'torso_clothes_longsleeve_formal', clothColor: 'black',
+        legs: 'legs_skirt_straight', feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'gray',
+        note: '三十五岁女性，坐姿笔直；深褐头发中分、梳得一丝不乱；黑色高领长裙，袖口是白色硬边，手指上有墨水染出的淡痕',
+      },
     }),
     char({
       id: 'char_madam_whitlock',
@@ -1187,6 +1303,15 @@ export const veil: WorldCard = {
       location: '邓威克西区·柏树台',
       present: false,
       tags: ['西区', '体面', '慈善', '丧服'],
+      look: {
+        head: 'heads_human_female', skin: 'light',
+        hair: 'hair_half_up', hairColor: 'white',
+        torso: 'dress_sash_purple',
+        legs: '',
+        feet: 'feet_shoes_basic',
+        beard: '', brows: 'eyebrows_thin', nose: 'head_nose_straight', eye: 'gray',
+        note: '五十二岁女性，身量偏高、肩背极直；花白头发梳成高髻、插一支珍珠发针；深紫色丝绸长裙配黑色蕾丝披肩，手上戴素金戒指与一枚旧胸针',
+      },
     }),
   ],
   enableMechanics: true,

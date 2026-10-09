@@ -17,6 +17,7 @@
  */
 
 import type { WorldCard } from '@/types/cards'
+import { isSillyTavernLorebook } from '@/utils/stLorebook'
 
 export const WORLDBOOK_FORMAT = 'deng-xu-worldbook'
 export const WORLDBOOK_VERSION = 1
@@ -133,6 +134,14 @@ export function parseWorldbook(input: unknown): WorldbookParseResult {
     }
     if (f === 'deng-xu-save') {
       return { ok: false, error: '这是「存档」，请用标题页的「导入存档」。' }
+    }
+    /*
+      SillyTavern 世界书也没有 `format` 字段，所以必须**在报"格式缺失"之前**认出来。
+      它不该在这里被解析（映射逻辑在 `utils/stLorebook.ts`），但提示要指对路 ——
+      否则用户拿到的是"不是世界书文件（format=缺失）"，而他手里明明是一本世界书。
+    */
+    if (isSillyTavernLorebook(input)) {
+      return { ok: false, error: '这是 SillyTavern 世界书，请用「导入世界包」入口 —— 它会自动转成本作的世界卡。' }
     }
     return { ok: false, error: `不是世界书文件（format=${String(f) || '缺失'}）` }
   }

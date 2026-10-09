@@ -68,10 +68,20 @@ export function RelationshipPanel({ className = '' }: RelationshipPanelProps) {
                           id={char.id}
                           scale={3}
                           /*
+                            ⚠️ `look` 放在最前面：它是**部件级显式外观**，
+                            有它就以它为准，下面那份 profile 只用来补没写的字段。
+
+                            这是"立绘与描述对不上"的根治办法（2026-10）：
+                            原先只能靠关键词从描述里猜部件，而中文表述空间无穷，
+                            正则表永远追不上。现在作者直接在卡里写部件 id。
+                          */
+                          look={char.look}
+                          /*
                             把角色资料传进去，立绘才会**照着描述**画
                             （黑发马尾就画黑发马尾，守卫队长就穿甲）。
                             不传的话 recipeFor 只能随机挑部件 ——
                             那正是"立绘和角色描述毫无关联"的原因。
+                            现在它是 `look` 的兜底：没写 look 的卡（如导入的第三方卡）才走这条路。
                           */
                           profile={{
                             name: char.name,

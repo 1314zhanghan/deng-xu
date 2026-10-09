@@ -314,6 +314,14 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
         status: card.status || '正常',
         location: card.location,
         avatar: card.avatar,
+        /*
+          ⚠️ **这一行是立绘能不能照卡片画的关键**（2026-10）。
+          世界卡里每个角色都写了 `look`（部件级显式外观），但如果不在这里透传进 store，
+          `char.look` 就是 undefined，立绘会**静默退回关键词推断** ——
+          47 张卡辛苦写的部件全部白写，而且症状是"看起来大致正常但总有几个不对"，
+          极难联想到是这里漏了一个字段。我是靠逐环追查才发现的。
+        */
+        look: card.look,
         // 把角色卡的核心资料压成一段提示词，引擎会注入叙事 AI
         prompt: [card.personality, card.scenario, card.messageExamples]
           .filter(Boolean)
@@ -802,7 +810,8 @@ export function SessionSetup({ world, onCancel, onLaunch }: SessionSetupProps) {
                   {(() => {
                     const slotLabel = world.story.openerSlot
                     const slot = slotLabel ? world.backgrounds.find(s => s.label === slotLabel) : null
-                    const map = slotLabel ? world.story.openingSeeds?.[slotLabel] : null
+                    // openingSeeds 已扁平化：直接「选项 id → 素材」
+                    const map = world.story.openingSeeds
                     const chosenId = slotLabel ? backgroundChoices[slotLabel] : undefined
                     const opt = slot?.options.find(o => o.id === chosenId)
                     const seed = (opt && map ? (map[opt.id] ?? map[opt.title] ?? '') : '').trim()

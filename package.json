@@ -37,6 +37,7 @@
     "check:tools": "node scripts/check-tools-selftest.mjs",
     "check:sprites-audit": "node scripts/lib/audit-sprites.mjs",
     "check:worlds": "node scripts/check-worlds.mjs",
+    "check:look": "node scripts/check-sprites.mjs",
     "see": "node scripts/see.mjs"
   },
   "dependencies": {

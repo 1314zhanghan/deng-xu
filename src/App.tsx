@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { ApiKeyModal } from '@/components/ApiKeyModal'
 import { ChoicePanel } from '@/components/ChoicePanel'
 import { StatusPanel } from '@/components/StatusPanel'
+import { ChroniclePanel } from '@/components/ChroniclePanel'
 import { GameMenuActions } from '@/components/GameMenuActions'
 import { MobileTabBar, type MobileTab } from '@/components/MobileTabBar'
 import { MobileSheet } from '@/components/MobileSheet'
@@ -16,11 +17,11 @@ import { DebugPanel } from '@/components/DebugPanel'
 import { StartScreen } from '@/components/StartScreen'
 import { StatusBar } from '@/components/StatusBar'
 import { ChapterOverlay } from '@/components/ChapterOverlay'
-import { useGameStore } from '@/stores/game'
+import { useGameStore, MAX_TURN_SNAPSHOTS, type TokenUsage } from '@/stores/game'
 import { useSessionStore } from '@/stores/session'
 import { useUIStore } from '@/stores/ui'
 import { useGameEngine } from '@/hooks/useGameEngine'
-import { X, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react'
+import { X, AlertTriangle, ChevronUp, ChevronDown, ScrollText } from 'lucide-react'
 import { lazyWithRetry, appLoadedCleanly } from '@/utils/lazyWithRetry'
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary'
 import { SceneBackdrop } from '@/components/SceneBackdrop'
@@ -35,9 +36,53 @@ const NarrativeView = lazyWithRetry(() =>
   import('@/components/NarrativeView').then(m => ({ default: m.NarrativeView }))
 )
 
+/** 参考单价（元 / 千 token）—— DeepSeek 官方在 2026 年前后的档位，只用于给玩家一个量级感 */
+const PRICE_PER_1K = { prompt: 0.001, completion: 0.002 }
+
+/**
+ * 把用量渲染成给玩家看的一行字（C9）。
+ *
+ * 两个刻意的取舍：
+ *  1. **token 数永远显示**，金额只在拿得到单价时附在后面。单价会变（服务商调价、
+ *     玩家换模型），把金额当主角迟早会出错 —— 而 token 数是客观发生的量。
+ *  2. 估算值必须带 `约` 与明确标注。只有一部分端点会回 `usage`（流式响应里尤其少见），
+ *     拿不到就按字符数估 —— 但**不能让玩家把估算当账单**。
+ */
+function formatUsage(u?: TokenUsage | null): string {
+  if (!u || (!u.promptTokens && !u.completionTokens)) return '—'
+  const approx = u.estimated ? '约' : ''
+  const tokens = `${approx}${u.promptTokens + u.completionTokens} tok`
+  const cost = (u.promptTokens / 1000) * PRICE_PER_1K.prompt
+    + (u.completionTokens / 1000) * PRICE_PER_1K.completion
+  const money = cost > 0 ? ` ¥${cost < 0.01 ? cost.toFixed(4) : cost.toFixed(3)}` : ''
+  return `${tokens}${money}`
+}
+
+/** 悬浮说明：把"这个数字是怎么来的"讲清楚，而不是只给一个数 */
+function tokenTooltip(u: TokenUsage | null | undefined, label: string): string {
+  if (!u || (!u.promptTokens && !u.completionTokens)) return `${label}：暂无记录`
+  const src = u.estimated
+    ? '接口未返回 usage，数字按字符数估算（仅供参考）'
+    : '取自接口返回的 usage'
+  const money = (u.promptTokens / 1000) * PRICE_PER_1K.prompt
+    + (u.completionTokens / 1000) * PRICE_PER_1K.completion
+  return `${label}\n输入 ${u.promptTokens} tok / 输出 ${u.completionTokens} tok\n`
+    + `按 DeepSeek 参考单价折算约 ¥${money.toFixed(4)}\n${src}`
+}
+
+/** 回溯可用的轮次上限（与 gameStore 保持同一个数字，只用于提示文案） */
+const MAX_TURN_SNAPSHOTS_UI = MAX_TURN_SNAPSHOTS
+
 function App() {
-  const { history, resources, resourceDefs, isGameStarted, playerName, location } = useGameStore()
+  const { history, resources, resourceDefs, isGameStarted, playerName, location, lastUsage, sessionUsage } = useGameStore()
   const { llm } = useUIStore()
+  /*
+    C9：快速模式开关。
+    在这里订阅的是**布尔值**（选择器只返回 fastMode），所以切换它只会让 App 重渲染一次；
+    引擎侧按需读取 store 的此刻值，因此开启后**下一轮立刻生效**，不需要重挂引擎。
+  */
+  const fastMode = useUIStore(s => s.fastMode)
+  const setFastMode = useUIStore(s => s.setFastMode)
   const world = useSessionStore(s => s.world)
   const {
     handleAction,
@@ -52,7 +97,9 @@ function App() {
     isInputAllowed,
     lastError,
     truncationWarning,
-    clearTruncationWarning
+    clearTruncationWarning,
+    rewindTurns,
+    rewindToTurn
   } = useGameEngine()
 
   /*
@@ -63,6 +110,14 @@ function App() {
   const isMobileMenuOpen = useUIStore(s => s.mobileMenuOpen)
   const setIsMobileMenuOpen = useUIStore(s => s.setMobileMenuOpen)
   const [rightPanelTab, setRightPanelTab] = useState<'inventory' | 'relationships'>('inventory')
+  /**
+   * 编年史浮层是否打开。
+   *
+   * 放在 App 的 useState 而不是 ui store：本轮任务不动 stores/**。
+   * 代价是 `useBackNavigation` 看不到它（它只订阅 ui store 里的那几个浮层），
+   * 所以手机返回键不会关编年史 —— 组件自己补了 Esc 出口与显眼的关闭按钮。
+   */
+  const [isChronicleOpen, setIsChronicleOpen] = useState(false)
   /**
    * 错误横幅是否展开。
    * 默认收起（显示两行），因为服务商原始报错很长，全量铺开在手机上要吃掉 5 行。
@@ -209,15 +264,86 @@ function App() {
       {/* 全身立绘面板（点角色头像打开） */}
       <PortraitPanel />
 
+      {/* 编年史浮层：桌面从左侧面板进，手机从「更多」菜单进 */}
+      <ChroniclePanel open={isChronicleOpen} onClose={() => setIsChronicleOpen(false)} />
+
       {/* Desktop Left Panel (Status) */}
       <aside className="hidden md:block w-64 flex-shrink-0 z-10 relative border-r border-text-muted/30">
-        <StatusPanel />
+        <StatusPanel onOpenChronicle={() => setIsChronicleOpen(true)} />
       </aside>
 
       {/* Main Game Area */}
       <main className="flex-1 flex flex-col min-w-0 relative z-10">
         <ChapterOverlay />
         <StatusBar />
+
+        {/*
+          ── 成本 / 快速模式 / 回溯 工具条（C9 + B8）──
+
+          为什么挤在最窄的一条里，还要默认收起用法说明：
+          它是**辅助信息**，不是叙事的一部分。玩家主要想看故事，
+          所以这一条的高度必须可控 —— 详细代价写在 title 与展开的提示里，
+          而不是常驻铺开。
+        */}
+        <div className="flex items-center gap-2 px-3 py-1 text-[10px] font-mono text-text-muted border-b border-text-muted/20 flex-wrap">
+          <span title={tokenTooltip(lastUsage, '上一轮（叙事 + 数据结算两次调用）')}>
+            本轮 <span className="text-text-secondary">{formatUsage(lastUsage)}</span>
+          </span>
+          <span className="opacity-40">|</span>
+          <span
+            className="cursor-pointer hover:text-text-secondary"
+            title={`${tokenTooltip(sessionUsage, '本局累计（从开局算起，刷新后仍然保留）')}\n点击清零重新统计`}
+            onClick={() => useGameStore.getState().resetSessionUsage()}
+          >
+            累计 <span className="text-text-secondary">{formatUsage(sessionUsage)}</span>
+          </span>
+
+          <span className="opacity-40">|</span>
+          {/*
+            快速模式。代价必须写在这里 —— "数值不再更新"是玩家不看提示
+            绝对猜不到的事（他会以为是 bug），而不是能自己发现的体验差异。
+          */}
+          <label
+            className="flex items-center gap-1 cursor-pointer select-none"
+            title={'开启后跳过「数据结算」这一步：每轮只调用一次模型，更快更省。\n代价：属性 / 资源 / 物品 / 人物关系 / 结局选项都不再更新，只出剧情。'}
+          >
+            <input
+              type="checkbox"
+              checked={fastMode}
+              onChange={e => setFastMode(e.target.checked)}
+              className="accent-current"
+            />
+            快速模式
+            {fastMode && <span className="text-amber-400">（数值与状态不再更新）</span>}
+          </label>
+
+          {/*
+            回溯（B8）。只在**真的攒过快照**时出现：开局第一轮还没结束，
+            列一个空下拉只会让人以为功能坏了。
+          */}
+          {rewindTurns.length > 0 && (
+            <>
+              <span className="opacity-40">|</span>
+              <select
+                className="bg-transparent border border-text-muted/30 rounded px-1 py-[1px] text-[10px] font-mono text-text-muted hover:text-text-primary disabled:opacity-40"
+                value=""
+                disabled={isProcessing}
+                title={`回到某一轮结束时：叙事历史、三层记忆、数值（属性/资源/物品/关系/时间）都会一起回滚，之后发生的事全部作废。\n可回滚的轮次：${rewindTurns.join('、')}（更早的轮次已超出快照上限 ${MAX_TURN_SNAPSHOTS_UI}）`}
+                onChange={e => {
+                  const t = Number(e.target.value)
+                  if (!t) return
+                  const ok = rewindToTurn(t)
+                  if (!ok) window.alert(`第 ${t} 轮的快照已经不在了，无法回到那一轮。`)
+                }}
+              >
+                <option value="">回到第…轮</option>
+                {[...rewindTurns].reverse().map(t => (
+                  <option key={t} value={t}>第 {t} 轮结束时</option>
+                ))}
+              </select>
+            </>
+          )}
+        </div>
 
         {/*
           Mobile Header。
@@ -257,6 +383,18 @@ function App() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
+              {/*
+                编年史入口放在「更多」里而不是底栏：底栏四个页签是**面板**
+                （手机走查里逐个数过按钮个数，加第五个会挤且会破坏那条断言），
+                而编年史是一个回看用的全屏浮层，属于"低频入口"。
+              */}
+              <button
+                onClick={() => { setIsChronicleOpen(true); closeOverlay() }}
+                className="w-full mb-3 flex items-center justify-center gap-2 p-2.5 text-sm text-text-secondary hover:text-accent-lantern hover:bg-accent-lantern/10 border border-text-muted/30 hover:border-accent-lantern/40 rounded transition-all"
+              >
+                <ScrollText size={15} />
+                <span>编年史</span>
+              </button>
               <GameMenuActions />
             </div>
           </div>

@@ -31,6 +31,73 @@ export const STORAGE_KEYS = {
 } as const
 
 /**
+ * 导入 `game` store 时的**一致性修补**（B8 回溯引入）。
+ *
+ * 为什么需要：回溯（`gameStore.rewindTo`）会把 history 截短到第 N 轮，
+ * 同时把 N 轮之后的回溯快照丢掉。但存档文件是**先导出、后导入**的 ——
+ * 用户手上那份 JSON 完全可能比当前状态"旧"，于是导入后出现
+ * “快照轮次 > 历史轮次”这种不自洽：
+ *
+ *  - `memory.timeline` 里记着第 12 轮，而 history 只剩 5 轮
+ *    → 模型会把玩家**已经取消的未来**当成发生过的事写进叙事；
+ *  - `turnSnapshots` 停留在被回滚掉的轮次上 → 玩家再点回溯会跳到未来。
+ *
+ * 处理方式是**按历史的轮次上限做裁剪**，而不是把整份存档判为损坏：
+ * 旧存档（完全没有这几个字段）走的也是这条路径，天然向后兼容，
+ * 不需要动 `SAVE_VERSION`（动版本号会把所有旧存档挡在门外，代价太大）。
+ *
+ * ⚠️ 归档（IndexedDB 里的旧叙事）这里**不动**：它与 history 的对应关系
+ * 无法从文件里精确还原（归档是定时发生的，没有记录切割点）。
+ * 若归档比 history 更长，`loadArchive` 那边有版本护栏会给出明确报错，
+ * 而不是静默拼出错误的故事 —— 宁可让用户看到"这份存档不自洽"，
+ * 也不要让两段时间线悄悄混在一起。
+ */
+export function reconcileGameState(state: any): any {
+  if (!state || typeof state !== 'object') return state
+
+  const history: any[] = Array.isArray(state.history) ? state.history : []
+  // 轮次 = assistant 消息条数（与 stores/game.ts 的 countTurns 同一口径）
+  const turns = history.filter(h => h?.role === 'assistant').length
+
+  const next: any = { ...state }
+
+  if (Array.isArray(state.turnSnapshots)) {
+    next.turnSnapshots = state.turnSnapshots.filter(
+      (s: any) => s && typeof s.turn === 'number' && s.turn > 0 && s.turn <= turns,
+    )
+  } else {
+    /*
+      旧存档（A1/B8 之前的版本）里没有这个字段。
+      这里**必须补一个空数组**而不是留着 undefined：zustand 的 persist 只覆盖
+      存档里出现过的键，缺字段会原样留在 state 上，而 UI 会直接读
+      `.turnSnapshots.map(...)` → 导入旧存档后整个游戏界面崩掉。
+    */
+    next.turnSnapshots = []
+  }
+
+  const mem = state.memory
+  if (mem && typeof mem === 'object') {
+    next.memory = {
+      ...mem,
+      // 只丢"指向未来"的时间线拍子，已经积累的关系与线索原样保留
+      timeline: Array.isArray(mem.timeline)
+        ? mem.timeline.filter((b: any) => !b || typeof b.turn !== 'number' || b.turn <= turns)
+        : [],
+    }
+  } else {
+    // 同上：旧存档没有记忆层，补一个结构完整的空记忆，
+    // 让 renderMemoryForPrompt / normalizeMemory 拿到的东西一定是合法的
+    next.memory = { bonds: [], threads: [], timeline: [], earlierSummary: '', updatedAtTurn: 0 }
+  }
+
+  if (!state.sessionUsage || typeof state.sessionUsage !== 'object') {
+    next.sessionUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0, estimated: false }
+  }
+
+  return next
+}
+
+/**
  * 注意：`stores/library.ts`（世界卡 / 角色卡库）**没有用 persist** ——
  * 它的持久化走 IndexedDB（见 utils/idb.ts），因为卡片里的头像与封面是 base64，
  * localStorage 的 5MB 配额顶不住。
@@ -197,7 +264,12 @@ export async function applySave(save: SaveFile): Promise<ImportResult> {
     for (const [key, value] of Object.entries(save.data)) {
       if (!Object.values(STORAGE_KEYS).includes(key as any)) continue
       backup.set(key, localStorage.getItem(key))
-      localStorage.setItem(key, JSON.stringify(value))
+      // zustand persist 的结构是 { state, version }；只修补 state，version 原样保留，
+      // 否则中间的 migrate 会失效
+      const patched = key === STORAGE_KEYS.game && value && typeof value === 'object' && 'state' in (value as any)
+        ? { ...(value as any), state: reconcileGameState((value as any).state) }
+        : value
+      localStorage.setItem(key, JSON.stringify(patched))
       written.push(key)
     }
   } catch (err) {

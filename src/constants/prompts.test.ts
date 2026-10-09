@@ -53,16 +53,14 @@ const mkWorld = (over: Partial<WorldCard> = {}): WorldCard => ({
   ],
   lores: [],
   story: {
-    opening: '（基调）汴梁的秋天来得比西京早。',
+    atmosphere: '（基调）汴梁的秋天来得比西京早。',
     mainQuest: '',
     enableStages: false, stages: [], enableChoices: true, urgencyAfterTurns: 0,
     openerSlot: '开局处境',
     openingSeeds: {
-      开局处境: {
-        court: '朝中的日常是案牍、奏对与同僚之间的分寸；消息在廊下比在公文里走得快。',
-        local: '外任要面对的是一方的钱粮、讼案与胥吏的默契；上头的考课悬在头顶。',
-        jianghu: '没有官身的人靠规矩和拳头吃饭；同行之间讲义气也讲价钱。',
-      },
+      court: '朝中的日常是案牍、奏对与同僚之间的分寸；消息在廊下比在公文里走得快。',
+      local: '外任要面对的是一方的钱粮、讼案与胥吏的默契；上头的考课悬在头顶。',
+      jianghu: '没有官身的人靠规矩和拳头吃饭；同行之间讲义气也讲价钱。',
     },
   },
   narrative: { pov: 'second', tense: 'present', replyLength: 500, customStyle: '' },

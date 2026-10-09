@@ -79,6 +79,10 @@ jobs:
         # 这一项拦的是"内容悄悄退化"——编译器和单元测试都看不见那类问题。
         run: pnpm check:worlds
 
+      # 立绘一致性：look 里的部件 id / 颜色键写错会**静默失效**（不报错、画错人），
+      # 所以必须单独对一遍素材目录。见 scripts/check-sprites.mjs 的说明。
+      - run: pnpm check:look
+
       - name: Self-test the guards
         # 用**污染测试**证明上面两个守卫真的会报警 ——
         # 一个只会打印"全部通过"的检测器毫无价值。
