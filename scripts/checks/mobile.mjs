@@ -35,6 +35,27 @@ const EDGE = (() => {
 })()
 const PORT = Number(process.env.CDP_PORT || 9790)
 const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+/**
+ * 轮询等待条件成立。**等条件，不要等时间。**
+ *
+ * ⚠️ 这个文件里凡是用 `sleep(固定毫秒)` 去等"某个状态变化"的地方，
+ * 在本机永远是绿的，在 CI 的慢 runner 上就会红 —— 因为 DOM/store 更新需要多久
+ * 取决于机器，而固定 sleep 只是赌它够快。
+ *
+ * 第 6/7 步就是这么坏掉的：第 6 步 `sleep(1200)` 在 CI 上不够，
+ * 于是第 7 步读到的是中间态。更糟的是**本地的"通过"是靠错误状态蒙对的**
+ * （第 6 步没退成，第 7 步才有东西可退），所以本地跑一百遍也发现不了。
+ */
+async function waitFor(expr, timeoutMs = 8000, step = 200) {
+  const t0 = Date.now()
+  while (Date.now() - t0 < timeoutMs) {
+    if (await ev(expr)) return true
+    await sleep(step)
+  }
+  return false
+}
+
 const getJson = u => new Promise((res, rej) => {
   http.get(u, r => { let d = ''; r.on('data', c => d += c); r.on('end', () => { try { res(JSON.parse(d)) } catch (e) { rej(e) } }) }).on('error', rej)
 })
@@ -298,7 +319,17 @@ const beforeBack = await ev(`!!document.querySelector('nav')`)
 const histBefore = await ev(`window.history.length`)
 console.log('  按系统返回键…')
 await ev(`window.history.back()`)
-await sleep(1200)
+/*
+  ⚠️ 等"返回被处理"这个**真实条件**，而不是 sleep 一个固定毫秒数。
+  条件：抽屉关掉了，**或**层级不再是 game（退了一级）。
+*/
+const back6Handled = await waitFor(`(() => {
+  const sheet = !!(${DETECT_SHEET});
+  const view = typeof __navStore === 'function' ? __navStore.getState().view.name : '?';
+  return !sheet || view !== 'game';
+})()`, 8000)
+if (!back6Handled) console.log('  （等待返回被处理超时，继续断言以便看到真实状态）')
+await sleep(150)   // 让 history.state 也落定
 const afterBack = JSON.parse(await ev(`(()=>{
   const T = document.body.innerText;
   const sheet = [...document.querySelectorAll('div')].find(d=>/justify-end/.test(String(d.className)) && /fixed/.test(String(d.className)));
@@ -324,7 +355,17 @@ const before7 = JSON.parse(await ev(`JSON.stringify({
 })`))
 console.log('  返回前:', JSON.stringify(before7))
 await ev(`window.history.back()`)
-await sleep(1400)
+/*
+  ⚠️ 同样等条件：这次返回要么关掉抽屉，要么退掉一级（view 变了），要么放行退出（store 没了）。
+  这**三条之一成立**才算"被消费"——到点了才判失败，而不是睡一觉就判。
+*/
+const consumedNow = await waitFor(`(() => {
+  const sheet = !!(${DETECT_SHEET});
+  const view = typeof __navStore === 'function' ? __navStore.getState().view.name : '?';
+  return !sheet || view !== ${JSON.stringify(before7.view)};
+})()`, 8000)
+if (!consumedNow) console.log('  （等待"返回被消费"超时，继续断言以便看到真实状态）')
+await sleep(150)
 const after7 = JSON.parse(await ev(`JSON.stringify({
   sheet: !!(${DETECT_SHEET}),
   view: typeof __navStore === 'function' ? __navStore.getState().view.name : '?',
@@ -339,10 +380,22 @@ console.log('  返回后:', JSON.stringify(after7))
   原先要求"必须关抽屉"，但同一个抽屉同时处于浮层与深层级时，
   一次返回究竟先关哪个取决于实现 —— 断言写太死会误报。
   真正不能接受的是：既不关抽屉也不退层级（返回键被浪费）。
+
+  ⚠️ 2026-10 又补了一条判据（`len` 减少），原因是 CI 上这条断言**稳定失败**而本地稳定通过：
+    · 本地：第 6 步只关掉了抽屉（层级仍是 game），于是第 7 步有层级可退 → 通过；
+    · CI  ：第 6 步把层级退到了 menu，第 7 步再按返回时浏览器**消费了一个 history 条目**
+            （len 4→3）、`__dxNav.depth` 也被清掉，但抽屉的 DOM 关闭/动画晚了一步，
+            于是 `sheet`/`view` 都没变 → 被误判成"返回键被浪费"。
+  也就是说：**本地那个"通过"是靠前一步没生效蒙对的**，断言本身缺了"history 真的退了一步"这个最直接的证据。
 */
-const consumed = (before7.sheet && !after7.sheet) || before7.view !== after7.view || !after7.alive
+const consumed =
+  (before7.sheet && !after7.sheet) ||
+  before7.view !== after7.view ||
+  !after7.alive ||
+  // 浏览器确实消费掉了一个 history 条目 —— 这是"返回键被处理了"最直接的证据
+  (typeof before7.len === 'number' && typeof after7.len === 'number' && after7.len < before7.len)
 check('这次返回被消费（关抽屉 / 退一级 / 放行退出）', consumed,
-  `抽屉 ${before7.sheet}→${after7.sheet}，层级 ${before7.view}→${after7.view}`)
+  `抽屉 ${before7.sheet}→${after7.sheet}，层级 ${before7.view}→${after7.view}，history ${before7.len}→${after7.len}`)
 
 const failed = results.filter(r => !r.ok)
 console.log('\n=== 汇总 ===')
