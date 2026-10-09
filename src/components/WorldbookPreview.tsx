@@ -301,7 +301,14 @@ export function WorldbookPreview({
           {/* 世界书下载入口：想照着做自己世界的人会需要 */}
           <div className="p-4 rounded border border-text-muted/20 bg-black/20">
             <div className="text-xs text-text-secondary mb-2">想照着写自己的世界？</div>
-            <a href="./official-worldbook.json" download
+            {/*
+              ⚠️ 链接必须带 `?v=<build>`。
+              `official-worldbook.json` 放在 `public/` 下，**文件名不带 hash**，
+              所以它和 index.html 一样会被缓存十分钟 —— 用户点"下载"可能拿到上一版。
+              带上构建标识，就等于每次下载都绕开缓存拿最新的。
+              （`__DX_BUILD__` 由 scripts/vite-plugin-build-version.ts 注入，见那里的注释。）
+            */}
+            <a href={`./official-worldbook.json?v=${(window as unknown as { __DX_BUILD__?: string }).__DX_BUILD__ || ''}`} download
               className="inline-flex items-center gap-1.5 text-[11px] text-accent-lantern hover:underline decoration-dotted">
               <ScrollText size={12} /> 下载官方世界书（含全部内置世界，可直接导入回来）
             </a>

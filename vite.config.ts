@@ -1,12 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { buildVersionProbe } from './scripts/vite-plugin-build-version'
 
 // 端口优先用 5173；被占用时自动往后找，避免「一键启动」因为端口冲突直接失败。
 const DEFAULT_PORT = Number(process.env.PORT) || 5173
 
 export default defineConfig({
-  plugins: [react()],
+  /*
+    `buildVersionProbe()` 解决「更新后浏览器还显示旧版」——
+    GitHub Pages 给 index.html 发 max-age=600，而静态托管改不了响应头。
+    它注入一个"主动问线上有没有新版"的探测脚本，细节见那个文件。
+  */
+  plugins: [react(), buildVersionProbe()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
